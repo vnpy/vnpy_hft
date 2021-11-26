@@ -149,8 +149,7 @@ MAX_FLOAT = sys.float_info.max                  # 浮点数极限值
 CHINA_TZ = pytz.timezone("Asia/Shanghai")       # 中国时区
 
 # 合约数据全局缓存字典
-symbol_name_map: Dict[str, str] = {}
-symbol_pricetick_map: Dict[str, float] = {}
+symbol_contract_map: Dict[str, ContractData] = {}
 
 
 class GtjaGateway(BaseGateway):
@@ -322,13 +321,14 @@ class GtjaMdApi(MdApi):
             pre_close=data["uPreClose"] / 10000,
             gateway_name=self.gateway_name
         )
+        contract: ContractData = symbol_contract_map[tick.symbol]
 
         tick.bid_price_1, tick.bid_price_2, tick.bid_price_3, tick.bid_price_4, tick.bid_price_5 = data["bid"][0:5]
         tick.ask_price_1, tick.ask_price_2, tick.ask_price_3, tick.ask_price_4, tick.ask_price_5 = data["ask"][0:5]
         tick.bid_volume_1, tick.bid_volume_2, tick.bid_volume_3, tick.bid_volume_4, tick.bid_volume_5 = data["bid_qty"][0:5]
         tick.ask_volume_1, tick.ask_volume_2, tick.ask_volume_3, tick.ask_volume_4, tick.ask_volume_5 = data["ask_qty"][0:5]
 
-        pricetick = symbol_pricetick_map.get(tick.vt_symbol, 0)
+        pricetick = contract.pricetick
         if pricetick:
             tick.bid_price_1 = round_to(tick.bid_price_1 / 10000, pricetick)
             tick.bid_price_2 = round_to(tick.bid_price_2 / 10000, pricetick)
@@ -341,7 +341,7 @@ class GtjaMdApi(MdApi):
             tick.ask_price_4 = round_to(tick.ask_price_4 / 10000, pricetick)
             tick.ask_price_5 = round_to(tick.ask_price_5 / 10000, pricetick)
 
-        tick.name = symbol_name_map.get(tick.vt_symbol, tick.symbol)
+        tick.name = contract.name
         self.gateway.on_tick(tick)
 
     def connect(
@@ -405,8 +405,7 @@ class GtjaMdApi(MdApi):
             net_position=True
         )
         self.gateway.on_contract(contract)
-        symbol_name_map[contract.vt_symbol] = contract.name
-        symbol_pricetick_map[contract.vt_symbol] = contract.pricetick
+        symbol_contract_map[contract.symbol] = contract
 
     def onSZBaseInfo(self, code, data) -> None:
         """深交所合约查询回报"""
@@ -425,8 +424,7 @@ class GtjaMdApi(MdApi):
         )
 
         self.gateway.on_contract(contract)
-        symbol_name_map[contract.vt_symbol] = contract.name
-        symbol_pricetick_map[contract.vt_symbol] = contract.pricetick
+        symbol_contract_map[contract.symbol] = contract
 
 
 class GtjaTdApi(TdApi):
