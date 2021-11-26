@@ -707,7 +707,7 @@ class GtjaTdApi(TdApi):
 
         if not self.connect_status:
             path: Path = get_folder_path(self.gateway_name.lower())
-            self.setLogConfig(str(path))
+            self.setLogConfig(str(path).encode("GBK"))
             self.createTraderApi()
 
             account_info: dict = {
