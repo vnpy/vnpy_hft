@@ -1,12 +1,11 @@
-"""
-"""
-
 import sys
 import pytz
 import json
 from datetime import datetime
-from typing import Dict
+from typing import Dict, List
+from pathlib import Path
 
+from vnpy.event import EventEngine
 from vnpy.api.hft import TdApi
 from vnpy.api.sip import (
     MdApi,
@@ -54,9 +53,7 @@ from vnpy.trader.event import EVENT_TIMER
 from.terminal_info import get_terminal_info
 
 
-MAX_FLOAT = sys.float_info.max
-CHINA_TZ = pytz.timezone("Asia/Shanghai")
-
+# 市场映射
 MK_GTJA2VT: Dict[int, Exchange] = {
     MKtype_SH: Exchange.SSE,
     MKtype_SZ: Exchange.SZSE
@@ -64,6 +61,7 @@ MK_GTJA2VT: Dict[int, Exchange] = {
 }
 MK_VT2GTJA: Dict[Exchange, int] = {v: k for k, v in MK_GTJA2VT.items()}
 
+# 产品类型映射
 SH_PRODUCT_GTJA2VT: Dict[str, Product] = {
     "ES": Product.EQUITY,
     "D": Product.BOND,
@@ -71,7 +69,6 @@ SH_PRODUCT_GTJA2VT: Dict[str, Product] = {
     "FF": Product.FUTURES,
     "EU": Product.FUND
 }
-
 SZ_PRODUCT_GTJA2VT: Dict[int, Product] = {
     1: Product.EQUITY,
     2: Product.EQUITY,
@@ -108,6 +105,7 @@ SZ_PRODUCT_GTJA2VT: Dict[int, Product] = {
 
 }
 
+# 委托类型映射
 ORDERSTATUS_GTJA2VT: Dict[int, Status] = {
     OrderStatus_PendingNew: Status.SUBMITTING,
     OrderStatus_New: Status.NOTTRADED,
@@ -120,7 +118,6 @@ ORDERSTATUS_GTJA2VT: Dict[int, Status] = {
     OrderStatus_Rejected: Status.REJECTED,
     OrderStatus_CancelRejected: Status.REJECTED,
 }
-
 ORDERTYPE_GTJA2VT: Dict[int, OrderType] = {
     OrderType_LMT: OrderType.LIMIT,
     OrderType_B5TC: OrderType.MARKET
@@ -129,6 +126,7 @@ ORDERTYPE_VT2GTJA: Dict[OrderType, int] = {
     v: k for k, v in ORDERTYPE_GTJA2VT.items()
 }
 
+# 交易所映射
 EXCHANGE_GTJA2VT: Dict[str, Exchange] = {
     "SH": Exchange.SSE,
     "SZ": Exchange.SZSE
@@ -136,6 +134,8 @@ EXCHANGE_GTJA2VT: Dict[str, Exchange] = {
 EXCHANGE_VT2GTJA: Dict[Exchange, str] = {
     v: k for k, v in EXCHANGE_GTJA2VT.items()
 }
+
+# 多空方向映射
 DIRECTION_GTJA2VT: Dict[int, Direction] = {
     PositionSide_Long: Direction.LONG,
     PositionSide_Short: Direction.SHORT
@@ -144,16 +144,21 @@ DIRECTION_VT2GTJA: Dict[Direction, int] = {
     v: k for k, v in DIRECTION_GTJA2VT.items()
 }
 
+# 其他常量
+MAX_FLOAT = sys.float_info.max                  # 浮点数极限值
+CHINA_TZ = pytz.timezone("Asia/Shanghai")       # 中国时区
+
+# 合约数据全局缓存字典
 symbol_name_map: Dict[str, str] = {}
 symbol_pricetick_map: Dict[str, float] = {}
 
 
 class GtjaGateway(BaseGateway):
     """
-    VN Trader Gateway for CTP .
+    vn.py用于对接国泰君安的交易接口。
     """
 
-    default_setting = {
+    default_setting: Dict[str, str] = {
         "交易用户名": "",
         "交易密码": "",
         "交易服务器": "",
@@ -167,29 +172,29 @@ class GtjaGateway(BaseGateway):
         "行情端口": ""
     }
 
-    exchanges = [Exchange.SSE, Exchange.SZSE]
+    exchanges: List[str] = [Exchange.SSE, Exchange.SZSE]
 
-    def __init__(self, event_engine):
-        """Constructor"""
-        super().__init__(event_engine, "GTJA")
+    def __init__(self, event_engine: EventEngine, gateway_name: str = "GTJA") -> None:
+        """构造函数"""
+        super().__init__(event_engine, gateway_name)
 
-        self.td_api = GtjaTdApi(self)
-        self.md_api = GtjaMdApi(self)
+        self.td_api: "GtjaTdApi" = GtjaTdApi(self)
+        self.md_api: "GtjaMdApi" = GtjaMdApi(self)
 
-    def connect(self, setting: dict):
-        """"""
-        td_userid = setting["交易用户名"]
-        td_password = setting["交易密码"]
-        td_ip = setting["交易服务器"]
-        td_port = setting["交易端口"]
-        orgid = setting["机构代号"]
-        barnchid = setting["营业部代号"]
-        system_id = setting["网关"]
+    def connect(self, setting: dict) -> None:
+        """连接交易接口"""
+        td_userid: str = setting["交易用户名"]
+        td_password: str = setting["交易密码"]
+        td_ip: str = setting["交易服务器"]
+        td_port: str = setting["交易端口"]
+        orgid: str = setting["机构代号"]
+        barnchid: str = setting["营业部代号"]
+        system_id: str = setting["网关"]
 
-        md_userid = setting["行情用户名"]
-        md_password = setting["行情密码"]
-        md_ip = setting["行情服务器"]
-        md_port = setting["行情端口"]
+        md_userid: str = setting["行情用户名"]
+        md_password: str = setting["行情密码"]
+        md_ip: str = setting["行情服务器"]
+        md_port: str = setting["行情端口"]
 
         self.td_api.connect(
             td_userid,
@@ -209,39 +214,39 @@ class GtjaGateway(BaseGateway):
         )
 
     def subscribe(self, req: SubscribeRequest) -> None:
-        """"""
+        """订阅行情"""
         self.md_api.subscrbie(req)
 
     def send_order(self, req: OrderRequest) -> str:
-        """"""
+        """委托下单"""
         self.td_api.send_order(req)
 
     def cancel_order(self, req: CancelRequest) -> None:
-        """"""
+        """委托撤单"""
         self.td_api.cancel_order(req)
 
     def query_account(self) -> None:
-        """"""
+        """查询资金"""
         self.td_api.query_account()
 
     def query_position(self):
-        """"""
+        """查询持仓"""
         self.td_api.query_position()
 
     def close(self) -> None:
-        """"""
+        """关闭接口"""
         self.td_api.close()
         self.md_api.close()
 
-    def write_error(self, msg: str, error: dict):
-        """"""
-        error_id = error["err_code"]
-        error_msg = error["err_msg"]
-        msg = f"{msg}，代码：{error_id}，信息：{error_msg}"
+    def write_error(self, msg: str, error: dict) -> None:
+        """输出错误信息日志"""
+        error_id: int = error["err_code"]
+        error_msg: str = error["err_msg"]
+        msg: str = f"{msg}，代码：{error_id}，信息：{error_msg}"
         self.write_log(msg)
 
-    def process_timer_event(self, event):
-        """"""
+    def process_timer_event(self, event) -> None:
+        """定时事件处理"""
         self.count += 1
         if self.count < 2:
             return
@@ -251,17 +256,17 @@ class GtjaGateway(BaseGateway):
         func()
         self.query_functions.append(func)
 
-    def init_query(self):
-        """"""
-        self.count = 0
-        self.query_functions = [self.query_account, self.query_position]
+    def init_query(self) -> None:
+        """初始化查询任务"""
+        self.count: int = 0
+        self.query_functions: list = [self.query_account, self.query_position]
         self.event_engine.register(EVENT_TIMER, self.process_timer_event)
 
 
 class GtjaMdApi(MdApi):
 
-    def __init__(self, gateway: GtjaGateway):
-        """"""
+    def __init__(self, gateway: GtjaGateway) -> None:
+        """构造函数"""
         super().__init__()
 
         self.gateway: GtjaGateway = gateway
@@ -283,31 +288,27 @@ class GtjaMdApi(MdApi):
         self.szse_inited: bool = False
 
     def onDisconnected(self, reason: int) -> None:
-        """"""
+        """服务器连接断开回报"""
         self.connect_status = False
         self.login_status = False
         self.gateway.write_log(f"行情服务器连接断开, 原因{reason}")
 
         self.login_server()
 
-    def onSubscribe(self, error):
-        """"""
+    def onSubscribe(self, error) -> None:
+        """订阅行情回报"""
         if error["errcode"]:
             self.gateway.write_log(
                 f"订阅失败，错误码{error['errcode']}，信息{error['errstr']}"
             )
 
-    def onDepthMarketData(self, mk_type: int, symbol: str, data: dict) -> None:
-        """"""
-        pass
-
     def onMarketData(self, mk_type: int, symbol: str, data: dict) -> None:
-        """"""
-        timestamp = f"{self.date}{str(data['nTime'])}"
-        dt = datetime.strptime(timestamp, "%Y%m%d%H%M%S%f")
-        dt = CHINA_TZ.localize(dt)
+        """行情数据推送"""
+        timestamp: str = f"{self.date}{str(data['nTime'])}"
+        dt: datetime = datetime.strptime(timestamp, "%Y%m%d%H%M%S%f")
+        dt: datetime = CHINA_TZ.localize(dt)
 
-        tick = TickData(
+        tick: TickData = TickData(
             symbol=symbol,
             exchange=MK_GTJA2VT[mk_type],
             datetime=dt,
@@ -350,15 +351,15 @@ class GtjaMdApi(MdApi):
         username: str,
         password: str,
     ) -> None:
-        """"""
-        cfg = generate_cfg(ip, port, username, password)
+        """连接服务器"""
+        cfg: str = generate_cfg(ip, port, username, password)
 
         self.date = datetime.now().strftime("%Y%m%d")
 
         # Create API object
         if not self.connect_status:
             self.createMdApi(cfg, False)
-            n = self.login()
+            n: int = self.login()
             self.query_contract()
 
             if not n:
@@ -371,26 +372,26 @@ class GtjaMdApi(MdApi):
             self.gateway.write_log("行情接口已登录，请勿重复操作")
 
     def close(self) -> None:
-        """"""
+        """关闭连接"""
         if self.connect_status:
             self.exit()
 
     def subscrbie(self, req: SubscribeRequest) -> None:
-        """"""
+        """订阅行情"""
         if self.login_status:
             gtja_exchange = MK_VT2GTJA.get(req.exchange, "")
             self.subscribeMarketData(gtja_exchange, req.symbol)
 
     def query_contract(self) -> None:
-        """
-        0 -> SSE, SZSE
-        1 -> SSE,
-        2 -> SZSE
-        """
+        """查询合约"""
+        # 0 -> SSE, SZSE
+        # 1 -> SSE,
+        # 2 -> SZSE
         self.subscribeBaseInfo(0)
 
-    def onSHBaseInfo(self, code, data):
-        contract = ContractData(
+    def onSHBaseInfo(self, code, data) -> None:
+        """上交所合约查询回报"""
+        contract: ContractData = ContractData(
             gateway_name=self.gateway_name,
             symbol=str(code),
             exchange=Exchange.SSE,
@@ -407,8 +408,9 @@ class GtjaMdApi(MdApi):
         symbol_name_map[contract.vt_symbol] = contract.name
         symbol_pricetick_map[contract.vt_symbol] = contract.pricetick
 
-    def onSZBaseInfo(self, code, data):
-        contract = ContractData(
+    def onSZBaseInfo(self, code, data) -> None:
+        """深交所合约查询回报"""
+        contract: ContractData = ContractData(
             gateway_name=self.gateway_name,
             symbol=str(code),
             exchange=Exchange.SZSE,
@@ -430,8 +432,8 @@ class GtjaMdApi(MdApi):
 class GtjaTdApi(TdApi):
     """"""
 
-    def __init__(self, gateway):
-        """Constructor"""
+    def __init__(self, gateway) -> None:
+        """构造函数"""
         super().__init__()
 
         self.gateway: GtjaGateway = gateway
@@ -447,27 +449,27 @@ class GtjaTdApi(TdApi):
         self.password: str = ""
         self.orders: Dict[str, OrderData] = {}
 
-        self.orderid_sysid_map = {}
+        self.orderid_sysid_map: Dict[str, str] = {}
 
-        self.prefix = ""
+        self.prefix: str = ""
 
     def onError(self, error: dict, reqid: int) -> None:
-        """"""
+        """错误回报"""
         self.gateway.write_error("错误", error)
 
     def onRiskNotify(self, data: dict) -> None:
-        """"""
-        status = data["alarm_status"]
-        rule = data["alarm_rule"]
+        """风险警告回报"""
+        status: str = data["alarm_status"]
+        rule: str = data["alarm_rule"]
         self.gateway.write_log(f"触发风险警告，状态{status}，类型{rule}")
 
     def onDisconnect(self) -> None:
-        """"""
+        """服务器连接断开回报"""
         self.login_status = False
         self.gateway.write_log(f"交易服务器连接断开")
 
     def onLogin(self, data: dict, error: dict) -> None:
-        """"""
+        """用户登录请求回报"""
         if not error["err_code"]:
             self.login_status = True
             self.gateway.write_log(f"交易服务器登录成功")
@@ -479,21 +481,21 @@ class GtjaTdApi(TdApi):
             self.gateway.write_error("交易服务器登录失败", error)
 
     def onOrderStatus(self, data) -> None:
-        """"""
+        """委托更新推送"""
         exchange, symbol = data["symbol"].split(".")
 
-        orderid = data["cl_order_id"]
-        sysid = data["order_id"]
+        orderid: str = data["cl_order_id"]
+        sysid: str = data["order_id"]
         if not orderid:
             orderid = sysid
 
-        timestamp = f"{data['order_date']} {data['order_time']}"
-        dt = datetime.strptime(timestamp, "%Y%m%d %H%M%S%f")
-        dt = CHINA_TZ.localize(dt)
+        timestamp: str = f"{data['order_date']} {data['order_time']}"
+        dt: datetime = datetime.strptime(timestamp, "%Y%m%d %H%M%S%f")
+        dt: datetime = CHINA_TZ.localize(dt)
 
-        order = self.orders.get(orderid, None)
+        order: OrderData = self.orders.get(orderid, None)
         if not order:
-            order = OrderData(
+            order: OrderData = OrderData(
                 orderid=orderid,
                 gateway_name=self.gateway_name,
                 symbol=symbol,
@@ -516,20 +518,20 @@ class GtjaTdApi(TdApi):
         self.gateway.on_order(order)
 
     def onTradeReport(self, data) -> None:
-        """"""
+        """成交数据推送"""
         exchange, symbol = data["symbol"].split(".")
 
-        orderid = data["cl_order_id"]
-        sysid = data["order_id"]
+        orderid: str = data["cl_order_id"]
+        sysid: str = data["order_id"]
         if not orderid:
             orderid = sysid
 
-        timestamp = f"{data['trade_date']} {data['trade_time']}"
-        dt = datetime.strptime(timestamp, "%Y%m%d %H%M%S%f")
-        dt = CHINA_TZ.localize(dt)
+        timestamp: str = f"{data['trade_date']} {data['trade_time']}"
+        dt: datetime = datetime.strptime(timestamp, "%Y%m%d %H%M%S%f")
+        dt: datetime = CHINA_TZ.localize(dt)
 
         if data["report_type"] == TradeReportType_Normal:
-            trade = TradeData(
+            trade: TradeData = TradeData(
                 tradeid=data["report_no"],
                 orderid=orderid,
                 gateway_name=self.gateway_name,
@@ -549,20 +551,20 @@ class GtjaTdApi(TdApi):
         reqid: int,
         last: bool
     ):
-        """"""
-        orderid = data["cl_order_id"]
-        order = self.orders[orderid]
+        """委托下单回报"""
+        orderid: str = data["cl_order_id"]
+        order: OrderData = self.orders[orderid]
 
         if error["err_code"]:
             self.gateway.write_error("交易委托失败", error)
 
             order.status = Status.REJECTED
-            dt = datetime.now()
-            dt = CHINA_TZ.localize(dt)
+            dt: datetime = datetime.now()
+            dt: datetime = CHINA_TZ.localize(dt)
             order.datetime = dt
             self.gateway.on_order(order)
         else:
-            sysid = data["order_id"]
+            sysid: str = data["order_id"]
             self.orderid_sysid_map[orderid] = sysid
 
     def onCancelRsp(
@@ -572,7 +574,7 @@ class GtjaTdApi(TdApi):
         reqid: int,
         last: bool
     ) -> None:
-        """"""
+        """委托撤单失败回报"""
         if error["err_code"]:
             self.gateway.write_error("交易撤单失败", error)
 
@@ -584,12 +586,12 @@ class GtjaTdApi(TdApi):
         last: bool,
         pos: str
     ) -> None:
-        """"""
+        """持仓查询回报"""
         if not data["symbol"]:
             return
         exchange, symbol = data["symbol"].split(".")
 
-        pos = PositionData(
+        pos: PositionData = PositionData(
             gateway_name=self.gateway_name,
             symbol=symbol,
             exchange=EXCHANGE_GTJA2VT[exchange],
@@ -601,8 +603,8 @@ class GtjaTdApi(TdApi):
         self.gateway.on_position(pos)
 
     def onQueryCashRsp(self, data: dict, error: dict, reqid: int) -> None:
-        """"""
-        account = AccountData(
+        """资金查询回报"""
+        account: AccountData = AccountData(
             accountid=data["account_id"],
             balance=data["total_amount"] / 10000,
             frozen=(data["total_amount"] - data["avail_amount"]) / 10000,
@@ -618,22 +620,22 @@ class GtjaTdApi(TdApi):
         last: bool,
         pos: str
     ) -> None:
-        """"""
+        """未成交委托查询回报"""
         if error["err_code"] != 14020:
             exchange, symbol = data["symbol"].split(".")
 
-            orderid = data["cl_order_id"]
-            sysid = data["order_id"]
+            orderid: str = data["cl_order_id"]
+            sysid: str = data["order_id"]
             if not orderid:
                 orderid = sysid
             else:
                 self.orderid_sysid_map[orderid] = sysid
 
-            timestamp = f"{data['order_date']} {data['order_time']}"
-            dt = datetime.strptime(timestamp, "%Y%m%d %H%M%S%f")
-            dt = CHINA_TZ.localize(dt)
+            timestamp: str = f"{data['order_date']} {data['order_time']}"
+            dt: datetime = datetime.strptime(timestamp, "%Y%m%d %H%M%S%f")
+            dt: datetime = CHINA_TZ.localize(dt)
 
-            order = OrderData(
+            order: OrderData = OrderData(
                 orderid=orderid,
                 gateway_name=self.gateway_name,
                 symbol=symbol,
@@ -659,20 +661,20 @@ class GtjaTdApi(TdApi):
         last: bool,
         pos: str
     ) -> None:
-        """"""
+        """成交信息查询回报"""
         if error["err_code"] != 14020:
             exchange, symbol = data["symbol"].split(".")
 
-            orderid = data["cl_order_id"]
-            sysid = data["order_id"]
+            orderid: str = data["cl_order_id"]
+            sysid: str = data["order_id"]
             if not orderid:
                 orderid = sysid
 
-            timestamp = f"{data['trade_date']} {data['trade_time']}"
-            dt = datetime.strptime(timestamp, "%Y%m%d %H%M%S%f")
-            dt = CHINA_TZ.localize(dt)
+            timestamp: str = f"{data['trade_date']} {data['trade_time']}"
+            dt: datetime = datetime.strptime(timestamp, "%Y%m%d %H%M%S%f")
+            dt: datetime = CHINA_TZ.localize(dt)
 
-            trade = TradeData(
+            trade: TradeData = TradeData(
                 tradeid=data["report_no"],
                 orderid=orderid,
                 gateway_name=self.gateway_name,
@@ -686,7 +688,7 @@ class GtjaTdApi(TdApi):
             self.gateway.on_trade(trade)
 
         if last:
-            self.gateway.write_log("查询委托信息成功")
+            self.gateway.write_log("查询成交信息成功")
 
     def connect(
         self,
@@ -698,19 +700,17 @@ class GtjaTdApi(TdApi):
         host: str,
         port: str,
     ) -> None:
-        """
-        Start connection to server.
-        """
+        """连接服务器"""
         self.userid = userid
         self.password = password
         self.prefix = datetime.now().strftime("%Y%m%d%H%M%S")
 
         if not self.connect_status:
-            path = get_folder_path(self.gateway_name.lower())
+            path: Path = get_folder_path(self.gateway_name.lower())
             self.setLogConfig(str(path))
             self.createTraderApi()
 
-            account_info = {
+            account_info: dict = {
                 "account_id": userid,
                 "account_type": AccountType_Stock,
                 "account_pwd": password,
@@ -724,17 +724,15 @@ class GtjaTdApi(TdApi):
             self.connect_status = True
 
     def send_order(self, req: OrderRequest) -> str:
-        """
-        Send new order.
-        """
+        """委托下单"""
         self.order_count += 1
-        suffix = str(self.order_count).rjust(6, "0")
-        orderid = f"{self.prefix}_{suffix}"
+        suffix: str = str(self.order_count).rjust(6, "0")
+        orderid: str = f"{self.prefix}_{suffix}"
 
-        exchange = EXCHANGE_VT2GTJA[req.exchange]
-        gtja_symbol = f"{exchange}.{req.symbol}"
+        exchange: Exchange = EXCHANGE_VT2GTJA[req.exchange]
+        gtja_symbol: str = f"{exchange}.{req.symbol}"
 
-        order_req = {
+        order_req: dict = {
             "cl_order_id": orderid,
             "symbol": gtja_symbol,
             "order_type": OrderType_LMT,
@@ -747,67 +745,60 @@ class GtjaTdApi(TdApi):
         self.reqid += 1
         self.order(order_req, self.reqid)
 
-        order = req.create_order_data(orderid, self.gateway_name)
+        order: OrderData = req.create_order_data(orderid, self.gateway_name)
         self.orders[orderid] = order
         self.gateway.on_order(order)
         return order.vt_orderid
 
     def query_order(self) -> None:
-        """"""
+        """查询未成交委托"""
         self.reqid += 1
         self.queryOrders("", 500, self.reqid, 0)
 
     def query_trade(self) -> None:
-        """"""
+        """查询成交"""
         self.reqid += 1
         self.queryTrades("", 500, self.reqid)
 
     def cancel_order(self, req: CancelRequest) -> None:
-        """
-        Cancel existing order.
-        """
+        """委托撤单"""
         self.reqid += 1
-        sysid = self.orderid_sysid_map.get(req.orderid, req.orderid)
+        sysid: str = self.orderid_sysid_map.get(req.orderid, req.orderid)
 
-        cancel_req = {"order_id": sysid}
+        cancel_req: dict = {"order_id": sysid}
         self.cancelOrder(cancel_req, self.reqid)
 
     def query_account(self) -> None:
-        """
-        Query account balance data.
-        """
+        """查询资金"""
         self.reqid += 1
         self.queryCash(self.reqid)
 
     def query_position(self) -> None:
-        """
-        Query position holding data.
-        """
-
+        """查询持仓"""
         self.reqid += 1
         self.queryPositions("", 500, self.reqid)
 
     def close(self) -> None:
-        """"""
+        """关闭连接"""
         if self.connect_status:
             self.exit()
 
 
 def adjust_price(price: float) -> float:
-    """"""
+    """将异常的浮点数最大值（MAX_FLOAT）数据调整为0"""
     if price == MAX_FLOAT:
         price = 0
     return price
 
 
 def generate_cfg(ip: str, port: int, username: str, password: str) -> str:
-    """"""
-    setting = {
+    """生成配置信息"""
+    setting: dict = {
         "ip0": ip,
         "port0": port,
         "connect_mode": "NR",
         "username": username,
         "password": password
     }
-    cfg = json.dumps(setting, separators=("|", ":"))
+    cfg: str = json.dumps(setting, separators=("|", ":"))
     return cfg
