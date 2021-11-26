@@ -6,8 +6,8 @@ from typing import Dict, List
 from pathlib import Path
 
 from vnpy.event import EventEngine
-from vnpy.api.hft import TdApi
-from vnpy.api.sip import (
+from ..api.hft import TdApi
+from ..api.sip import (
     MdApi,
     AccountType_Stock,
     PositionSide_Long,
