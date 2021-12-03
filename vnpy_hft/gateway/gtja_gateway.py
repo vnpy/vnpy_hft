@@ -1,5 +1,4 @@
 import sys
-from tkinter.constants import S
 import pytz
 import json
 from datetime import datetime
