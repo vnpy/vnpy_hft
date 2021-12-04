@@ -619,7 +619,7 @@ class GtjaTdApi(TdApi):
         pos: str
     ) -> None:
         """未成交委托查询回报"""
-        if error["err_code"] != 14020:
+        if not error["err_code"]:
             exchange, symbol = data["symbol"].split(".")
 
             orderid: str = data["cl_order_id"]
@@ -648,6 +648,9 @@ class GtjaTdApi(TdApi):
             self.orders[orderid] = order
             self.gateway.on_order(order)
 
+        elif error["err_code"] != 14020:
+            self.gateway.write_error(error)
+
         if last:
             self.gateway.write_log("查询委托信息成功")
 
@@ -660,7 +663,7 @@ class GtjaTdApi(TdApi):
         pos: str
     ) -> None:
         """成交信息查询回报"""
-        if error["err_code"] != 14020:
+        if not error["err_code"]:
             exchange, symbol = data["symbol"].split(".")
 
             orderid: str = data["cl_order_id"]
@@ -684,6 +687,9 @@ class GtjaTdApi(TdApi):
                 datetime=dt,
             )
             self.gateway.on_trade(trade)
+
+        elif error["err_code"] != 14020:
+            self.gateway.write_error(error)
 
         if last:
             self.gateway.write_log("查询成交信息成功")
