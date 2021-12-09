@@ -23,7 +23,7 @@
 
 import importlib_metadata
 
-from .gateway import GtjaGateway
+from .gateway import HftGateway
 
 
 try:
