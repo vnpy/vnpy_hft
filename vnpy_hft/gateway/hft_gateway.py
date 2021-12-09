@@ -2,7 +2,7 @@ import sys
 import pytz
 import json
 from datetime import datetime
-from typing import Dict, List
+from typing import Dict, List, Tuple, Any
 from pathlib import Path
 
 from vnpy.event import EventEngine
@@ -14,7 +14,10 @@ from ..api.sip import (
     PositionSide_Short,
     OrderType_LMT,
     OrderType_B5TC,
-    OrderFlag_Security_Normal,
+    OrderSide_Margin_EnBuyBack,
+    OrderSide_Margin_EnSellBack,
+    OrderSide_Margin_Bid,
+    OrderSide_Margin_Ask,
     OrderStatus_PendingNew,
     OrderStatus_New,
     OrderStatus_PartiallyFilled,
@@ -31,9 +34,11 @@ from ..api.sip import (
 )
 from vnpy.trader.constant import (
     Direction,
-    Exchange, OrderType,
+    Exchange, 
+    OrderType,
+    Offset,
     Product,
-    Status,
+    Status
 )
 from vnpy.trader.gateway import BaseGateway
 from vnpy.trader.utility import round_to, get_folder_path
@@ -54,22 +59,22 @@ from.terminal_info import get_terminal_info
 
 
 # 市场映射
-MK_GTJA2VT: Dict[int, Exchange] = {
+MK_HFT2VT: Dict[int, Exchange] = {
     MKtype_SH: Exchange.SSE,
     MKtype_SZ: Exchange.SZSE
 
 }
-MK_VT2GTJA: Dict[Exchange, int] = {v: k for k, v in MK_GTJA2VT.items()}
+MK_VT2HFT: Dict[Exchange, int] = {v: k for k, v in MK_HFT2VT.items()}
 
 # 产品类型映射
-SH_PRODUCT_GTJA2VT: Dict[str, Product] = {
+SH_PRODUCT_HFT2VT: Dict[str, Product] = {
     "ES": Product.EQUITY,
     "D": Product.BOND,
     "RWS": Product.OPTION,
     "FF": Product.FUTURES,
     "EU": Product.FUND
 }
-SZ_PRODUCT_GTJA2VT: Dict[int, Product] = {
+SZ_PRODUCT_HFT2VT: Dict[int, Product] = {
     1: Product.EQUITY,
     2: Product.EQUITY,
     3: Product.EQUITY,
@@ -106,7 +111,7 @@ SZ_PRODUCT_GTJA2VT: Dict[int, Product] = {
 }
 
 # 委托类型映射
-ORDERSTATUS_GTJA2VT: Dict[int, Status] = {
+ORDERSTATUS_HFT2VT: Dict[int, Status] = {
     OrderStatus_PendingNew: Status.SUBMITTING,
     OrderStatus_New: Status.NOTTRADED,
     OrderStatus_PartiallyFilled: Status.PARTTRADED,
@@ -118,30 +123,34 @@ ORDERSTATUS_GTJA2VT: Dict[int, Status] = {
     OrderStatus_Rejected: Status.REJECTED,
     OrderStatus_CancelRejected: Status.REJECTED,
 }
-ORDERTYPE_GTJA2VT: Dict[int, OrderType] = {
+ORDERTYPE_HFT2VT: Dict[int, OrderType] = {
     OrderType_LMT: OrderType.LIMIT,
     OrderType_B5TC: OrderType.MARKET
 }
-ORDERTYPE_VT2GTJA: Dict[OrderType, int] = {
-    v: k for k, v in ORDERTYPE_GTJA2VT.items()
+ORDERTYPE_VT2HFT: Dict[OrderType, int] = {
+    v: k for k, v in ORDERTYPE_HFT2VT.items()
 }
 
 # 交易所映射
-EXCHANGE_GTJA2VT: Dict[str, Exchange] = {
+EXCHANGE_HFT2VT: Dict[str, Exchange] = {
     "SH": Exchange.SSE,
     "SZ": Exchange.SZSE
 }
-EXCHANGE_VT2GTJA: Dict[Exchange, str] = {
-    v: k for k, v in EXCHANGE_GTJA2VT.items()
+EXCHANGE_VT2HFT: Dict[Exchange, str] = {
+    v: k for k, v in EXCHANGE_HFT2VT.items()
 }
 
 # 多空方向映射
-DIRECTION_GTJA2VT: Dict[int, Direction] = {
-    PositionSide_Long: Direction.LONG,
-    PositionSide_Short: Direction.SHORT
+SIDE_HFT2VT: Dict[int, Any] = {
+    PositionSide_Long:(Direction.LONG, Offset.NONE),
+    PositionSide_Short: (Direction.SHORT, Offset.NONE),
+    OrderSide_Margin_Bid: (Direction.LONG, Offset.OPEN),
+    OrderSide_Margin_Ask: (Direction.SHORT, Offset.OPEN),
+    OrderSide_Margin_EnBuyBack:(Direction.LONG, Offset.CLOSE),
+    OrderSide_Margin_EnSellBack:(Direction.SHORT, Offset.CLOSE),
 }
-DIRECTION_VT2GTJA: Dict[Direction, int] = {
-    v: k for k, v in DIRECTION_GTJA2VT.items()
+SIDE_VT2HFT: Dict[Any, int] = {
+    v: k for k, v in SIDE_HFT2VT.items()
 }
 
 # 其他常量
@@ -152,7 +161,7 @@ CHINA_TZ = pytz.timezone("Asia/Shanghai")       # 中国时区
 symbol_contract_map: Dict[str, ContractData] = {}
 
 
-class GtjaGateway(BaseGateway):
+class HftGateway(BaseGateway):
     """
     vn.py用于对接国泰君安的交易接口。
     """
@@ -173,12 +182,12 @@ class GtjaGateway(BaseGateway):
 
     exchanges: List[str] = [Exchange.SSE, Exchange.SZSE]
 
-    def __init__(self, event_engine: EventEngine, gateway_name: str = "GTJA") -> None:
+    def __init__(self, event_engine: EventEngine, gateway_name: str = "HFT") -> None:
         """构造函数"""
         super().__init__(event_engine, gateway_name)
 
-        self.td_api: "GtjaTdApi" = GtjaTdApi(self)
-        self.md_api: "GtjaMdApi" = GtjaMdApi(self)
+        self.td_api: "HftTdApi" = HftTdApi(self)
+        self.md_api: "HftMdApi" = HftMdApi(self)
 
     def connect(self, setting: dict) -> None:
         """连接交易接口"""
@@ -262,13 +271,13 @@ class GtjaGateway(BaseGateway):
         self.event_engine.register(EVENT_TIMER, self.process_timer_event)
 
 
-class GtjaMdApi(MdApi):
+class HftMdApi(MdApi):
 
-    def __init__(self, gateway: GtjaGateway) -> None:
+    def __init__(self, gateway: HftGateway) -> None:
         """构造函数"""
         super().__init__()
 
-        self.gateway: GtjaGateway = gateway
+        self.gateway: HftGateway = gateway
         self.gateway_name: str = gateway.gateway_name
 
         self.userid: str = ""
@@ -309,7 +318,7 @@ class GtjaMdApi(MdApi):
 
         tick: TickData = TickData(
             symbol=symbol,
-            exchange=MK_GTJA2VT[mk_type],
+            exchange=MK_HFT2VT[mk_type],
             datetime=dt,
             volume=data["iVolume"],
             last_price=data["uMatch"] / 10000,
@@ -379,8 +388,8 @@ class GtjaMdApi(MdApi):
     def subscrbie(self, req: SubscribeRequest) -> None:
         """订阅行情"""
         if self.login_status:
-            gtja_exchange = MK_VT2GTJA.get(req.exchange, "")
-            self.subscribeMarketData(gtja_exchange, req.symbol)
+            exchange = MK_VT2HFT.get(req.exchange, "")
+            self.subscribeMarketData(exchange, req.symbol)
 
     def query_contract(self) -> None:
         """查询合约"""
@@ -396,7 +405,7 @@ class GtjaMdApi(MdApi):
             symbol=str(code),
             exchange=Exchange.SSE,
             name=data["szStkNameZN"].split(" ")[0],
-            product=SH_PRODUCT_GTJA2VT.get(
+            product=SH_PRODUCT_HFT2VT.get(
                 data["szStkClass"].split(" ")[0], Product.EQUITY
             ),
             min_volume=data["i64BuyNumUnit"],
@@ -414,7 +423,7 @@ class GtjaMdApi(MdApi):
             symbol=str(code),
             exchange=Exchange.SZSE,
             name=data["sSymbol"],
-            product=SZ_PRODUCT_GTJA2VT.get(
+            product=SZ_PRODUCT_HFT2VT.get(
                 data["usSecurityType"], Product.EQUITY
             ),
             min_volume=data["i64BuyQtyUnit"],
@@ -427,14 +436,14 @@ class GtjaMdApi(MdApi):
         symbol_contract_map[contract.symbol] = contract
 
 
-class GtjaTdApi(TdApi):
+class HftTdApi(TdApi):
     """"""
 
     def __init__(self, gateway) -> None:
         """构造函数"""
         super().__init__()
 
-        self.gateway: GtjaGateway = gateway
+        self.gateway: HftGateway = gateway
         self.gateway_name: str = gateway.gateway_name
 
         self.reqid: int = 0
@@ -446,10 +455,14 @@ class GtjaTdApi(TdApi):
         self.userid: str = ""
         self.password: str = ""
         self.orders: Dict[str, OrderData] = {}
+        self.short_positions: Dict[str, PositionData] = {}
 
         self.orderid_sysid_map: Dict[str, str] = {}
 
         self.prefix: str = ""
+
+        # 账户是否支持两融交易
+        self.margin_trading = False
 
     def onError(self, error: dict, reqid: int) -> None:
         """错误回报"""
@@ -491,19 +504,22 @@ class GtjaTdApi(TdApi):
         dt: datetime = datetime.strptime(timestamp, "%Y%m%d %H%M%S%f")
         dt: datetime = CHINA_TZ.localize(dt)
 
+        direction, offset = SIDE_HFT2VT[data["side"]]
+
         order: OrderData = self.orders.get(orderid, None)
         if not order:
             order: OrderData = OrderData(
                 orderid=orderid,
                 gateway_name=self.gateway_name,
                 symbol=symbol,
-                exchange=EXCHANGE_GTJA2VT[exchange],
-                direction=DIRECTION_GTJA2VT[data["side"]],
-                type=ORDERTYPE_GTJA2VT.get(data["order_type"], OrderType.MARKET),
+                exchange=EXCHANGE_HFT2VT[exchange],
+                direction=direction,
+                offset=offset,
+                type=ORDERTYPE_HFT2VT.get(data["order_type"], OrderType.MARKET),
                 price=data["price"] / 10000,
                 volume=data["volume"],
                 traded=data["filled_volume"],
-                status=ORDERSTATUS_GTJA2VT[data["order_status"]],
+                status=ORDERSTATUS_HFT2VT[data["order_status"]],
                 datetime=dt,
             )
             self.orders[orderid] = order
@@ -511,7 +527,7 @@ class GtjaTdApi(TdApi):
             order.datetime = dt
 
         order.traded = data["filled_volume"]
-        order.status = ORDERSTATUS_GTJA2VT[data["order_status"]]
+        order.status = ORDERSTATUS_HFT2VT[data["order_status"]]
 
         self.gateway.on_order(order)
 
@@ -528,14 +544,17 @@ class GtjaTdApi(TdApi):
         dt: datetime = datetime.strptime(timestamp, "%Y%m%d %H%M%S%f")
         dt: datetime = CHINA_TZ.localize(dt)
 
+        direction, offset = SIDE_HFT2VT[data["side"]]
+
         if data["report_type"] == TradeReportType_Normal:
             trade: TradeData = TradeData(
                 tradeid=data["report_no"],
                 orderid=orderid,
                 gateway_name=self.gateway_name,
                 symbol=symbol,
-                exchange=EXCHANGE_GTJA2VT[exchange],
-                direction=DIRECTION_GTJA2VT[data["side"]],
+                exchange=EXCHANGE_HFT2VT[exchange],
+                direction=direction,
+                offset=offset,
                 price=data["price"] / 10000,
                 volume=data["volume"],
                 datetime=dt,
@@ -576,6 +595,35 @@ class GtjaTdApi(TdApi):
         if error["err_code"]:
             self.gateway.write_error("交易撤单失败", error)
 
+    def onQueryCreditShortsellRsp(
+        self,
+        data: dict,
+        error: dict,
+        reqid: int,
+        last: bool,
+        pos: str
+    ):
+        if not data["symbol"]:
+            return
+        exchange, symbol = data["symbol"].split(".")
+
+        pos: PositionData = self.short_positions.get(symbol, None)
+        if not pos:
+            pos: PositionData = PositionData(
+                gateway_name=self.gateway_name,
+                symbol=symbol,
+                exchange=EXCHANGE_HFT2VT[exchange],
+                direction=Direction.SHORT,
+            )
+            self.short_positions[symbol] = pos
+        pos.volume += data["cur_qty"]
+
+        if last:
+            for pos in self.short_positions.values():
+                self.gateway.on_position(pos)
+
+            self.short_positions.clear()
+
     def onQueryPositionRsp(
         self,
         data: dict,
@@ -585,6 +633,7 @@ class GtjaTdApi(TdApi):
         pos: str
     ) -> None:
         """持仓查询回报"""
+        print("onQueryPositionRsp", data)
         if not data["symbol"]:
             return
         exchange, symbol = data["symbol"].split(".")
@@ -592,12 +641,15 @@ class GtjaTdApi(TdApi):
         pos: PositionData = PositionData(
             gateway_name=self.gateway_name,
             symbol=symbol,
-            exchange=EXCHANGE_GTJA2VT[exchange],
+            exchange=EXCHANGE_HFT2VT[exchange],
             direction=Direction.NET,
             volume=data["volume"],
             price=data["cost_price"] / 10000,
             pnl=data["total_income"] / 10000,
+            yd_volume=data["avail_volume"],
         )
+        if self.margin_trading:
+            pos.direction = Direction.LONG
         self.gateway.on_position(pos)
 
     def onQueryCashRsp(self, data: dict, error: dict, reqid: int) -> None:
@@ -608,6 +660,8 @@ class GtjaTdApi(TdApi):
             frozen=(data["total_amount"] - data["avail_amount"]) / 10000,
             gateway_name=self.gateway_name
         )
+        if data["account_type"] == 4:
+            self.margin_trading = True
         self.gateway.on_account(account)
 
     def onQueryOrderRsp(
@@ -633,16 +687,20 @@ class GtjaTdApi(TdApi):
             dt: datetime = datetime.strptime(timestamp, "%Y%m%d %H%M%S%f")
             dt: datetime = CHINA_TZ.localize(dt)
 
+            direction, offset = SIDE_HFT2VT[data["side"]]
+
             order: OrderData = OrderData(
                 orderid=orderid,
                 gateway_name=self.gateway_name,
                 symbol=symbol,
-                exchange=EXCHANGE_GTJA2VT[exchange],
-                direction=DIRECTION_GTJA2VT[data["side"]],
-                type=ORDERTYPE_GTJA2VT.get(data["order_type"], OrderType.MARKET),
+                exchange=EXCHANGE_HFT2VT[exchange],
+                direction=direction,
+                offset=offset,
+                type=ORDERTYPE_HFT2VT.get(data["order_type"], OrderType.MARKET),
                 price=data["price"] / 10000,
                 volume=data["volume"],
-                status=ORDERSTATUS_GTJA2VT[data["order_status"]],
+                status=ORDERSTATUS_HFT2VT[data["order_status"]],
+                traded=data["filled_volume"],
                 datetime=dt,
             )
             self.orders[orderid] = order
@@ -675,13 +733,16 @@ class GtjaTdApi(TdApi):
             dt: datetime = datetime.strptime(timestamp, "%Y%m%d %H%M%S%f")
             dt: datetime = CHINA_TZ.localize(dt)
 
+            direction, offset = SIDE_HFT2VT[data["side"]]
+
             trade: TradeData = TradeData(
                 tradeid=data["report_no"],
                 orderid=orderid,
                 gateway_name=self.gateway_name,
                 symbol=symbol,
-                exchange=EXCHANGE_GTJA2VT[exchange],
-                direction=DIRECTION_GTJA2VT[data["side"]],
+                exchange=EXCHANGE_HFT2VT[exchange],
+                direction=direction,
+                offset=offset,
                 price=data["price"] / 10000,
                 volume=data["volume"],
                 datetime=dt,
@@ -729,22 +790,45 @@ class GtjaTdApi(TdApi):
 
     def send_order(self, req: OrderRequest) -> str:
         """委托下单"""
+        if self.margin_trading and req.offset == Offset.NONE:
+            self.gateway.write_log("委托失败，两融交易需要选择开平方向")
+            return ""
+
+        elif not self.margin_trading and req.offset != Offset.NONE:
+            self.gateway.write_log("委托失败，现货交易不需要选择开平方向")
+            return ""
+
         self.order_count += 1
         suffix: str = str(self.order_count).rjust(6, "0")
         orderid: str = f"{self.prefix}_{suffix}"
 
-        exchange: Exchange = EXCHANGE_VT2GTJA[req.exchange]
-        gtja_symbol: str = f"{exchange}.{req.symbol}"
+        exchange: Exchange = EXCHANGE_VT2HFT[req.exchange]
+        hft_symbol: str = f"{exchange}.{req.symbol}"
 
         order_req: dict = {
             "cl_order_id": orderid,
-            "symbol": gtja_symbol,
+            "symbol": hft_symbol,
             "order_type": OrderType_LMT,
-            "side": DIRECTION_VT2GTJA[req.direction],
             "volume": int(req.volume),
             "price": int(req.price * 10000),
-            "order_flag": OrderFlag_Security_Normal,
+            "side": SIDE_VT2HFT[(req.direction, req.offset)]
         }
+
+#        if self.margin_trading:
+#            if req.direction == Direction.LONG:
+#                if req.offset == Offset.OPEN:
+#                    order_req["side"] = OrderSide_Margin_Bid
+#                else:
+#                    order_req["side"] = OrderSide_Margin_EnBuyBack
+#
+#            else:
+#                if req.offset == Offset.OPEN:
+#                    order_req["side"] = OrderSide_Margin_Ask
+#                else:
+#                    order_req["side"] = OrderSide_Margin_EnSellBack
+#
+#        else:
+#            order_req["side"] = SIDE_VT2HFT[req.direction]
 
         self.reqid += 1
         self.order(order_req, self.reqid)
@@ -758,6 +842,10 @@ class GtjaTdApi(TdApi):
         """查询未成交委托"""
         self.reqid += 1
         self.queryOrders("", 500, self.reqid, 0)
+        self.reqid += 1
+        self.queryCreditSecuritySellQty("", "", self.reqid)
+        self.reqid += 1
+        self.queryCreditFinance("", 500, self.reqid)
 
     def query_trade(self) -> None:
         """查询成交"""
@@ -781,6 +869,12 @@ class GtjaTdApi(TdApi):
         """查询持仓"""
         self.reqid += 1
         self.queryPositions("", 500, self.reqid)
+
+        if self.margin_trading:
+            #self.reqid += 1
+            #self.queryCreditRepayStock("", "", self.reqid)
+            self.reqid += 1
+            self.queryCreditShortsell("", 500, self.reqid)
 
     def close(self) -> None:
         """关闭连接"""
