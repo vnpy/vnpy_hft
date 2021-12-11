@@ -365,7 +365,6 @@ class HftMdApi(MdApi):
 
         self.date = datetime.now().strftime("%Y%m%d")
 
-        # Create API object
         if not self.connect_status:
             self.createMdApi(cfg, False)
             n: int = self.login()
@@ -633,7 +632,6 @@ class HftTdApi(TdApi):
         pos: str
     ) -> None:
         """持仓查询回报"""
-        print("onQueryPositionRsp", data)
         if not data["symbol"]:
             return
         exchange, symbol = data["symbol"].split(".")
@@ -814,22 +812,6 @@ class HftTdApi(TdApi):
             "side": SIDE_VT2HFT[(req.direction, req.offset)]
         }
 
-#        if self.margin_trading:
-#            if req.direction == Direction.LONG:
-#                if req.offset == Offset.OPEN:
-#                    order_req["side"] = OrderSide_Margin_Bid
-#                else:
-#                    order_req["side"] = OrderSide_Margin_EnBuyBack
-#
-#            else:
-#                if req.offset == Offset.OPEN:
-#                    order_req["side"] = OrderSide_Margin_Ask
-#                else:
-#                    order_req["side"] = OrderSide_Margin_EnSellBack
-#
-#        else:
-#            order_req["side"] = SIDE_VT2HFT[req.direction]
-
         self.reqid += 1
         self.order(order_req, self.reqid)
 
@@ -842,10 +824,6 @@ class HftTdApi(TdApi):
         """查询未成交委托"""
         self.reqid += 1
         self.queryOrders("", 500, self.reqid, 0)
-        self.reqid += 1
-        self.queryCreditSecuritySellQty("", "", self.reqid)
-        self.reqid += 1
-        self.queryCreditFinance("", 500, self.reqid)
 
     def query_trade(self) -> None:
         """查询成交"""
@@ -871,8 +849,6 @@ class HftTdApi(TdApi):
         self.queryPositions("", 500, self.reqid)
 
         if self.margin_trading:
-            #self.reqid += 1
-            #self.queryCreditRepayStock("", "", self.reqid)
             self.reqid += 1
             self.queryCreditShortsell("", 500, self.reqid)
 
