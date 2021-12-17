@@ -2,7 +2,7 @@ import sys
 import pytz
 import json
 from datetime import datetime
-from typing import Dict, List, Tuple, Any
+from typing import Dict, List, Any
 from pathlib import Path
 
 from vnpy.event import EventEngine
@@ -34,7 +34,7 @@ from ..api.sip import (
 )
 from vnpy.trader.constant import (
     Direction,
-    Exchange, 
+    Exchange,
     OrderType,
     Offset,
     Product,
@@ -142,12 +142,12 @@ EXCHANGE_VT2HFT: Dict[Exchange, str] = {
 
 # 多空方向映射
 SIDE_HFT2VT: Dict[int, Any] = {
-    PositionSide_Long:(Direction.LONG, Offset.NONE),
+    PositionSide_Long: (Direction.LONG, Offset.NONE),
     PositionSide_Short: (Direction.SHORT, Offset.NONE),
     OrderSide_Margin_Bid: (Direction.LONG, Offset.OPEN),
     OrderSide_Margin_Ask: (Direction.SHORT, Offset.OPEN),
-    OrderSide_Margin_EnBuyBack:(Direction.LONG, Offset.CLOSE),
-    OrderSide_Margin_EnSellBack:(Direction.SHORT, Offset.CLOSE),
+    OrderSide_Margin_EnBuyBack: (Direction.LONG, Offset.CLOSE),
+    OrderSide_Margin_EnSellBack: (Direction.SHORT, Offset.CLOSE),
 }
 SIDE_VT2HFT: Dict[Any, int] = {
     v: k for k, v in SIDE_HFT2VT.items()

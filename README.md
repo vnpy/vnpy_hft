@@ -5,19 +5,19 @@
 </p>
 
 <p align="center">
-    <img src ="https://img.shields.io/badge/version-6.5.1.6-blueviolet.svg"/>
-    <img src ="https://img.shields.io/badge/platform-windows|linux-yellow.svg"/>
+    <img src ="https://img.shields.io/badge/version-1.0.0-blueviolet.svg"/>
+    <img src ="https://img.shields.io/badge/platform-windows-yellow.svg"/>
     <img src ="https://img.shields.io/badge/python-3.7-blue.svg" />
     <img src ="https://img.shields.io/github/license/vnpy/vnpy.svg?color=orange"/>
 </p>
 
 ## 说明
 
-基于国泰君安的股票接口封装开发。
+基于国泰君安证券的统一接入网关API接口封装开发。
 
 ## 安装
 
-安装需要基于2.8.0版本以上的[VN Studio](https://www.vnpy.com)。
+安装需要基于2.9.0版本以上的[VN Studio](https://www.vnpy.com)。
 
 直接使用pip命令：
 
