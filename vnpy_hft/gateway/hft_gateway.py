@@ -166,6 +166,8 @@ class HftGateway(BaseGateway):
     vn.py用于对接国泰君安的交易接口。
     """
 
+    default_name: str = "HFT"
+
     default_setting: Dict[str, str] = {
         "交易用户名": "",
         "交易密码": "",
@@ -182,7 +184,7 @@ class HftGateway(BaseGateway):
 
     exchanges: List[str] = [Exchange.SSE, Exchange.SZSE]
 
-    def __init__(self, event_engine: EventEngine, gateway_name: str = "HFT") -> None:
+    def __init__(self, event_engine: EventEngine, gateway_name: str) -> None:
         """构造函数"""
         super().__init__(event_engine, gateway_name)
 
