@@ -163,7 +163,7 @@ symbol_contract_map: Dict[str, ContractData] = {}
 
 class HftGateway(BaseGateway):
     """
-    vn.py用于对接国泰君安的交易接口。
+    VeighNa用于对接国泰君安的交易接口。
     """
 
     default_name: str = "HFT"

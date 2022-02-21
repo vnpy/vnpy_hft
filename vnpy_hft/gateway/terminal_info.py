@@ -71,7 +71,7 @@ def get_terminal_info():
         f"LIP={lip}",
         f"MAC={mac}",
         f"HD={hd}",
-        f"CPU={cpu}@vn.py;V{vnpy.__version__}",
+        f"CPU={cpu}@VeighNa;V{vnpy.__version__}",
     ])
 
     return terminal_info
