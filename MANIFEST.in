@@ -1,1 +1,1 @@
-recursive-include vnpy_hft *.dll *.so *.pyd *.h *.cpp
+recursive-include vnpy_hft *.dll *.so *.pyd *.h *.cpp *.lib
