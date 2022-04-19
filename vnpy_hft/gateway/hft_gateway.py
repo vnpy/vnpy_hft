@@ -509,7 +509,7 @@ class HftTdApi(TdApi):
 
         order: OrderData = self.orders.get(orderid, None)
         if not order:
-            order: OrderData = OrderData(
+            order = OrderData(
                 orderid=orderid,
                 gateway_name=self.gateway_name,
                 symbol=symbol,
@@ -610,7 +610,7 @@ class HftTdApi(TdApi):
 
         pos: PositionData = self.short_positions.get(symbol, None)
         if not pos:
-            pos: PositionData = PositionData(
+            pos = PositionData(
                 gateway_name=self.gateway_name,
                 symbol=symbol,
                 exchange=EXCHANGE_HFT2VT[exchange],
