@@ -6,6 +6,29 @@ from typing import Dict, List, Any
 from pathlib import Path
 
 from vnpy.event import EventEngine
+from vnpy.trader.constant import (
+    Direction,
+    Exchange,
+    OrderType,
+    Offset,
+    Product,
+    Status
+)
+from vnpy.trader.gateway import BaseGateway
+from vnpy.trader.utility import round_to, get_folder_path
+from vnpy.trader.object import (
+    TickData,
+    OrderData,
+    TradeData,
+    PositionData,
+    AccountData,
+    ContractData,
+    OrderRequest,
+    CancelRequest,
+    SubscribeRequest,
+)
+from vnpy.trader.event import EVENT_TIMER
+
 from ..api.hft import TdApi
 from ..api.sip import (
     MdApi,
@@ -32,29 +55,6 @@ from ..api.sip import (
     MKtype_SH,
     MKtype_SZ,
 )
-from vnpy.trader.constant import (
-    Direction,
-    Exchange,
-    OrderType,
-    Offset,
-    Product,
-    Status
-)
-from vnpy.trader.gateway import BaseGateway
-from vnpy.trader.utility import round_to, get_folder_path
-from vnpy.trader.object import (
-    TickData,
-    OrderData,
-    TradeData,
-    PositionData,
-    AccountData,
-    ContractData,
-    OrderRequest,
-    CancelRequest,
-    SubscribeRequest,
-)
-from vnpy.trader.event import EVENT_TIMER
-
 from.terminal_info import get_terminal_info
 
 
@@ -339,7 +339,7 @@ class HftMdApi(MdApi):
         tick.bid_volume_1, tick.bid_volume_2, tick.bid_volume_3, tick.bid_volume_4, tick.bid_volume_5 = data["bid_qty"][0:5]
         tick.ask_volume_1, tick.ask_volume_2, tick.ask_volume_3, tick.ask_volume_4, tick.ask_volume_5 = data["ask_qty"][0:5]
 
-        pricetick = contract.pricetick
+        pricetick: float = contract.pricetick
         if pricetick:
             tick.bid_price_1 = round_to(tick.bid_price_1 / 10000, pricetick)
             tick.bid_price_2 = round_to(tick.bid_price_2 / 10000, pricetick)
@@ -478,13 +478,13 @@ class HftTdApi(TdApi):
     def onDisconnect(self) -> None:
         """服务器连接断开回报"""
         self.login_status = False
-        self.gateway.write_log(f"交易服务器连接断开")
+        self.gateway.write_log("交易服务器连接断开")
 
     def onLogin(self, data: dict, error: dict) -> None:
         """用户登录请求回报"""
         if not error["err_code"]:
             self.login_status = True
-            self.gateway.write_log(f"交易服务器登录成功")
+            self.gateway.write_log("交易服务器登录成功")
 
             self.query_order()
             self.query_trade()
@@ -509,7 +509,7 @@ class HftTdApi(TdApi):
 
         order: OrderData = self.orders.get(orderid, None)
         if not order:
-            order: OrderData = OrderData(
+            order = OrderData(
                 orderid=orderid,
                 gateway_name=self.gateway_name,
                 symbol=symbol,
@@ -610,7 +610,7 @@ class HftTdApi(TdApi):
 
         pos: PositionData = self.short_positions.get(symbol, None)
         if not pos:
-            pos: PositionData = PositionData(
+            pos = PositionData(
                 gateway_name=self.gateway_name,
                 symbol=symbol,
                 exchange=EXCHANGE_HFT2VT[exchange],
