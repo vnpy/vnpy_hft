@@ -1,5 +1,4 @@
 import sys
-import pytz
 import json
 from datetime import datetime
 from typing import Dict, List, Any
@@ -15,7 +14,7 @@ from vnpy.trader.constant import (
     Status
 )
 from vnpy.trader.gateway import BaseGateway
-from vnpy.trader.utility import round_to, get_folder_path
+from vnpy.trader.utility import round_to, get_folder_path, ZoneInfo
 from vnpy.trader.object import (
     TickData,
     OrderData,
@@ -155,7 +154,7 @@ SIDE_VT2HFT: Dict[Any, int] = {
 
 # 其他常量
 MAX_FLOAT = sys.float_info.max                  # 浮点数极限值
-CHINA_TZ = pytz.timezone("Asia/Shanghai")       # 中国时区
+CHINA_TZ = ZoneInfo("Asia/Shanghai")       # 中国时区
 
 # 合约数据全局缓存字典
 symbol_contract_map: Dict[str, ContractData] = {}
@@ -314,9 +313,8 @@ class HftMdApi(MdApi):
 
     def onMarketData(self, mk_type: int, symbol: str, data: dict) -> None:
         """行情数据推送"""
-        timestamp: str = f"{self.date}{str(data['nTime'])}"
-        dt: datetime = datetime.strptime(timestamp, "%Y%m%d%H%M%S%f")
-        dt: datetime = CHINA_TZ.localize(dt)
+        timestamp: str = f"{self.date} {str(data['nTime'])}"
+        dt: datetime = generate_datetime(timestamp)
 
         tick: TickData = TickData(
             symbol=symbol,
@@ -502,8 +500,7 @@ class HftTdApi(TdApi):
             orderid = sysid
 
         timestamp: str = f"{data['order_date']} {data['order_time']}"
-        dt: datetime = datetime.strptime(timestamp, "%Y%m%d %H%M%S%f")
-        dt: datetime = CHINA_TZ.localize(dt)
+        dt: datetime = generate_datetime(timestamp)
 
         direction, offset = SIDE_HFT2VT[data["side"]]
 
@@ -542,8 +539,7 @@ class HftTdApi(TdApi):
             orderid = sysid
 
         timestamp: str = f"{data['trade_date']} {data['trade_time']}"
-        dt: datetime = datetime.strptime(timestamp, "%Y%m%d %H%M%S%f")
-        dt: datetime = CHINA_TZ.localize(dt)
+        dt: datetime = generate_datetime(timestamp)
 
         direction, offset = SIDE_HFT2VT[data["side"]]
 
@@ -578,7 +574,7 @@ class HftTdApi(TdApi):
 
             order.status = Status.REJECTED
             dt: datetime = datetime.now()
-            dt: datetime = CHINA_TZ.localize(dt)
+            dt: datetime = dt.replace(tzinfo=CHINA_TZ)
             order.datetime = dt
             self.gateway.on_order(order)
         else:
@@ -684,8 +680,7 @@ class HftTdApi(TdApi):
                 self.orderid_sysid_map[orderid] = sysid
 
             timestamp: str = f"{data['order_date']} {data['order_time']}"
-            dt: datetime = datetime.strptime(timestamp, "%Y%m%d %H%M%S%f")
-            dt: datetime = CHINA_TZ.localize(dt)
+            dt: datetime = generate_datetime(timestamp)
 
             direction, offset = SIDE_HFT2VT[data["side"]]
 
@@ -730,8 +725,7 @@ class HftTdApi(TdApi):
                 orderid = sysid
 
             timestamp: str = f"{data['trade_date']} {data['trade_time']}"
-            dt: datetime = datetime.strptime(timestamp, "%Y%m%d %H%M%S%f")
-            dt: datetime = CHINA_TZ.localize(dt)
+            dt: datetime = generate_datetime(timestamp)
 
             direction, offset = SIDE_HFT2VT[data["side"]]
 
@@ -865,6 +859,13 @@ def adjust_price(price: float) -> float:
     if price == MAX_FLOAT:
         price = 0
     return price
+
+
+def generate_datetime(timestamp: str) -> datetime:
+    """生成时间"""
+    dt: datetime = datetime.strptime(timestamp, "%Y%m%d %H%M%S%f")
+    dt: datetime = dt.replace(tzinfo=CHINA_TZ)
+    return dt
 
 
 def generate_cfg(ip: str, port: int, username: str, password: str) -> str:
