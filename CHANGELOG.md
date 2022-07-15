@@ -2,6 +2,7 @@
 
 1. 修复打包文件缺少lib的问题
 2. 使用zoneinfo替换pytz库
+3. 调整安装脚本setup.cfg，添加Python版本限制
 
 # 1.0.1版本
 
