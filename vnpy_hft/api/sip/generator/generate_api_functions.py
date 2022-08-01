@@ -245,7 +245,7 @@ class ApiGenerator:
                 struct_type = ""
 
                 if not d:
-                    f.write(f"\tint i = this->api->getCounterType();\n")
+                    f.write("\tint i = this->api->getCounterType();\n")
                     f.write("\treturn i;\n")
                     f.write("};\n\n")
                 else:
@@ -332,7 +332,7 @@ class ApiGenerator:
                 f.write("\t}\n")
                 f.write("\tcatch (const error_already_set &e)\n")
                 f.write("\t{\n")
-                f.write(f"\t\tcout << e.what() << endl;\n")
+                f.write("\t\tcout << e.what() << endl;\n")
                 f.write("\t}\n")
                 f.write("};\n\n")
 
