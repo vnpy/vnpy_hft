@@ -1,13 +1,18 @@
+import platform
+
+
 from setuptools import Extension, setup
 
 
 def get_ext_modules() -> list:
     """
     获取三方模块
-
     Windows需要编译封装接口
     Linux和Mac由于缺乏二进制库支持无法使用
     """
+    if platform.system() != "Windows":
+        return []
+
     extra_compile_flags = ["-O2", "-MT"]
     extra_link_args = []
     runtime_library_dirs = []
