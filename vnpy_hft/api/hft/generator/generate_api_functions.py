@@ -29,7 +29,7 @@ class ApiGenerator:
                 self.structs[name] = getattr(module, name)
 
         self.structs["ErrorInfo"] = {
-            "err_code": "int32_t",
+            "err_code": "int",
             "err_msg": "string"
         }
 
@@ -47,13 +47,8 @@ class ApiGenerator:
 
         self.f_cpp.close()
 
-        self.generate_header_define()
-        self.generate_header_process()
         self.generate_header_on()
         self.generate_header_function()
-
-        # self.generate_source_task()
-        # self.generate_source_switch()
         self.generate_source_spi()
         self.generate_source_function()
         self.generate_source_on()
@@ -67,6 +62,7 @@ class ApiGenerator:
         line = line.replace("\n", "")
         line = line.replace("\t", "")
         line = line.replace("{}", "")
+        line = line.replace("    ", "")
 
         if "virtual void On" in line:
             self.process_callback(line)
@@ -74,7 +70,7 @@ class ApiGenerator:
             self.process_function(line)
 
     def process_callback(self, line: str):
-        """处理回掉函数"""
+        """处理回调函数"""
         name = line[line.index("On"):line.index("(")]
         self.lines[name] = line
 
@@ -84,14 +80,12 @@ class ApiGenerator:
     def process_function(self, line: str):
         """处理主动函数"""
         name = line.split("(")[0].split(" ")[-1]
-        # name = line[line.index("Que"):line.index("(")]
 
         d = self.generate_arg_dict(line)
         self.functions[name] = d
 
     def generate_arg_dict(self, line: str):
         """生成参数字典"""
-        # print(line)
         args_str = line[line.index("(") + 1:line.index(")")]
         if not args_str:
             return {}
@@ -106,23 +100,6 @@ class ApiGenerator:
             d[words[-1].replace("*", "")] = words[-2].replace("*", "")
         return d
 
-    def generate_header_define(self):
-        """"""
-        filename = f"{self.prefix}_{self.name}_header_define.h"
-        with open(filename, "w") as f:
-            for n, name in enumerate(self.callbacks.keys()):
-                line = f"#define {name.upper()} {n}\n"
-                f.write(line)
-
-    def generate_header_process(self):
-        """"""
-        filename = f"{self.prefix}_{self.name}_header_process.h"
-        with open(filename, "w") as f:
-            for name in self.callbacks.keys():
-                name = name.replace("On", "process")
-                line = f"void {name}(Task *task);\n\n"
-                f.write(line)
-
     def generate_header_on(self):
         """"""
         filename = f"{self.prefix}_{self.name}_header_on.h"
@@ -134,23 +111,16 @@ class ApiGenerator:
                 for name_, type_ in d.items():
                     if type_ == "int":
                         args_list.append(f"int {name_}")
+                    elif type_ == "int64_t":
+                        args_list.append(f"int64_t {name_}")
                     elif type_ == "bool":
                         args_list.append("bool last")
                     elif type_ == "ErrorInfo":
                         args_list.append("const dict &error")
-                    elif type_ == "int16_t":
-                        args_list.append(f"int {name_}")
-                    elif type_ == "int32_t":
-                        args_list.append(f"int {name_}")
-                    elif type_ == "int64_t":
-                        args_list.append(f"int {name_}")
                     elif type_ == "char":
                         args_list.append(f"string {name_}")
                     else:
-                        if "const dict &data" in args_list:
-                            args_list.append("const dict &data_1")
-                        else:
-                            args_list.append("const dict &data")
+                        args_list.append("const dict &data")
 
                 args_str = ", ".join(args_list)
                 line = f"virtual void {name}({args_str}) {{}};\n\n"
@@ -166,7 +136,7 @@ class ApiGenerator:
 
                 args_list = []
                 for name_, type_ in d.items():
-                    if type_ == "int" or type_ == "int16_t" or type_ == "int32_t" or type_ == "int64_t":
+                    if type_ == "int":
                         args_list.append(f"int {name_}")
                     elif type_ == "bool":
                         args_list.append(f"bool {name_}")
@@ -203,14 +173,10 @@ class ApiGenerator:
                         args.append(field)
                     elif type_ == "int64_t":
                         args.append(field)
-                    elif type_ == "int16_t":
-                        args.append(field)
-                    elif type_ == "int32_t":
-                        args.append(field)
                     elif type_ == "bool":
                         args.append(field)
                     elif type_ == "char":
-                        args.append(field)
+                        args.append(f"string({field})")
                     elif type_ == "ErrorInfo":
                         args.append("error")
 
@@ -235,8 +201,7 @@ class ApiGenerator:
 
                         struct_fields = self.structs[type_]
                         for struct_field, struct_type in struct_fields.items():
-                            # print(struct_type)
-                            if struct_type == "char":
+                            if struct_type == "string":
                                 f.write(
                                     f"\t\tdata[\"{struct_field}\"] = toUtf({field}->{struct_field});\n")
                             else:
@@ -264,7 +229,7 @@ class ApiGenerator:
                     f.write("};\n\n")
                 else:
                     for field, type_ in d.items():
-                        if type_ == "int" or type_ == "int64_t" or type_ == "int16_t" or type_ == "int32_t" or type_ == "int64_t":
+                        if type_ == "int":
                             args.append(f"int {field}")
                             end_args.append(field)
                         elif type_ == "bool":
@@ -274,7 +239,6 @@ class ApiGenerator:
                             args.append(f"string {field}")
                             end_args.append(field + ".c_str()")
                         else:
-                            # struct_name = field
                             struct_type = type_
                             args.append("const dict &req")
                             end_args.append("&myreq")
@@ -295,9 +259,11 @@ class ApiGenerator:
 
                         struct_fields = self.structs[struct_type]
                         for struct_field, struct_type in struct_fields.items():
-                            if struct_type == "char":
+                            if struct_type == "string":
                                 line = f"\tgetString(req, \"{struct_field}\", myreq.{struct_field});\n"
                             else:
+                                if struct_type == "long long":
+                                    struct_type = "longlong"
                                 line = f"\tget{struct_type.capitalize()}(req, \"{struct_field}\", &myreq.{struct_field});\n"
                             f.write(line)
 
@@ -318,6 +284,9 @@ class ApiGenerator:
                     if type_ == "int":
                         args.append(f"int {field}")
                         bind_args.append(field)
+                    elif type_ == "int64_t":
+                        args.append(f"int64_t {field}")
+                        bind_args.append(field)
                     elif type_ == "bool":
                         args.append("bool last")
                         bind_args.append("last")
@@ -326,9 +295,6 @@ class ApiGenerator:
                         bind_args.append("error")
                     elif type_ == "char":
                         args.append(f"string {field}")
-                        bind_args.append(field)
-                    elif type_ == "int32_t" or type_ == "int64_t" or type_ == "int16_t":
-                        args.append(f"int {field}")
                         bind_args.append(field)
                     else:
                         args.append("const dict &data")
@@ -368,5 +334,5 @@ class ApiGenerator:
 
 if __name__ == "__main__":
 
-    td_generator = ApiGenerator("../include/hft/header_for_generator/hft_trader_api_.h", "hft", "td", "TdApi")
+    td_generator = ApiGenerator("../include/hft/hft_trader_api.h", "hft", "td", "TdApi")
     td_generator.run()

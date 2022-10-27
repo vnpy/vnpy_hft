@@ -22,6 +22,15 @@ class StructGenerator:
             if "__" not in name:
                 self.typedefs[name] = getattr(module, name)
 
+        self.typedefs["int64_t"] = "long long"
+        self.typedefs["int"] = "int"
+        self.typedefs["char"] = "char"
+        self.typedefs["int32_t"] = "int32_t"
+        self.typedefs["int16_t"] = "int16_t"
+        self.typedefs["uint16_t"] = "uint16_t"
+        self.typedefs["uint64_t"] = "uint64_t"
+        self.typedefs["bool"] = "bool"
+
     def run(self):
         """运行生成"""
         self.f_cpp = open(self.filename, "r", encoding="UTF-8")
@@ -37,22 +46,27 @@ class StructGenerator:
 
     def process_line(self, line: str):
         """处理每行"""
-        line = line.replace(";", "")
         line = line.replace("\n", "")
 
-        if line.startswith("struct"):
+        if "struct " in line:
             self.process_declare(line)
         elif line.startswith("{"):
             self.process_start(line)
-        elif line.startswith("}") and "//" not in line:
+        elif "};" in line:
             self.process_end(line)
-        elif "    " in line and "//" in line:
+        elif ";" in line and "//" in line:
+            line = line.replace(";", "")
             self.process_member(line)
 
     def process_declare(self, line: str):
         """处理声明"""
+        line = line.replace("    ", "")
         words = line.split(" ")
+
         name = words[1]
+        if "{" in name:
+            name = name.replace("{", "")
+
         end = "{"
 
         new_line = f"{name} = {end}\n"
@@ -69,6 +83,7 @@ class StructGenerator:
 
     def process_member(self, line: str):
         """处理成员"""
+        line = line.replace("\t", " ")
         line = line.split("//")[0]
 
         words = line.split(" ")
@@ -76,7 +91,11 @@ class StructGenerator:
         if not words:
             return
 
-        py_type = words[0]
+        s_type = words[0].replace(" ", "")
+        s_type = s_type.replace("		", "")
+
+        py_type = self.typedefs.get(s_type, "SecuidInfo")
+
         name = words[1]
         if "[" in name:
             name = name.split("[")[0]
@@ -86,5 +105,5 @@ class StructGenerator:
 
 
 if __name__ == "__main__":
-    generator = StructGenerator("../include/hft/header_for_generator/hft_trader_struct_.h", "hft")
+    generator = StructGenerator("../include/hft/hft_trader_struct.h", "hft")
     generator.run()
