@@ -28,9 +28,8 @@ from vnpy.trader.object import (
 )
 from vnpy.trader.event import EVENT_TIMER
 
-from ..api.hft import TdApi
-from ..api.sip import (
-    MdApi,
+from ..api.hft import (
+    TdApi,
     AccountType_Stock,
     PositionSide_Long,
     PositionSide_Short,
@@ -51,6 +50,9 @@ from ..api.sip import (
     OrderStatus_Rejected,
     OrderStatus_CancelRejected,
     TradeReportType_Normal,
+)
+from ..api.sip import (
+    MdApi,
     MKtype_SH,
     MKtype_SZ,
 )
@@ -827,7 +829,7 @@ class HftTdApi(TdApi):
         return order.vt_orderid
 
     def query_order(self, pos_str: str = "") -> None:
-        """查询未成交委托"""        
+        """查询未成交委托"""
         hft_req: dict = {
             "pos_str": pos_str,
             "query_num": 500
