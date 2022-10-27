@@ -857,16 +857,21 @@ class HftTdApi(TdApi):
     def query_account(self) -> None:
         """查询资金"""
         self.reqid += 1
-        self.queryCash(self.reqid)
+        self.queryCash({}, self.reqid)
 
     def query_position(self) -> None:
         """查询持仓"""
+        hft_req: dict = {
+            "pos_str": "",
+            "query_num": 500
+        }
+
         self.reqid += 1
-        self.queryPositions("", 500, self.reqid)
+        self.queryPositions(hft_req, self.reqid)
 
         if self.margin_trading:
             self.reqid += 1
-            self.queryCreditShortsell("", 500, self.reqid)
+            self.queryCreditShortsell(hft_req, self.reqid)
 
     def close(self) -> None:
         """关闭连接"""
