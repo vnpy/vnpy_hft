@@ -701,10 +701,13 @@ class HftTdApi(TdApi):
             self.orders[orderid] = order
             self.gateway.on_order(order)
 
+            if last:
+                self.query_order(pos)
+
         elif error["err_code"] != 14020:
             self.gateway.write_error(error)
 
-        if last:
+        else:
             self.gateway.write_log("查询委托信息成功")
 
     def onQueryTradeRsp(
@@ -743,10 +746,13 @@ class HftTdApi(TdApi):
             )
             self.gateway.on_trade(trade)
 
+            if last:
+                self.query_trade(pos)
+
         elif error["err_code"] != 14020:
             self.gateway.write_error(error)
 
-        if last:
+        else:
             self.gateway.write_log("查询成交信息成功")
 
     def connect(
@@ -820,15 +826,25 @@ class HftTdApi(TdApi):
         self.gateway.on_order(order)
         return order.vt_orderid
 
-    def query_order(self) -> None:
-        """查询未成交委托"""
-        self.reqid += 1
-        self.queryOrders("", 500, self.reqid, 0)
+    def query_order(self, pos_str: str = "") -> None:
+        """查询未成交委托"""        
+        hft_req: dict = {
+            "pos_str": pos_str,
+            "query_num": 500
+        }
 
-    def query_trade(self) -> None:
-        """查询成交"""
         self.reqid += 1
-        self.queryTrades("", 500, self.reqid)
+        self.queryOrders(hft_req, self.reqid)
+
+    def query_trade(self, pos_str: str = "") -> None:
+        """查询成交"""
+        hft_req: dict = {
+            "pos_str": pos_str,
+            "query_num": 500
+        }
+
+        self.reqid += 1
+        self.queryTrades(hft_req, self.reqid)
 
     def cancel_order(self, req: CancelRequest) -> None:
         """委托撤单"""
