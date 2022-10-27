@@ -784,6 +784,10 @@ class HftTdApi(TdApi):
 
     def send_order(self, req: OrderRequest) -> str:
         """委托下单"""
+        if req.type not in ORDERTYPE_VT2HFT:
+            self.gateway.write_log(f"当前接口不支持该类型的委托{req.type.value}")
+            return ""
+
         if self.margin_trading and req.offset == Offset.NONE:
             self.gateway.write_log("委托失败，两融交易需要选择开平方向")
             return ""
@@ -802,7 +806,7 @@ class HftTdApi(TdApi):
         order_req: dict = {
             "cl_order_id": orderid,
             "symbol": hft_symbol,
-            "order_type": OrderType_LMT,
+            "order_type": ORDERTYPE_VT2HFT[req.type],
             "volume": int(req.volume),
             "price": int(req.price * 10000),
             "side": SIDE_VT2HFT[(req.direction, req.offset)]
