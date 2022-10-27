@@ -54,7 +54,7 @@ from ..api.sip import (
     MKtype_SH,
     MKtype_SZ,
 )
-from.terminal_info import get_terminal_info
+from .terminal_info import get_terminal_info
 
 
 # 市场映射
@@ -154,7 +154,7 @@ SIDE_VT2HFT: Dict[Any, int] = {
 
 # 其他常量
 MAX_FLOAT = sys.float_info.max                  # 浮点数极限值
-CHINA_TZ = ZoneInfo("Asia/Shanghai")       # 中国时区
+CHINA_TZ = ZoneInfo("Asia/Shanghai")            # 中国时区
 
 # 合约数据全局缓存字典
 symbol_contract_map: Dict[str, ContractData] = {}
@@ -852,13 +852,6 @@ class HftTdApi(TdApi):
         """关闭连接"""
         if self.connect_status:
             self.exit()
-
-
-def adjust_price(price: float) -> float:
-    """将异常的浮点数最大值（MAX_FLOAT）数据调整为0"""
-    if price == MAX_FLOAT:
-        price = 0
-    return price
 
 
 def generate_datetime(timestamp: str) -> datetime:
