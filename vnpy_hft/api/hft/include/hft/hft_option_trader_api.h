@@ -59,6 +59,13 @@ class OptionTraderSpi {
      */
     virtual void OnRiskNotify(RiskNotify* risk_notify) {}
 
+	/**
+	* 回切通知信息回调
+	*
+	* @param failback_notify   回切通知信息
+	*/
+	virtual void OnFailBackNotify(FailBackNotify* failback_notify) {}
+
     /**
      * 登录成功或失败时回调
      * 
@@ -138,12 +145,11 @@ class OptionTraderSpi {
      * @param position_detail   持仓详情
      * @param error_info        应答的错误信息
      * @param request_id        对应请求时传入的序列号
-     * @param is_last           是否是最后一笔响应
-     * @param pos_str           本次查询最后一条记录的定位串，用于下一次查询
+     * @param is_last           是否是本次请求的最后一笔响应
      */
     virtual void OnQueryPositionRsp(OptionPositionDetail* position_detail,
                                     ErrorInfo* error_info, int request_id,
-                                    bool is_last, const char* pos_str) {}
+                                    bool is_last) {}
 
     /**
      * 查询当日资金的响应
@@ -213,7 +219,7 @@ class OptionTraderSpi {
      * @param detail            行权委托详情
      * @param error_info        应答的错误信息
      * @param request_id        对应请求时传入的序列号
-     * @param is_last           是否是最后一笔响应
+     * @param is_last           是否是本次请求的最后一笔响应
      * @param pos_str           本次查询最后一条记录的定位串，用于下一次查询
      */
     virtual void OnQueryExerciseRsp(ExerciseDetail* detail,
@@ -227,23 +233,24 @@ class OptionTraderSpi {
      * @param detail            期权合约信息
      * @param error_info        应答的错误信息
      * @param request_id        对应请求时传入的序列号
-     * @param is_last           是否是最后一笔响应
+     * @param is_last           是否是本次请求的最后一笔响应
      */
     virtual void OnQueryContractInfoRsp(ContractInfo* detail,
                                         ErrorInfo* error_info, int request_id,
                                         bool is_last) {}
 
     /**
-     * 查询现货系统现货持仓的响应
+     * 查询期权系统现货持仓的响应
      * QueryStockPositions由此接口响应
      * 
      * @param position_detail   现货持仓详情
      * @param error_info        应答的错误信息
      * @param request_id        对应请求时传入的序列号
+     * @param is_last           是否是本次请求的最后一笔响应
      */
     virtual void OnQueryStockPositionRsp(PositionDetail* position_detail,
                                          ErrorInfo* error_info,
-                                         int request_id) {}
+                                         int request_id, bool is_last) {}
 
     /**
      * 现货持仓划转状态推送
@@ -294,7 +301,7 @@ class OptionTraderSpi {
 
     /**
      * 查询当日锁定委托详情的响应，一次返回一个订单详情
-     * QueryLockOrder、QueryLockOrderByCode、QueryLockOrders均由此接口响应
+     * QueryLockOrder、QueryLockOrders均由此接口响应
      * 
      * @param order_detail  锁定委托详情
      * @param error_info    应答的错误信息
@@ -313,7 +320,7 @@ class OptionTraderSpi {
      * @param position_detail   锁定的现货持仓详情
      * @param error_info        应答的错误信息
      * @param request_id        对应请求时传入的序列号
-     * @param is_last           是否是最后一笔响应
+     * @param is_last           是否是本次请求的最后一笔响应
      */
     virtual void OnQueryLockPositionRsp(PositionDetail* position_detail,
                                         ErrorInfo* error_info, int request_id,
@@ -388,7 +395,7 @@ class OptionTraderSpi {
      * @param detail            组合行权委托详情
      * @param error_info        应答的错误信息
      * @param request_id        对应请求时传入的序列号
-     * @param is_last           是否是最后一笔响应
+     * @param is_last           是否是本次请求的最后一笔响应
      * @param pos_str           本次查询最后一条记录的定位串，用于下一次查询
      */
     virtual void OnQueryCombExerciseRsp(CombExerciseDetail* detail,
@@ -402,7 +409,7 @@ class OptionTraderSpi {
      * @param position_detail   组合持仓详情
      * @param error_info        应答的错误信息
      * @param request_id        对应请求时传入的序列号
-     * @param is_last           是否是最后一笔响应
+     * @param is_last           是否是本次请求的最后一笔响应
      */
     virtual void OnQueryCombPositionRsp(CombPositionDetail* position_detail,
                                         ErrorInfo* error_info, int request_id,
@@ -415,7 +422,7 @@ class OptionTraderSpi {
      * @param detail            期权合约信息
      * @param error_info        应答的错误信息
      * @param request_id        对应请求时传入的序列号
-     * @param is_last           是否是最后一笔响应
+     * @param is_last           是否是本次请求的最后一笔响应
      */
     virtual void OnQueryCombContractInfoRsp(CombContractInfo* detail,
                                             ErrorInfo* error_info,
@@ -432,6 +439,244 @@ class OptionTraderSpi {
     virtual void OnQueryTransferFundHistoryRsp(TransferFundDetail* detail,
                                                ErrorInfo* error_info,
                                                int request_id, bool is_last) {}
+
+    /**
+     * 查询当日组合持仓详情的响应，一次返回一个持仓详情
+     * QueryCombPositionSubDetails由此接口响应
+     * 
+     * @param position_detail   组合持仓详情
+     * @param error_info        应答的错误信息
+     * @param request_id        对应请求时传入的序列号
+     * @param is_last           是否是本次请求的最后一笔响应
+     */
+    virtual void OnQueryCombPositionSubDetailRsp(CombPositionSubDetail* position_detail,
+                                                 ErrorInfo* error_info, int request_id,
+                                                 bool is_last) {}
+
+    /**
+     * 微服务应答
+     *
+     * @param rsp           微服务应答数据
+     * @param request_id    对应请求时传入的序列号
+     */
+    virtual void OnMicroServiceRsp(MicroServiceRsp* rsp, int request_id) {}
+
+    /**
+     * 查询投资者限仓的响应，一次返回一个限仓详情
+     * QueryPositionLimits由此接口响应
+     * 
+     * @param limit_detail      限仓详情
+     * @param error_info        应答的错误信息
+     * @param request_id        对应请求时传入的序列号
+     * @param is_last           是否是本次请求的最后一笔响应
+     */
+    virtual void OnQueryPositionLimitsRsp(PositionLimitsDetail* limit_detail,
+                                          ErrorInfo* error_info, int request_id,
+                                          bool is_last) {}
+
+    /**
+     * 查询投资者限额的响应，一次返回一个限额详情
+     * QueryAmountLimits由此接口响应
+     * 
+     * @param limit_detail      限额详情
+     * @param error_info        应答的错误信息
+     * @param request_id        对应请求时传入的序列号
+     */
+    virtual void OnQueryAmountLimitsRsp(AmountLimitsDetail* limit_detail,
+                                        ErrorInfo* error_info, int request_id) {}
+
+    /**
+     * 查询拆分组合合约后保证金差额变动响应
+     * QuerySplitCombMarginDifference由此接口响应
+     * 
+     * @param margin_diff_detail    拆分组合合约后保证金差额变动详情
+     * @param error_info            应答的错误信息
+     * @param request_id            对应请求时传入的序列号
+     */
+    virtual void OnQuerySplitCombMarginDifferenceRsp(SplitCombMarginDiffDetail* margin_diff_detail, 
+                                                    ErrorInfo* error_info, int request_id) {}
+
+    /**
+     * 查询投资者行权指派明细响应
+     * QueryExerciseAppointment由此接口响应
+     * 
+     * @param appointment_detail     投资者行权指派明细详情
+     * @param error_info             应答的错误信息
+     * @param request_id             对应请求时传入的序列号
+     * @param is_last                是否是本次请求的最后一笔响应
+     */
+    virtual void OnQueryExerciseAppointmentRsp(ExerciseAppointmentDetail* appointment_detail, 
+                                              ErrorInfo* error_info, int request_id, 
+                                              bool is_last) {}
+
+    /**
+     * 查询股票期权保证金风险度明细响应
+     * QueryMarginRisk由此接口响应
+     * 
+     * @param detail                 投资者行权指派明细详情
+     * @param error_info             应答的错误信息
+     * @param request_id             对应请求时传入的序列号
+     */
+    virtual void OnQueryMarginRiskRsp(MarginRiskDetail* detail, ErrorInfo* error_info, int request_id) {}
+   
+    /**
+     * 查询期权最大可委托数响应
+     * QueryOptionMaxOrderVolume由此接口响应
+     * @param max_order_detail       期权最大可委托数详情
+     * @param error_info             应答的错误信息
+     * @param request_id             对应请求时传入的序列号
+     */
+    virtual void OnQueryOptionMaxOrderVolumeRsp(OptionMaxOrderVolumeDetail* max_order_detail, 
+                                               ErrorInfo* error_info, int request_id) {}
+
+   /**
+   * 查询现货系统现货持仓的响应
+   * QueryInquiryStockPositions由此接口响应
+   *
+   * @param position_detail   现货持仓详情
+   * @param error_info        应答的错误信息
+   * @param request_id        对应请求时传入的序列号
+   */
+   virtual void OnQueryInquiryStockPositionRsp(PositionDetail* position_detail,
+											   ErrorInfo* error_info, int request_id) {}
+
+    /**
+     * 查询股票期权历史委托响应，一次返回一个历史委托详情
+     * QueryOptionOrderHistory由此接口响应
+     *
+     * @param his_order_detail      股票期权历史委托详情
+     * @param error_info            应答的错误信息
+     * @param request_id            对应请求时传入的序列号
+     * @param is_last               是否是本次请求的最后一笔响应
+     * @param pos_str               本次查询最后一条记录的定位串，用于下一次查询
+     */
+    virtual void OnQueryOptionOrderHistoryRsp(OptionHisOrderDetail* his_order_detail,
+                                              ErrorInfo* error_info, int request_id,
+                                              bool is_last, const char* pos_str) {}
+
+    /**
+     * 查询股票期权历史成交响应，一次返回一个历史成交详情
+     * QueryOptionTradeHistory由此接口响应
+     *
+     * @param his_trade_detail     股票期权历史成交详情
+     * @param error_info           应答的错误信息
+     * @param request_id           对应请求时传入的序列号
+     * @param is_last              是否是本次请求的最后一笔响应
+     * @param pos_str              本次查询最后一条记录的定位串，用于下一次查询
+     */
+    virtual void OnQueryOptionTradeHistoryRsp(OptionHisTradeDetail* his_trade_detail,
+                                              ErrorInfo* error_info, int request_id,
+                                              bool is_last, const char* pos_str) {}
+
+    /**
+     * 查询股票期权历史行权指派明细响应，一次返回一个历史行权指派明细详情
+     * QueryExerciseAppointmentHistory由此接口响应
+     *
+     * @param his_appointment_detail       股票期权历史行权指派明细详情
+     * @param error_info                   应答的错误信息
+     * @param request_id                   对应请求时传入的序列号
+     * @param is_last                      是否是本次请求的最后一笔响应
+     * @param pos_str                      本次查询最后一条记录的定位串，用于下一次查询
+     */
+    virtual void OnQueryExerciseAppointmentHistoryRsp(HisExerciseAppointmentDetail* his_appointment_detail,
+                                                      ErrorInfo* error_info, int request_id,
+                                                      bool is_last, const char* pos_str) {}
+
+    /**
+     * 查询股票期权历史交收明细响应，一次返回一个历史交收明细详情
+     * QueryOptionDeliveryHistory由此接口响应
+     *
+     * @param his_delivery_detail     股票期权历史交收明细详情
+     * @param error_info              应答的错误信息
+     * @param request_id              对应请求时传入的序列号
+     * @param is_last                 是否是本次请求的最后一笔响应
+     * @param pos_str                 本次查询最后一条记录的定位串，用于下一次查询
+     */
+    virtual void OnQueryOptionDeliveryHistoryRsp(OptionHisDeliveryDetail* his_delivery_detail,
+                                                 ErrorInfo* error_info, int request_id,
+                                                 bool is_last, const char* pos_str) {}
+
+    /**
+     * 查询历史行权交收流水明细响应，一次返回一个历史行权交收流水明细
+     * QueryExerciseDeliveryHistory由此接口响应
+     *
+     * @param exercise_delivery_detail     历史行权交收流水明细
+     * @param error_info                   应答的错误信息
+     * @param request_id                   对应请求时传入的序列号
+     * @param is_last                      是否是本次请求的最后一笔响应
+     * @param pos_str                      本次查询最后一条记录的定位串，用于下一次查询
+     */
+    virtual void OnQueryExerciseDeliveryHistoryRsp(HisExerciseDeliveryyDetail* exercise_delivery_detail,
+                                                   ErrorInfo* error_info, int request_id,
+                                                   bool is_last, const char* pos_str) {}
+
+    /**
+     * 查询对账单历史合约资产响应，一次返回一个对账单历史合约资产明细
+     * QueryOptionContractAssetHistory由此接口响应
+     *
+     * @param contract_asset_detail        对账单历史合约资产明细
+     * @param error_info                   应答的错误信息
+     * @param request_id                   对应请求时传入的序列号
+     * @param is_last                      是否是本次请求的最后一笔响应
+     * @param pos_str                      本次查询最后一条记录的定位串，用于下一次查询
+     */
+    virtual void OnQueryOptionContractAssetHistoryRsp(OptionHisContractAssetDetail* contract_asset_detail,
+                                                      ErrorInfo* error_info, int request_id,
+                                                      bool is_last, const char* pos_str) {}
+
+    /**
+     * 查询历史交收金额汇总轧差响应，一次返回一个历史交收金额汇总轧差明细
+     * QueryOptionDeliveryNettingHistory由此接口响应
+     *
+     * @param delivery_netting_detail        历史交收金额汇总轧差明细
+     * @param error_info                     应答的错误信息
+     * @param request_id                     对应请求时传入的序列号
+     * @param is_last                        是否是本次请求的最后一笔响应
+     */
+    virtual void OnQueryOptionDeliveryNettingHistoryRsp(OptionHisDeliveryNettingDetail* delivery_netting_detail,
+                                                        ErrorInfo* error_info, int request_id,
+                                                        bool is_last) {}
+
+    /**
+     * 查询历史组合持仓明细响应，一次返回一个历史组合持仓明细
+     * QueryOptionCombPositionHistory由此接口响应
+     *
+     * @param comb_position_detail           历史组合持仓明细
+     * @param error_info                     应答的错误信息
+     * @param request_id                     对应请求时传入的序列号
+     * @param is_last                        是否是本次请求的最后一笔响应
+     * @param pos_str                        本次查询最后一条记录的定位串，用于下一次查询
+     */
+    virtual void OnQueryOptionCombPositionHistoryRsp(OptionHisCombPositionDetail* comb_position_detail,
+                                                     ErrorInfo* error_info, int request_id,
+                                                     bool is_last, const char* pos_str) {}
+
+    /**
+     * 查询期权历史交割单响应，一次返回一个历史交割单明细
+     * QueryOptionSettlementHistory由此接口响应
+     *
+     * @param his_settlement_detail          期权历史交割单明细
+     * @param error_info                     应答的错误信息
+     * @param request_id                     对应请求时传入的序列号
+     * @param is_last                        是否是本次请求的最后一笔响应
+     * @param pos_str                        本次查询最后一条记录的定位串，用于下一次查询
+     */
+    virtual void OnQueryOptionSettlementHistoryRsp(OptionHisSettlementDetail* his_settlement_detail,
+                                                   ErrorInfo* error_info, int request_id,
+                                                   bool is_last, const char* pos_str) {}
+
+    /**
+     * 查询期权组合策略文件响应，一次返回一个期权组合策略文件明细
+     * QueryOptionCombStrategyFile由此接口响应
+     *
+     * @param comb_strategy_file_detail      期权组合策略文件明细
+     * @param error_info                     应答的错误信息
+     * @param request_id                     对应请求时传入的序列号
+     * @param is_last                        是否是本次请求的最后一笔响应
+     */
+    virtual void OnQueryOptionCombStrategyFileRsp(OptionCombStrategyFileDetail* comb_strategy_file_detail,
+                                                  ErrorInfo* error_info, int request_id, bool is_last) {}
+
 };
 
 // 交易接口类定义
@@ -460,6 +705,38 @@ class HFT_TRADER_EXPORT OptionTraderApi {
                              LogLevel log_level = LogLevel_Info);
 
     /**
+     * 是否开启业务消息的日志，默认开启，只需调用一次，在调用CreateTraderApi之前调用
+     *
+     * @param enable        是否开启业务消息的日志
+     */
+    static void SetCriticalMsgLog(bool enable);
+
+    /**
+     * 设置首次登录失败后，自动登录重试次数，默认5次，设置为0会一直重试，
+     * 只需调用一次，在调用CreateOptionTraderApi之前调用，所有API共用这个设置
+     *
+     * @param login_retry_count     自动登录重试次数
+     */
+    static void SetLoginRetryCount(int login_retry_count);
+
+    /**
+     * 设置重试登录时间间隔，默认5秒，最小值也是5秒
+     * 只需调用一次，在调用CreateTraderApi之前调用，所有API共用这个设置
+     *
+     * @param login_retry_interval     自动登录重试时间间隔
+     */
+    static void SetLoginRetryInterval(int login_retry_interval);
+
+    /**
+     * 设置连接断开重连参数，只需调用一次
+     *
+     * @param max_retry_count     最大重连次数，大于0
+     * @param min_interval        最小重连时间间隔，单位秒，最小为5秒
+     * @param max_interval        最大重连时间间隔，单位秒，最小为6秒
+     */
+    static void SetReconnectConfig(int max_retry_count, int min_interval, int max_interval);
+
+    /**
      * 不再使用本接口对象时，调用该函数删除接口对象
      */
     virtual void Release() = 0;
@@ -482,9 +759,9 @@ class HFT_TRADER_EXPORT OptionTraderApi {
      * @param svr_ip        交易服务器ip地址
      * @param svr_port      交易服务器端口
      * @param account       接入方交易账户相关信息
-     * @param terminal_info 交易终端信息，格式需满足交易所要求，格式请见接口说明文档
+     * @param terminal_info 交易终端信息，格式需满足交易所要求，格式请见接口说明文档，必须UTF8编码
      * 
-     * @return              0表示登录成功，非0表示登录失败，通过GetApiLastError获取错误信息
+     * @return              0表示发起登录请求成功，非0表示发起登录请求失败，通过GetApiLastError获取错误信息
      */
     virtual int Login(const char* svr_ip, int svr_port,
                       const AccountInfo* account_info,
@@ -582,75 +859,74 @@ class HFT_TRADER_EXPORT OptionTraderApi {
     /**
      * 查询当日单个订单详情
      *
-     * @param order_id      后台系统的订单id
+     * @param qry_req       根据委托号查询的请求数据
      * @param request_id    请求序列号，用于匹配响应，由用户自定义，非0
      *
      * @return              成功返回0，失败返回错误码，通过GetApiLastError获取错误信息
      */
-    virtual int QueryOrder(const char* order_id, int request_id) = 0;
+    virtual int QueryOrder(QryByOrderIdReq* qry_req, int request_id) = 0;
 
     /**
      * 查当日指定标的委托列表
      *
-     * @param symbol        标的代码，例如SH.600000
+     * @param qry_req       根据指定标的查询委托列表的请求数据
      * @param request_id    请求序列号，用于匹配响应，由用户自定义，非0
      *
      * @return              成功返回0，失败返回错误码，通过GetApiLastError获取错误信息
      */
-    virtual int QueryOrderByCode(const char* symbol, int request_id) = 0;
+    virtual int QueryOrderByCode(QryOrderByCodeReq* qry_req, int request_id) = 0;
 
     /**
      * 查询当日订单列表，支持定位串增量查询
+     * 泰琰柜台仅支持全量查询
      *
-     * @param pos_str       查询定位串，第一次填空
-     * @param query_num     查询数量
+     * @param qry_req       根据定位串查询的请求数据
      * @param request_id    请求序列号，用于匹配响应，由用户自定义，非0
      *
      * @return              成功返回0，失败返回错误码，通过GetApiLastError获取错误信息
      */
-    virtual int QueryOrders(const char* pos_str, int query_num,
-                            int request_id) = 0;
+    virtual int QueryOrders(QryOrdersReq* qry_req, int request_id) = 0;
 
     /**
      * 查当日指定标的成交列表
      *
-     * @param symbol        标的代码，例如SH.600000
+     * @param qry_req       根据标的代码查询的请求数据
      * @param request_id    请求序列号，用于匹配响应，由用户自定义，非0
      *
      * @return              成功返回0，失败返回错误码，通过GetApiLastError获取错误信息
      */
-    virtual int QueryTradeByCode(const char* symbol, int request_id) = 0;
+    virtual int QueryTradeByCode(QryTradeByCodeReq* qry_req, int request_id) = 0;
 
     /**
      * 查询账户的当日成交列表，支持定位串增量查询
+     * 泰琰柜台仅支持全量查询
      * 
-     * @param pos_str       查询定位串，第一次填空
-     * @param query_num     查询数量
+     * @param qry_req       根据定位串查询的请求数据
      * @param request_id    请求序列号，用于匹配响应，由用户自定义，非0
      *
      * @return              成功返回0，失败返回错误码，通过GetApiLastError获取错误信息
      */
-    virtual int QueryTrades(const char* pos_str, int query_num,
-                            int request_id) = 0;
+    virtual int QueryTrades(QryTradesReq* qry_req, int request_id) = 0;
 
     /**
      * 查当日指定标的持仓
      *
-     * @param symbol        标的代码，例如SH.600000
+     * @param qry_req       根据标的代码查询的请求数据
      * @param request_id    请求序列号，用于匹配响应，由用户自定义，非0
      *
      * @return              成功返回0，失败返回错误码，通过GetApiLastError获取错误信息
      */
-    virtual int QueryPosition(const char* symbol, int request_id) = 0;
+    virtual int QueryPosition(QryByCodeReq* qry_req, int request_id) = 0;
 
     /**
      * 查询当日持仓列表，一次性全部查询出来
      *
+     * @param qry_req       请求数据
      * @param request_id    请求序列号，用于匹配响应，由用户自定义，非0
      *
      * @return              成功返回0，失败返回错误码，通过GetApiLastError获取错误信息
      */
-    virtual int QueryPositions(int request_id) = 0;
+    virtual int QueryPositions(QryPositionsReq* qry_req, int request_id) = 0;
 
     /**
      * 查询当日账户资产详情
@@ -659,10 +935,11 @@ class HFT_TRADER_EXPORT OptionTraderApi {
      *
      * @return              成功返回0，失败返回错误码，通过GetApiLastError获取错误信息
      */
-    virtual int QueryCash(int request_id) = 0;
+    virtual int QueryCash(QryCashReq* qry_req, int request_id) = 0;
 
     /**
      * 查集中交易系统可用资金
+     * 仅支持泰琰柜台
      *
      * @param request_id    请求序列号，用于匹配响应，由用户自定义，非0
      *
@@ -673,13 +950,12 @@ class HFT_TRADER_EXPORT OptionTraderApi {
     /**
      * 针对同一个资金账号在集中交易柜台与快速柜台之间资金转入转出
      *
-     * @param transfer_side     划转方向，请参考TransferFundSide
-     * @param transfer_value    划转金额，扩大一万倍，币种人民币
+     * @param trans_req         资金划转请求
      * @param request_id        请求序列号，用于匹配响应，由用户自定义，非0
      *
      * @return                  成功返回0，失败返回错误码，通过GetApiLastError获取错误信息
      */
-    virtual int TransferFundInAndOut(int transfer_side, int64_t transfer_value,
+    virtual int TransferFundInAndOut(TransferFundReq* trans_req,
                                      int request_id) = 0;
 
     /**
@@ -694,21 +970,20 @@ class HFT_TRADER_EXPORT OptionTraderApi {
 
     /**
      * 查询行权委托列表，支持定位串增量查询
+     * 泰琰柜台仅支持全量查询
      *
-     * @param pos_str       查询定位串，第一次填空
-     * @param query_num     查询数量
+     * @param qry_req       查询行权委托列表的请求数据
      * @param request_id    请求序列号，用于匹配响应，由用户自定义，非0
      *
      * @return              成功返回0，失败返回错误码，通过GetApiLastError获取错误信息
      */
-    virtual int QueryExercises(const char* pos_str, int query_num,
-                               int request_id) = 0;
+    virtual int QueryExercises(QryExercisesReq* qry_req, int request_id) = 0;
 
     /**
      * 查询期权合约信息
      *
      * @param request_id    请求序列号，用于匹配响应，由用户自定义，非0
-     * @param symbol        合约代码，格式为市场.证券ID或市场.合约ID, 默认查询所有
+     * @param symbol        合约代码，格式为市场.证券ID或市场.合约ID, 默认查询所有，低延时期权柜台必传
      *
      * @return              成功返回0，失败返回错误码，通过GetApiLastError获取错误信息
      */
@@ -716,7 +991,8 @@ class HFT_TRADER_EXPORT OptionTraderApi {
                                   const char* symbol = NULL) = 0;
 
     /**
-     * 查询现货系统现货持仓
+     * 查询期权系统现货持仓
+     * 仅支持泰琰柜台
      *
      * @param request_id    请求序列号，用于匹配响应，由用户自定义，非0
      * @param symbol        交易标的，格式为市场.证券ID或市场.合约ID, 默认查询所有
@@ -728,6 +1004,7 @@ class HFT_TRADER_EXPORT OptionTraderApi {
 
     /**
      * 现货持仓划转
+     * 仅支持泰琰柜台，低延时柜台不需要该接口
      *
      * @param transfer_req  传入现货转移请求对象
      * @param request_id    请求序列号，用于匹配响应，由用户自定义，非0
@@ -739,6 +1016,7 @@ class HFT_TRADER_EXPORT OptionTraderApi {
 
     /**
      * 查询现货持仓划转流水
+     * 仅支持泰琰柜台，低延时柜台不需要该接口
      *
      * @param request_id    请求序列号，用于匹配响应，由用户自定义，非0
      * @param symbol        根据转移标的过滤查询结果, 如果为NULL，则查询所有标的
@@ -772,15 +1050,14 @@ class HFT_TRADER_EXPORT OptionTraderApi {
 
     /**
      * 查询现货锁定委托列表，支持定位串增量查询
+     * 泰琰柜台仅支持全量查询
      *
-     * @param pos_str       查询定位串，第一次填空
-     * @param query_num     查询数量
+     * @param qry_req       查询现货锁定委托列表的请求数据
      * @param request_id    请求序列号，用于匹配响应，由用户自定义，非0
      *
      * @return              成功返回0，失败返回错误码，通过GetApiLastError获取错误信息
      */
-    virtual int QueryLockOrders(const char* pos_str, int query_num,
-                                int request_id) = 0;
+    virtual int QueryLockOrders(QryLockOrdersReq* qry_req, int request_id) = 0;
 
     /**
      * 查询现货锁定持仓列表
@@ -846,15 +1123,14 @@ class HFT_TRADER_EXPORT OptionTraderApi {
 
     /**
      * 查询当日组合委托列表，支持定位串增量查询
+     * 泰琰柜台仅支持全量查询
      *
-     * @param pos_str       查询定位串，第一次填空
-     * @param query_num     查询数量
+     * @param qry_req       查询当日组合委托列表的请求数据
      * @param request_id    请求序列号，用于匹配响应，由用户自定义，非0
      *
      * @return              成功返回0，失败返回错误码，通过GetApiLastError获取错误信息
      */
-    virtual int QueryCombOrders(const char* pos_str, int query_num,
-                                int request_id) = 0;
+    virtual int QueryCombOrders(QryCombOrdersReq* qry_req, int request_id) = 0;
 
     /**
      * 查询单个组合行权委托
@@ -868,22 +1144,21 @@ class HFT_TRADER_EXPORT OptionTraderApi {
 
     /**
      * 查询组合行权委托列表，支持定位串增量查询
+     * 泰琰柜台仅支持全量查询
      *
-     * @param pos_str       查询定位串，第一次填空
-     * @param query_num     查询数量
+     * @param qry_req       查询组合行权委托列表的请求数据
      * @param request_id    请求序列号，用于匹配响应，由用户自定义，非0
      *
      * @return              成功返回0，失败返回错误码，通过GetApiLastError获取错误信息
      */
-    virtual int QueryCombExercises(const char* pos_str, int query_num,
-                                   int request_id) = 0;
+    virtual int QueryCombExercises(QryCombExercisesReq* qry_req, int request_id) = 0;
 
     /**
-     * 查询当日组合持仓列表，支持定位串增量查询
+     * 查询当日组合持仓列表
      *
      * @param request_id    请求序列号，用于匹配响应，由用户自定义，非0
-     * @param symbol        根据组合合约代码查询，格式为市场.证券ID或市场.合约ID, 默认查询所有
-     * @param comb_strategy 根据组合策略类型查询，请参考OptionCombineStrategy定义
+     * @param symbol        根据组合合约代码查询，格式为市场.证券ID或市场.合约ID, 默认查询所有，仅支持泰琰柜台
+     * @param comb_strategy 根据组合策略类型查询，请参考OptionCombineStrategy定义，仅支持泰琰柜台
      *
      * @return              成功返回0，失败返回错误码，通过GetApiLastError获取错误信息
      */
@@ -892,6 +1167,8 @@ class HFT_TRADER_EXPORT OptionTraderApi {
 
     /**
      * 查询组合期权合约信息
+     * 仅支持泰琰柜台
+     * 
      * @param request_id    请求序列号，用于匹配响应，由用户自定义，非0
      * @param symbol        根据组合合约代码查询，格式为市场.证券ID或市场.合约ID, 默认查询所有
      * @param comb_strategy 根据组合策略类型查询，请参考OptionCombineStrategy定义
@@ -902,13 +1179,210 @@ class HFT_TRADER_EXPORT OptionTraderApi {
                                       int comb_strategy = 0) = 0;
 
     /**
-     * 查询资金划转流水，仅支持泰琰期权
+     * 查询资金划转流水
+     * 仅支持泰琰柜台
      *
      * @param request_id    请求序列号，用于匹配响应，由用户自定义，非0
      *
      * @return              成功返回0，失败返回错误码，通过GetApiLastError获取错误信息
      */
     virtual int QueryTransferFundHistory(int request_id) = 0;
+
+    /**
+     * 查询当日组合持仓二级明细列表
+     *
+     * @param request_id    请求序列号，用于匹配响应，由用户自定义，非0
+     * @param symbol        根据组合合约代码查询，格式为市场.证券ID或市场.合约ID, 默认查询所有，仅支持泰琰柜台
+     * @param comb_strategy 根据组合策略类型查询，请参考OptionCombineStrategy定义，仅支持泰琰柜台
+     *
+     * @return              成功返回0，失败返回错误码，通过GetApiLastError获取错误信息
+     */
+    virtual int QueryCombPositionSubDetails(int request_id, const char* symbol = NULL,
+                                            int16_t comb_strategy = 0) = 0;
+
+    /**
+     * 微服务请求
+     *
+     * @param req           请求数据
+     * @param request_id    请求序列号，用于匹配响应，由用户自定义，非0
+     *
+     * @return              成功返回0，失败返回错误码，通过GetApiLastError获取错误信息
+     */
+    virtual int DoMicroServiceReq(MicroServiceReq* req, int request_id) = 0;
+
+    /**
+     * 查询投资者限仓请求
+     * 仅支持泰琰柜台
+     *
+     * @param request_id    请求序列号，用于匹配响应，由用户自定义，非0
+     * @param symbol        根据标的证券代码查询，格式为市场.证券ID或市场.证券代码ID, 默认查询所有
+     *
+     * @return              成功返回0，失败返回错误码，通过GetApiLastError获取错误信息
+     */
+    virtual int QueryPositionLimits(int request_id, const char* symbol = NULL) = 0;
+
+    /**
+     * 查询投资者限额请求
+     * 仅支持泰琰柜台
+     *
+     * @param qry_req       查询投资者限额请求
+     * @param request_id    请求序列号，用于匹配响应，由用户自定义，非0
+     *
+     * @return              成功返回0，失败返回错误码，通过GetApiLastError获取错误信息
+     */
+    virtual int QueryAmountLimits(QryAmountLimitsReq* qry_req, int request_id) = 0;
+
+    /**
+     * 查询拆分组合合约后保证金差额变动
+     * 仅支持泰琰柜台
+     * 
+     * @param margin_diff_req      查询拆分组合合约后保证金差额变动请求
+     * @param request_id           请求序列号，用于匹配响应，由用户自定义，非0
+     * 
+     * @return                     成功返回0，失败返回错误码，通过GetApiLastError获取错误信息
+     */
+    virtual int QuerySplitCombMarginDifference(QrySplitCombMarginDiffReq* margin_diff_req, int request_id) = 0;
+
+    /**
+     * 查询投资者行权指派明细
+     * 仅支持泰琰柜台
+     * 
+     * @param exercise_appoint_req    查询投资者行权指派明细请求
+     * @param request_id              请求序列号，用于匹配响应，由用户自定义，非0
+     * 
+     * @return                        成功返回0，失败返回错误码，通过GetApiLastError获取错误信息
+     */
+    virtual int QueryExerciseAppointment(QryExerciseAppointmentReq* exercise_appoint_req, int request_id) = 0;
+
+    /**
+     * 查询股票期权保证金风险度
+     * 
+     * @param request_id              请求序列号，用于匹配响应，由用户自定义，非0
+     * 
+     * @return                        成功返回0，失败返回错误码，通过GetApiLastError获取错误信息
+     */
+    virtual int QueryMarginRisk(int request_id) = 0;
+   
+    /**
+     * 查询期权最大可委托数请求
+     * 
+     * @param max_order_req            查询期权最大可委托数请求
+     * @param request_id               请求序列号，用于匹配响应，由用户自定义，非0
+     * 
+     * @return                         成功返回0，失败返回错误码，通过GetApiLastError获取错误信息
+     */
+    virtual int QueryOptionMaxOrderVolume(QryOptionMaxOrderVolumeReq* max_order_req, int request_id) = 0;
+
+   /**
+   * 查询现货系统现货持仓
+   * 仅支持泰琰柜台
+   *
+   * @param request_id    请求序列号，用于匹配响应，由用户自定义，非0
+   * @param symbol        交易标的，格式为市场.证券ID或市场.合约ID, 默认查询所有
+   *
+   * @return              成功返回0，失败返回错误码，通过GetApiLastError获取错误信息
+   */
+   virtual int QueryInquiryStockPosition(int request_id, const char* symbol = NULL) = 0;
+   
+    /**
+     * 查询股票期权历史委托请求
+     * 
+     * @param order_history_req        查询股票期权历史委托请求
+     * @param request_id               请求序列号，用于匹配响应，由用户自定义，非0
+     * 
+     * @return                         成功返回0，失败返回错误码，通过GetApiLastError获取错误信息
+     */
+    virtual int QueryOptionOrderHistory(QryOptionHisOrderReq* order_history_req, int request_id) = 0;
+
+    /**
+     * 查询股票期权历史成交请求
+     * 
+     * @param trade_history_req        查询股票期权历史成交请求
+     * @param request_id               请求序列号，用于匹配响应，由用户自定义，非0
+     * 
+     * @return                         成功返回0，失败返回错误码，通过GetApiLastError获取错误信息
+     */
+    virtual int QueryOptionTradeHistory(QryOptionHisTradeReq* trade_history_req, int request_id) = 0;
+
+    /**
+     * 查询股票期权历史行权指派明细请求
+     * 
+     * @param appoint_history_req      查询股票期权历史行权指派明细请求
+     * @param request_id               请求序列号，用于匹配响应，由用户自定义，非0
+     * 
+     * @return                         成功返回0，失败返回错误码，通过GetApiLastError获取错误信息
+     */
+    virtual int QueryExerciseAppointmentHistory(QryHisExerciseAppointmentReq* appoint_history_req, int request_id) = 0;
+
+    /**
+     * 查询股票期权历史交收明细请求，只查询普通交易数据，起始日期相差不大于3个月
+     * 
+     * @param delivery_history_req        查询股票期权历史交收明细请求
+     * @param request_id                  请求序列号，用于匹配响应，由用户自定义，非0
+     * 
+     * @return                            成功返回0，失败返回错误码，通过GetApiLastError获取错误信息
+     */
+    virtual int QueryOptionDeliveryHistory(QryOptionHisDeliveryReq* delivery_history_req, int request_id) = 0;
+
+    /**
+     * 查询历史行权交收流水明细请求
+     * 
+     * @param exercise_delivery_req        查询历史行权交收流水明细请求
+     * @param request_id                   请求序列号，用于匹配响应，由用户自定义，非0
+     * 
+     * @return                             成功返回0，失败返回错误码，通过GetApiLastError获取错误信息
+     */
+    virtual int QueryExerciseDeliveryHistory(QryHisExerciseDeliveryReq* exercise_delivery_req, int request_id) = 0;
+
+    /**
+     * 查询对账单历史合约资产请求
+     * 
+     * @param contract_asset_req            查询对账单历史合约资产请求
+     * @param request_id                    请求序列号，用于匹配响应，由用户自定义，非0
+     * 
+     * @return                              成功返回0，失败返回错误码，通过GetApiLastError获取错误信息
+     */
+    virtual int QueryOptionContractAssetHistory(QryOptionHisContractAssetReq* contract_asset_req, int request_id) = 0;
+
+    /**
+     * 查询历史交收金额汇总轧差请求，只查询普通交易数据，起始日期相差不大于3个月
+     * 
+     * @param delivery_netting_req            查询历史交收金额汇总轧差请求
+     * @param request_id                      请求序列号，用于匹配响应，由用户自定义，非0
+     * 
+     * @return                                成功返回0，失败返回错误码，通过GetApiLastError获取错误信息
+     */
+    virtual int QueryOptionDeliveryNettingHistory(QryOptionHisDeliveryNettingReq* delivery_netting_req, int request_id) = 0;
+
+    /**
+     * 查询历史组合持仓明细请求，起始日期相差不大于3个月
+     * 
+     * @param comb_position_req               查询历史组合持仓明细请求
+     * @param request_id                      请求序列号，用于匹配响应，由用户自定义，非0
+     * 
+     * @return                                成功返回0，失败返回错误码，通过GetApiLastError获取错误信息
+     */
+    virtual int QueryOptionCombPositionHistory(QryOptionHisCombPositionReq* comb_position_req, int request_id) = 0;
+
+    /**
+     * 查询期权历史交割单请求，所有导致合约持仓余额变动的数据, 包括普通交易、对冲、行权指派，起始日期相差不大于3个月
+     * 
+     * @param his_settlement_req              查询期权历史交割单请求
+     * @param request_id                      请求序列号，用于匹配响应，由用户自定义，非0
+     * 
+     * @return                                成功返回0，失败返回错误码，通过GetApiLastError获取错误信息
+     */
+    virtual int QueryOptionSettlementHistory(QryOptionHisSettlementReq* his_settlement_req, int request_id) = 0;
+
+    /**
+     * 查询期权组合策略文件请求
+     * 
+     * @param comb_strategy_file_req          期权组合策略文件查询请求
+     * @param request_id                      请求序列号，用于匹配响应，由用户自定义，非0
+     * 
+     * @return                                成功返回0，失败返回错误码，通过GetApiLastError获取错误信息
+     */
+    virtual int QueryOptionCombStrategyFile(QryOptionCombStrategyFileReq* comb_strategy_file_req, int request_id) = 0;
 
    protected:
     virtual ~OptionTraderApi(){};
