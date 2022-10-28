@@ -28,9 +28,8 @@ from vnpy.trader.object import (
 )
 from vnpy.trader.event import EVENT_TIMER
 
-from ..api.hft import TdApi
-from ..api.sip import (
-    MdApi,
+from ..api.hft import (
+    TdApi,
     AccountType_Stock,
     PositionSide_Long,
     PositionSide_Short,
@@ -51,10 +50,13 @@ from ..api.sip import (
     OrderStatus_Rejected,
     OrderStatus_CancelRejected,
     TradeReportType_Normal,
+)
+from ..api.sip import (
+    MdApi,
     MKtype_SH,
     MKtype_SZ,
 )
-from.terminal_info import get_terminal_info
+from .terminal_info import get_terminal_info
 
 
 # 市场映射
@@ -154,7 +156,7 @@ SIDE_VT2HFT: Dict[Any, int] = {
 
 # 其他常量
 MAX_FLOAT = sys.float_info.max                  # 浮点数极限值
-CHINA_TZ = ZoneInfo("Asia/Shanghai")       # 中国时区
+CHINA_TZ = ZoneInfo("Asia/Shanghai")            # 中国时区
 
 # 合约数据全局缓存字典
 symbol_contract_map: Dict[str, ContractData] = {}
@@ -701,10 +703,13 @@ class HftTdApi(TdApi):
             self.orders[orderid] = order
             self.gateway.on_order(order)
 
+            if last:
+                self.query_order(pos)
+
         elif error["err_code"] != 14020:
             self.gateway.write_error(error)
 
-        if last:
+        else:
             self.gateway.write_log("查询委托信息成功")
 
     def onQueryTradeRsp(
@@ -743,10 +748,13 @@ class HftTdApi(TdApi):
             )
             self.gateway.on_trade(trade)
 
+            if last:
+                self.query_trade(pos)
+
         elif error["err_code"] != 14020:
             self.gateway.write_error(error)
 
-        if last:
+        else:
             self.gateway.write_log("查询成交信息成功")
 
     def connect(
@@ -784,6 +792,10 @@ class HftTdApi(TdApi):
 
     def send_order(self, req: OrderRequest) -> str:
         """委托下单"""
+        if req.type not in ORDERTYPE_VT2HFT:
+            self.gateway.write_log(f"当前接口不支持该类型的委托{req.type.value}")
+            return ""
+
         if self.margin_trading and req.offset == Offset.NONE:
             self.gateway.write_log("委托失败，两融交易需要选择开平方向")
             return ""
@@ -802,7 +814,7 @@ class HftTdApi(TdApi):
         order_req: dict = {
             "cl_order_id": orderid,
             "symbol": hft_symbol,
-            "order_type": OrderType_LMT,
+            "order_type": ORDERTYPE_VT2HFT[req.type],
             "volume": int(req.volume),
             "price": int(req.price * 10000),
             "side": SIDE_VT2HFT[(req.direction, req.offset)]
@@ -816,15 +828,25 @@ class HftTdApi(TdApi):
         self.gateway.on_order(order)
         return order.vt_orderid
 
-    def query_order(self) -> None:
+    def query_order(self, pos_str: str = "") -> None:
         """查询未成交委托"""
-        self.reqid += 1
-        self.queryOrders("", 500, self.reqid, 0)
+        hft_req: dict = {
+            "pos_str": pos_str,
+            "query_num": 500
+        }
 
-    def query_trade(self) -> None:
-        """查询成交"""
         self.reqid += 1
-        self.queryTrades("", 500, self.reqid)
+        self.queryOrders(hft_req, self.reqid)
+
+    def query_trade(self, pos_str: str = "") -> None:
+        """查询成交"""
+        hft_req: dict = {
+            "pos_str": pos_str,
+            "query_num": 500
+        }
+
+        self.reqid += 1
+        self.queryTrades(hft_req, self.reqid)
 
     def cancel_order(self, req: CancelRequest) -> None:
         """委托撤单"""
@@ -837,28 +859,26 @@ class HftTdApi(TdApi):
     def query_account(self) -> None:
         """查询资金"""
         self.reqid += 1
-        self.queryCash(self.reqid)
+        self.queryCash({}, self.reqid)
 
     def query_position(self) -> None:
         """查询持仓"""
+        hft_req: dict = {
+            "pos_str": "",
+            "query_num": 500
+        }
+
         self.reqid += 1
-        self.queryPositions("", 500, self.reqid)
+        self.queryPositions(hft_req, self.reqid)
 
         if self.margin_trading:
             self.reqid += 1
-            self.queryCreditShortsell("", 500, self.reqid)
+            self.queryCreditShortsell(hft_req, self.reqid)
 
     def close(self) -> None:
         """关闭连接"""
         if self.connect_status:
             self.exit()
-
-
-def adjust_price(price: float) -> float:
-    """将异常的浮点数最大值（MAX_FLOAT）数据调整为0"""
-    if price == MAX_FLOAT:
-        price = 0
-    return price
 
 
 def generate_datetime(timestamp: str) -> datetime:

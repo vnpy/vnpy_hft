@@ -79,32 +79,59 @@ void getInt(const dict &d, const char *key, int *value)
     }
 };
 
+void getInt16_t(const dict& d, const char* key, INT16* value)
+{
+    if (d.contains(key))		//检查字典中是否存在该键值
+    {
+        object o = d[key];		//获取该键值
+        *value = o.cast<INT16>();
+    }
+};
 
-void getInt16_t(const dict &d, const char *key, int16_t *value)
+void getInt32_t(const dict& d, const char* key, INT32* value)
+{
+    if (d.contains(key))		//检查字典中是否存在该键值
+    {
+        object o = d[key];		//获取该键值
+        *value = o.cast<INT32>();
+    }
+
+};
+
+void getLonglong(const dict &d, const char *key, INT64 *value)
 {
 	if (d.contains(key))		//检查字典中是否存在该键值
 	{
 		object o = d[key];		//获取该键值
-		*value = o.cast<int>();
+		*value = o.cast<INT64>();
 	}
 };
 
-void getInt32_t(const dict &d, const char *key, int32_t *value)
+void getUint16_t(const dict& d, const char* key, UINT16* value)
 {
-	if (d.contains(key))		//检查字典中是否存在该键值
-	{
-		object o = d[key];		//获取该键值
-		*value = o.cast<int>();
-	}
+    if (d.contains(key))		//检查字典中是否存在该键值
+    {
+        object o = d[key];		//获取该键值
+        *value = o.cast<UINT16>();
+    }
 };
 
-void getInt64_t(const dict &d, const char *key, int64_t *value)
+void getUint64_t(const dict& d, const char* key, UINT64* value)
 {
-	if (d.contains(key))		//检查字典中是否存在该键值
-	{
-		object o = d[key];		//获取该键值
-		*value = o.cast<int>();
-	}
+    if (d.contains(key))		//检查字典中是否存在该键值
+    {
+        object o = d[key];		//获取该键值
+        *value = o.cast<UINT64>();
+    }
+};
+
+void getBool(const dict& d, const char* key, bool* value)
+{
+    if (d.contains(key))		//检查字典中是否存在该键值
+    {
+        object o = d[key];		//获取该键值
+        *value = o.cast<bool>();
+    }
 };
 
 //从字典中获取某个建值对应的浮点数，并赋值到请求结构体对象的值上
