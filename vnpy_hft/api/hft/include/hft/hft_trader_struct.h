@@ -57,6 +57,21 @@ struct AccountInfo {
     char40 cl_system_id;   // 接入方系统标识，由服务端分配
 };
 
+// 登录请求相关信息
+struct LoginReq {
+    char16 account_id;      // 交易账号，目前是资金账号
+    int16_t account_type;   // 交易账号类型，参考AccountType定义
+    char16 account_pwd;     // 交易账号密码
+    char8 cust_orgid;       // 交易账号的机构编码
+    char8 cust_branchid;    // 交易账号的分支编码
+    char40 cl_system_id;    // 接入方系统标识，由服务端分配
+    char32 svr_ip;          // 交易服务器ip地址
+    int svr_port;           // 交易服务器端口
+    char256 terminal_info;  // 交易终端信息，格式需满足交易所要求，格式请见接口说明文档
+                            // windows平台GBK编码, Linux平台UTF8编码 
+    int16_t inner_flag;     // 内部调用标志，参考 InnerCallFlag 定义，非必传，默认非内部调用   
+};
+
 // 资金账号对应的股东账号信息
 struct SecuidInfo {
     char8 market;				// 市场，SH、SZ等，参考本文件中定义
@@ -65,6 +80,8 @@ struct SecuidInfo {
 	int16_t account_type;       // 证券账户(股东代码)类型，参考AccountType定义
 	char account_status;		// 证券账户(股东代码)状态，参考AccountStatus定义
 	char account_class;         // 股东代码类别，参考AccountClass定义
+	char64 account_rights;      // 股东代码权限集，单个权限参考AccountRightType定义
+	char account_hgtright;      // 沪港通权限，参考SHHKAccountRight定义
 };
 
 // 登录应答数据
@@ -161,7 +178,7 @@ struct CancelRsp {
 struct QryByOrderIdReq {
     char32 order_id;      // 柜台订单id
     char8 market;         // 市场，港股通需要填，深港通传SZHK，沪港通传SHHK，默认设置为空
-						  // 顶点普通柜台不支持此字段入参。
+						  // 顶点普通账号,低延时非一户两地账号不支持此字段入参。
 };
 
 // 根据标的代码查询请求
@@ -513,7 +530,7 @@ struct SecurityBaseInfo {
     Percent_t limit_up_rate;			// 最大涨幅，扩大100倍
     int32_t is_registration;			// 是否注册制1=True/Yes,0=False/No
     Percent_t limit_down_rate;			// 最大跌幅，扩大100倍
-	
+	char trade_id;                      // 可交易类型，参考TradableType定义，目前仅集中交易，低延时V2柜台支持
 };
 
 // 根据市场查询请求
@@ -753,6 +770,8 @@ struct CreditFinanceDetail {
     Amt_t credit_repay_unfrz;  // 当日归还负债金额，扩大一万倍
     Amt_t all_fee_unfrz;       // 当日归还负债息费，扩大一万倍
     int32_t market;            // 市场
+    char32 pos_str;            // 定位串
+    int32_t end_date;          // 到期日期
 };
 
 // 查询信用融券合约请求
@@ -919,6 +938,8 @@ struct OptionPositionDetail {
     Amt_t frozen_amount;           // 冻结的资金，扩大一万倍，仅支持泰琰柜台
     Amt_t today_close_profit;      // 当日平仓盈亏，扩大一万倍
     Amt_t buy_quota_used;          // 买入占用额度，扩大一万倍
+    Price_t last_price;            // 最新价，扩大一万倍
+    int64_t underlying_multiple;   // 合约单位
 };
 
 // 行权的请求类型
@@ -989,7 +1010,7 @@ struct ExerciseDetail {
 struct ContractInfo {
     char32 contract_id;                    // 合约代码，格式为市场.证券ID或市场.合约ID
     char32 exch_contract_id;               // 交易所合约代码，仅支持泰琰柜台
-    char32 contract_name;                  // 合约名称
+    char64 contract_name;                  // 合约名称
     char32 underlying_contract_id;         // 基础证券代码
     char32 underlying_contract_name;       // 基础证券名称
     int32_t underlying_multiplier;         // 合约基础商品乘数，仅支持泰琰柜台
@@ -1283,10 +1304,10 @@ struct CombContractInfo {
     char32 contract_id;       // 组合合约代码，格式为市场.合约ID&合约ID，例如SHOP.10002421&10002401
     int16_t comb_strategy;    // 组合策略类型，参考OptionCombineStrategy定义
     char32 leg1_contract_id;  // 成分一合约代码，格式为市场.证券ID或市场.合约ID
-    char32 leg1_name;         // 成分一合约名称
+    char64 leg1_name;         // 成分一合约名称
     int16_t leg1_side;        // 策略要求的成分一合约多空方向，参考PositionSide定义
     char32 leg2_contract_id;  // 成分二合约代码，格式为市场.证券ID或市场.合约ID
-    char32 leg2_name;         // 成分二合约名称
+    char64 leg2_name;         // 成分二合约名称
     int16_t leg2_side;        // 策略要求的成分二合约多空方向，参考PositionSide定义
 };
 
@@ -1321,87 +1342,6 @@ struct LockSecurityDetail {
     int32_t end_date;         // 结束日期
     int16_t hs_status;        // 回收状态，参考 RecycleStatus 定义，目前仅支持低延时柜台
     int16_t wy_status;        // 违约状态，参考 ViolationStatus 定义，目前仅支持低延时柜台
-};
-
-// 锁券展期申请请求
-struct ExtendLockSecurityReq {
-    int32_t sys_date;               // 锁券日期，格式为YYYYMMDD
-    char32 sno;                     // 锁券流水号
-    int32_t apply_delay_days;       // 申请展期天数
-    Ratio_t apply_used_fee_rate;    // 申请使用费率，扩大一万倍
-    Ratio_t apply_unused_fee_rate;  // 申请占用费率，扩大一万倍
-    int32_t apply_delay_qty;        // 申请展期数量
-    char32 symbol;                  // 标的代码，格式为市场.证券ID，顶点两融必送，低延时取前半部分市场以获取股东代码用
-};
-
-struct ExtendLockSecurityRsp {
-    char16 account_id;     // 交易账号，目前是资金账号
-    int16_t account_type;  // 交易账号类型，参考AccountType定义
-    char8 cust_orgid;      // 机构编码
-    char8 cust_branchid;   // 分支编码
-    int32_t apply_date;    // 申请日期，格式为YYYYMMDD
-    char32 apply_sno;      // 申请流水号
-};
-
-// 查询锁券展期申请请求
-struct QryLockSecurityExtensionReq {
-	int start_date;       // 开始日期，格式为YYYYMMDD，如20190415
-	int end_date;         // 结束日期，格式为YYYYMMDD，如20190418
-	char32 pos_str;       // 查询定位串，第一次查询传入空，后续查询使用前一次查询返回的定位串
-	int32_t query_num;    // 查询的数量，最大支持500个，低延时账号无回切此字段值有效，其他情况无效。
-};
-
-// 锁券展期明细数据
-struct LockSecurityExtensionDetail {
-    char16 account_id;                 // 交易账号，目前是资金账号
-    int16_t account_type;              // 交易账号类型，参考AccountType定义
-    char8 cust_orgid;                  // 机构编码
-    char8 cust_branchid;               // 分支编码
-    int32_t apply_date;                // 申请日期，格式为YYYYMMDD
-    char32 apply_sno;                  // 申请流水号
-    int32_t sys_date;                  // 起始日（系统日期)，格式为YYYYMMDD
-    char32 sno;                        // 流水号
-    char32 symbol;                     // 锁定的标的代码，格式为市场.证券ID
-    char32 name;                       // 证券名称，目前仅支持低延时柜台 
-    int32_t apply_end_date;            // 申请展期到期日，格式为YYYYMMDD 
-    int32_t apply_delay_qty;           // 申请展期股数 
-    Ratio_t approval_used_fee_rate;    // 审批融券费率，扩大一万倍 
-    Ratio_t approval_unused_fee_rate;  // 审批管理费率，扩大一万倍 
-    int16_t approval_status;           // 审批状态，参见ApprovalStatus定义 
-    char128 approval_remark;           // 审批批注 
-    int32_t old_end_date;              // 原到期日，格式为YYYYMMDD，目前仅支持低延时柜台 
-    Ratio_t old_used_fee_rate;         // 原融券费率，扩大一万倍 
-    Ratio_t old_unused_fee_rate;       // 原管理费率，扩大一万倍 
-    int64_t old_left_qty;              // 原预约融券数量 
-    Ratio_t old_violate_fee_rate;      // 原违约费率，扩大一万倍，目前仅支持低延时柜台
-    int16_t old_hs_status;             // 原状态，参考 RecycleStatus 定义，目前仅支持低延时柜台
-    Ratio_t apply_used_fee_rate;       // 申请融券费率，扩大一万倍 
-    Ratio_t apply_unused_fee_rate;     // 申请管理费率，扩大一万倍 
-    int32_t apply_delay_days;          // 申请展期天数 
-    int32_t approval_end_date;         // 审批到期日，格式为YYYYMMDD 
-    Ratio_t approval_violate_fee_rate; // 审批违约费率，扩大一万倍，目前仅支持低延时柜台
-    int64_t approval_delay_qty;        // 审批展期数量 
-    int32_t approval_delay_days;       // 审批展期天数 
-    int16_t hs_status; 			       // 回收状态，参考 RecycleStatus 定义，目前仅支持低延时柜台
-    int16_t wy_status; 			       // 违约状态，参考 ViolationStatus 定义，目前仅支持低延时柜台
-    int64_t lock_qty;                  // 锁券数量，目前仅支持低延时柜台
-    int64_t used_qty;                  // 已使用数量，目前仅支持低延时柜台
-    int64_t back_qty;                  // 已回收数量，目前仅支持低延时柜台
-    int64_t delay_qty;                 // 展期数量，目前仅支持低延时柜台
-    int32_t oper_date;                 // 申请日期YYYYMMDD，目前仅支持低延时柜台
-    int32_t oper_time;                 // 申请时间，精确到毫秒，格式HHMMSSmmm，首位为0不显示，目前仅支持低延时柜台
-    int16_t back_type;                 // 回收类型，参考 RecycleType 定义，目前仅支持低延时柜台
-    Price_t lock_price;                // 锁券价格，扩大一万倍，目前仅支持低延时柜台
-    int32_t begin_date;                // 开始日期YYYYMMDD，目前仅支持低延时柜台
-    int32_t end_date;                  // 结束日期YYYYMMDD，目前仅支持低延时柜台
-    int32_t real_date;                 // 实际了结日期YYYYMMDD，目前仅支持低延时柜台
-    int32_t last_date;                 // 最后计息日YYYYMMDD，目前仅支持低延时柜台
-    int64_t deal_back_qty;             // 处理日回收数量，目前仅支持低延时柜台
-    char32 secuid;                     // 股东代码，目前仅支持低延时柜台
-    int32_t chk_date;                  // 审批物理日YYYYMMDD，目前仅支持低延时柜台
-    int32_t chk_time;                  // 审批时间，精确到毫秒，格式HHMMSSmmm，首位为0不显示，目前仅支持低延时柜台
-    int16_t deal_flag;                 // 处理标识，参考 DealFlag 定义，目前仅支持低延时柜台
-    int32_t deal_date;                 // 处理日期YYYYMMDD，目前仅支持低延时柜台
 };
 
 // 资金划转流水明细数据
@@ -1560,8 +1500,8 @@ struct OptionHisOrderDetail {
     char32 option_account;            // 期权合约账号
     int32_t option_security_type;     // 期权证券业务，参考OptionSecurityType定义
     char32 option_num;                // 合约编码
-    char32 option_code;               // 合约代码
-    char32 option_name;               // 合约简称
+    char64 option_code;               // 合约代码
+    char64 option_name;               // 合约简称
     char32 comb_num;                  // 组合编码
     int16_t comb_strategy;            // 组合策略类型，参考OptionCombineStrategy定义
     char32 leg1_num;                  // 成分一合约编码
@@ -1589,10 +1529,10 @@ struct OptionHisOrderDetail {
     int32_t leg2_side;                // 成分二持仓方向
     int32_t leg3_side;                // 成分三持仓方向
     int32_t leg4_side;                // 成分四持仓方向
-    char32 leg1_name;                 // 成分一合约简称
-    char32 leg2_name;                 // 成分二合约简称
-    char32 leg3_name;                 // 成分三合约简称
-    char32 leg4_name;                 // 成分四合约简称
+    char64 leg1_name;                 // 成分一合约简称
+    char64 leg2_name;                 // 成分二合约简称
+    char64 leg3_name;                 // 成分三合约简称
+    char64 leg4_name;                 // 成分四合约简称
 };
 
 // 查询股票期权历史成交请求
@@ -1621,7 +1561,7 @@ struct OptionHisTradeDetail {
     int32_t option_security_type;     // 期权证券业务，参考OptionSecurityType定义
     int32_t option_security_action;   // 期权证券业务行为，参考OptionSecurityAction定义
     char32 option_num;                // 合约编码
-    char32 option_name;               // 合约简称
+    char64 option_name;               // 合约简称
     char32 comb_num;                  // 组合编码
     int16_t comb_strategy;            // 组合策略类型，参考OptionCombineStrategy定义
     char32 leg1_num;                  // 成分一合约编码
@@ -1641,10 +1581,10 @@ struct OptionHisTradeDetail {
     int32_t leg2_side;                // 成分二持仓方向
     int32_t leg3_side;                // 成分三持仓方向
     int32_t leg4_side;                // 成分四持仓方向
-    char32 leg1_name;                 // 成分一合约简称
-    char32 leg2_name;                 // 成分二合约简称
-    char32 leg3_name;                 // 成分三合约简称
-    char32 leg4_name;                 // 成分四合约简称
+    char64 leg1_name;                 // 成分一合约简称
+    char64 leg2_name;                 // 成分二合约简称
+    char64 leg3_name;                 // 成分三合约简称
+    char64 leg4_name;                 // 成分四合约简称
 };
 
 // 查询股票期权历史行权指派明细请求
@@ -1668,7 +1608,7 @@ struct HisExerciseAppointmentDetail {
     char32 secuid;                   // 股东账号
     char32 option_account;           // 期权合约账号
     char32 option_num;               // 合约编码
-    char32 option_name;              // 合约简称
+    char64 option_name;              // 合约简称
     int32_t options_type;            // 期权类型，参考OptionsType定义
     char32 underlying_code;          // 标的证券代码
     int32_t cover_flag;              // 备兑标志，参考CoverFlag定义
@@ -1703,7 +1643,7 @@ struct OptionHisDeliveryDetail {
     int32_t option_security_type;     // 期权证券业务，参考OptionSecurityType定义
     int32_t option_security_action;   // 期权证券业务行为，参考OptionSecurityAction定义
     char32 option_num;                // 合约编码
-    char32 option_name;               // 合约简称
+    char64 option_name;               // 合约简称
     char32 comb_num;                  // 组合编码
     int16_t comb_strategy;            // 组合策略类型，参考OptionCombineStrategy定义
     char32 leg1_num;                  // 成分一合约编码
@@ -1734,10 +1674,10 @@ struct OptionHisDeliveryDetail {
     int32_t leg2_side;                // 成分二持仓方向
     int32_t leg3_side;                // 成分三持仓方向
     int32_t leg4_side;                // 成分四持仓方向
-    char32 leg1_name;                 // 成分一合约简称
-    char32 leg2_name;                 // 成分二合约简称
-    char32 leg3_name;                 // 成分三合约简称
-    char32 leg4_name;                 // 成分四合约简称
+    char64 leg1_name;                 // 成分一合约简称
+    char64 leg2_name;                 // 成分二合约简称
+    char64 leg3_name;                 // 成分三合约简称
+    char64 leg4_name;                 // 成分四合约简称
 };
 
 // 查询历史行权交收流水明细请求
@@ -1803,8 +1743,8 @@ struct OptionHisContractAssetDetail {
     int16_t currency_type;            // 货币类型，参考CurrencyType定义
     char32 option_account;            // 期权合约账号
     char32 option_num;                // 合约编码
-    char32 option_code;               // 合约代码
-    char32 option_name;               // 合约简称
+    char64 option_code;               // 合约代码
+    char64 option_name;               // 合约简称
     int32_t options_type;             // 期权类型，参考OptionsType定义
     int32_t option_side;              // 持仓方向，参考PositionSide定义
     int32_t cover_flag;               // 备兑标志，参考CoverFlag定义
@@ -1894,10 +1834,10 @@ struct OptionHisCombPositionDetail {
     int32_t leg4_type;                // 成分四合约类型，参考OptionsType定义
     int32_t leg4_side;                // 成分四持仓方向，参考PositionSide定义
     int64_t leg4_position;            // 成分四持仓数量
-    char32 leg1_name;                 // 成分一合约简称
-    char32 leg2_name;                 // 成分二合约简称
-    char32 leg3_name;                 // 成分三合约简称
-    char32 leg4_name;                 // 成分四合约简称
+    char64 leg1_name;                 // 成分一合约简称
+    char64 leg2_name;                 // 成分二合约简称
+    char64 leg3_name;                 // 成分三合约简称
+    char64 leg4_name;                 // 成分四合约简称
 };
 
 // 期权历史交割单查询请求
@@ -1924,7 +1864,7 @@ struct OptionHisSettlementDetail {
     int32_t option_security_type;     // 期权证券业务，参考OptionSecurityType定义
     int32_t option_security_action;   // 期权证券业务行为，参考OptionSecurityAction定义
     char32 option_num;                // 合约编码
-    char32 option_name;               // 合约简称
+    char64 option_name;               // 合约简称
     int32_t option_side;              // 持仓方向，参考PositionSide定义
     int64_t match_price;              // 成交价格，扩大一万倍
     int64_t match_qty;                // 成交数量
@@ -2588,7 +2528,7 @@ struct CreditContractDetail {
     int32_t cancel_date;      // 合同实际终止日期，格式为YYYYMMDD
     int16_t currency_type;    // 货币类型，参考CurrencyType定义
     int32_t contract_limit;   // 合同期限
-    int32_t contract_status;  // 合约状态，参考ContractStatus定义
+    int32_t contract_status;  // 合约状态，参考CreditContractStatus定义
     int32_t begin_date;       // 起始日期
     int32_t end_date;         // 结束日期
     Ratio_t f_prate;          // 融资罚息年利率，扩大一万倍
@@ -2977,18 +2917,6 @@ struct CreditAssetFlowDetail {
     Amt_t match_amt;            // 成交金额，金额扩大一万倍
     char32 order_id;            // 柜台订单id，目前仅低延时柜台有此字段
     char32 pos_str;             // 定位串
-};
-
-// 指定合约卖券还款请求
-struct AppointContractSellStockRepayReq {
-    int32_t order_date;  // 合约委托日期，格式为YYYYMMDD
-    char32 sno;          // 合约编号
-    char32 cl_order_id;  // 卖券客户端订单id，用来引用一个普通订单，由用户自定义，可不传
-    char32 symbol;       // 卖券标的，格式为市场.证券ID或市场.合约ID，例如SH.600000或SHOP.10002003
-    int16_t order_type;  // 卖券订单类型，参考OrderType定义，新股申购填限价
-    int16_t side;        // 卖券买卖方向，参考OrderSide定义
-    int64_t volume;      // 卖券订单数量，股票单位（股），债券单位（上海：手，深圳：张），可按需后台配置上海债券的单位
-    Price_t price;       // 卖券委托价，限价单使用，扩大一万倍，市价填写0
 };
 
 // 查询信用客户融资融券合约请求

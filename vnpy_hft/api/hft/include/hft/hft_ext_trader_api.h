@@ -1181,6 +1181,16 @@ class ExtTraderSpi : public TraderSpi {
 									 int request_id, bool is_last, const char* pos_str) {}
 
     /**
+    * 券池查询客户合约定价信息应答
+    *
+    * @param detail        客户合约定价信息详情
+    * @param error_info    应答的错误信息
+    * @param request_id    对应请求时传入的序列号
+    */
+    virtual void OnQCQueryCustContractPriceInfoRsp(QCQueryCustContractPriceInfoDeatil* detail, ErrorInfo* error_info,
+                                        int request_id, bool is_last, const char* pos_str) {}
+
+    /**
     * 券源通预告申报应答
     *
     * @param detail        券源通预告申报应答明细
@@ -1197,6 +1207,62 @@ class ExtTraderSpi : public TraderSpi {
     * @param request_id    对应请求时传入的序列号
     */
     virtual void OnQytDirectOrderRsp(QytDirectOrderDetail* detail, ErrorInfo* error_info, int request_id) {}
+
+
+    /**
+    * 券源通标准篮子申报应答
+    *
+    * @param detail        券源通标准篮子申报应答
+    * @param error_info    应答的错误信息
+    * @param request_id    对应请求时传入的序列号
+    */
+    virtual void OnQytBasketOrderRsp(QytBasketOrderDetail* detail, ErrorInfo* error_info, int request_id) {}
+
+    /**
+    * 券源通篮子申报撤单应答
+    *
+    * @param detail        券源通篮子申报撤单应答
+    * @param error_info    应答的错误信息
+    * @param request_id    对应请求时传入的序列号
+    */
+    virtual void OnCancelQytBasketOrderRsp(CancelQytBasketOrderRsp* detail, ErrorInfo* error_info, int request_id) {}
+
+    /**
+    * 券源通篮子申报查询应答
+    *
+    * @param detail        篮子申报明细
+    * @param error_info    应答的错误信息
+    * @param request_id    对应请求时传入的序列号
+    * @param is_last       是否是本次请求的最后一笔响应
+    * @param pos_str       本次查询最后一条记录的定位串，用于下一次查询
+    */
+    virtual void OnQueryQytBasketOrderRsp(QytBasketOrderRecord* detail, ErrorInfo* error_info, 
+            int request_id, bool is_last, const char* pos_str) {}
+
+    /**
+    * 券源通标准篮子申报详情应答
+    *
+    * @param detail        标准篮子申报详情明细
+    * @param error_info    应答的错误信息
+    * @param request_id    对应请求时传入的序列号
+    * @param is_last       是否是本次请求的最后一笔响应
+    * @param pos_str       本次查询最后一条记录的定位串，用于下一次查询
+    */
+    virtual void OnQueryQytBasketOrderDetailRsp(QytBasketOrderDetailRecord* detail, ErrorInfo* error_info, 
+            int request_id, bool is_last, const char* pos_str) {}
+
+    /**
+    * 券源通定制篮子申报详情应答
+    *
+    * @param detail        定制篮子申报详情明细
+    * @param error_info    应答的错误信息
+    * @param request_id    对应请求时传入的序列号
+    * @param is_last       是否是本次请求的最后一笔响应
+    * @param pos_str       本次查询最后一条记录的定位串，用于下一次查询
+    */
+    virtual void OnQueryQytCustBasketOrderDetailRsp(QytCustBasketOrderDetailRecord* detail, ErrorInfo* error_info, 
+            int request_id, bool is_last, const char* pos_str) {}
+
 
     /**
      * 资产总值分类查询的响应
@@ -1249,6 +1315,250 @@ class ExtTraderSpi : public TraderSpi {
 	* @param request_id    对应请求时传入的序列号
 	*/
 	virtual void OnSignFundRiskGgreementRsp(SignFundRiskGgreementRsp* detail, ErrorInfo* error_info, int request_id) {}
+
+    /**
+    * 资金横向划转应答
+    *
+    * @param rsp           资金横向划转应答
+    * @param error_info    应答的错误信息
+    * @param request_id    对应请求时传入的序列号
+    */
+    virtual void OnLateralTransferOrderRsp(LateralTransferOrderRsp* rsp, ErrorInfo* error_info, int request_id) {}
+
+    /**
+    * 查询横向划转流水应答
+    *
+    * @param detail        横向划转流水明细
+    * @param error_info    应答的错误信息
+    * @param request_id    对应请求时传入的序列号
+    * @param is_last       是否是本次请求的最后一笔响应
+    */
+    virtual void OnQueryLateralTransferFlowRsp(LateralTransferFlowDetail* detail, ErrorInfo* error_info,
+            int request_id, bool is_last) {}
+
+	/**
+	* 券源通意向登记应答
+	*
+	* @param req           券源通意向登记请求
+	* @param request_id    请求序列号，用于匹配响应，由用户自定义，非0
+	*
+	* @return              成功返回0，失败返回错误码，通过GetApiLastError获取错误信息
+	*/
+	virtual void OnQytIntenRegistraRsp(QytIntenRegistraRsp* rsp, ErrorInfo* error_info, int request_id) {}
+
+	/**
+	* 券源通查询意向登记应答
+	*
+	* @param req           券源通查询意向登记请求
+	* @param request_id    请求序列号，用于匹配响应，由用户自定义，非0
+	*
+	* @return              成功返回0，失败返回错误码，通过GetApiLastError获取错误信息
+	*/
+	virtual void OnQytQueryIntenRegistraRsp(QytQueryIntenRegistraRsp* detail, ErrorInfo* error_info,
+											int request_id, bool is_last, const char* pos_str) {}
+
+    /**
+    * 券源通提前了结前置判断应答
+    *
+    * @param detail        券源通提前了结前置判断应答
+    * @param error_info    应答的错误信息
+    * @param request_id    请求序列号，用于匹配响应，由用户自定义，非0
+    */
+    virtual void OnQytSettleEarlyPreJudgeRsp(QytSettleEarlyPreJudgeRsp* rsp, ErrorInfo* error_info, int request_id) {}
+
+    /**
+    * 券源通提前了结申请应答
+    *
+    * @param detail        券源通提前了结申请应答
+    * @param error_info    应答的错误信息
+    * @param request_id    请求序列号，用于匹配响应，由用户自定义，非0
+    */
+    virtual void OnQytSettleEarlyOrderRsp(QytSettleEarlyOrderRsp* rsp, ErrorInfo* error_info, int request_id) {}
+
+    /**
+    * 券源通提前了结查询应答
+    *
+    * @param detail        券源通提前了结查询应答
+    * @param error_info    应答的错误信息
+    * @param request_id    对应请求时传入的序列号
+    * @param is_last       是否是本次请求的最后一笔响应
+    * @param pos_str       本次查询最后一条记录的定位串，用于下一次查询
+    */
+    virtual void OnQueryQytSettleEarlyOrdersRsp(QytSettleEarlyOrderDetail* detail, ErrorInfo* error_info, 
+                       int request_id, bool is_last, const char* pos_str) {}
+
+    /**
+    * 券源通提前了结撤单应答
+    *
+    * @param rsp           券源通提前了结撤单应答
+    * @param error_info    应答的错误信息
+    * @param request_id    请求序列号，用于匹配响应，由用户自定义，非0
+    */
+    virtual void OnCancelQytSettleEarlyOrderRsp(CancelQytSettleEarlyOrderRsp* rsp, ErrorInfo* error_info, int request_id) {}
+
+	/**
+	* 深圳报价回购合约查询应答
+	*
+	* @param detail        应答明细
+	* @param error_info    应答的错误信息
+	* @param request_id    对应请求时传入的序列号
+	* @param is_last       是否是本次请求的最后一笔响应
+	*/
+	virtual void OnQuerySZQuoteRepoContractRsp(QrySZQuoteRepoContractDetail* detail, ErrorInfo* error_info,
+											   int request_id, bool is_last) {}
+
+	/**
+	* 深圳报价回购委托应答
+	*
+	* @param rsp           应答明细
+	* @param error_info    应答的错误信息
+	* @param request_id    请求序列号，用于匹配响应，由用户自定义，非0
+	*/
+	virtual void OnSZQuoteRepoOrderRsp(SZQuoteRepoOrderRsp* rsp, ErrorInfo* error_info, int request_id) {}
+
+	/**
+	* 深圳报价回购不再续做应答
+	*
+	* @param rsp           应答明细
+	* @param error_info    应答的错误信息
+	* @param request_id    请求序列号，用于匹配响应，由用户自定义，非0
+	*/
+	virtual void OnSZQuoteRepoNoContinueRsp(SZQuoteRepoNoContinueRsp* rsp, ErrorInfo* error_info, int request_id) {}
+
+	/**
+	* 深圳报价回购提前购回委托应答
+	*
+	* @param rsp           应答明细
+	* @param error_info    应答的错误信息
+	* @param request_id    请求序列号，用于匹配响应，由用户自定义，非0
+	*/
+	virtual void OnSZQuoteRepoEarlyRepurchaseOrderRsp(SZQuoteRepoEarlyRepurchaseOrderRsp* rsp,
+													  ErrorInfo* error_info, int request_id) {}
+
+	/**
+	* 深圳报价回购提前购回预约应答
+	*
+	* @param rsp           应答明细
+	* @param error_info    应答的错误信息
+	* @param request_id    请求序列号，用于匹配响应，由用户自定义，非0
+	*/
+	virtual void OnSZQuoteRepoEarlyRepurchaseBookRsp(SZQuoteRepoEarlyRepurchaseBookRsp* rsp,
+													 ErrorInfo* error_info, int request_id) {}
+
+	/**
+	* 深圳报价回购合约不再续做查询应答
+	*
+	* @param detail        应答明细
+	* @param error_info    应答的错误信息
+	* @param request_id    对应请求时传入的序列号
+	* @param is_last       是否是本次请求的最后一笔响应
+	*/
+	virtual void OnQuerySZQuoteRepoNoContinueContractRsp(QrySZQuoteRepoNoContinueContractDetail* detail, ErrorInfo* error_info,
+														 int request_id, bool is_last) {}
+
+    /**
+    * 报价回购利率额度查询应答
+    *
+    * @param detail        报价回购利率额度明细
+    * @param error_info    应答的错误信息
+    * @param request_id    对应请求时传入的序列号
+    * @param is_last       是否是本次请求的最后一笔响应
+    */
+    virtual void OnQueryQuoteRepoInteRateLimitRsp(QuoteRepoInteRateLimitDetail* detail, 
+			ErrorInfo* error_info, int request_id, bool is_last) {}
+
+    /**
+    * 深圳报价回购产品信息查询应答
+    *
+    * @param detail        报价回购产品信息明细
+    * @param error_info    应答的错误信息
+    * @param request_id    对应请求时传入的序列号
+    * @param is_last       是否是本次请求的最后一笔响应
+    */
+    virtual void OnQuerySZQuoteRepoProdInfoRsp(SZQuoteRepoProdInfoDetail* detail, ErrorInfo* error_info, 
+            int request_id, bool is_last) {}
+
+    /**
+    * 深圳报价回购委托查询应答
+    *
+    * @param detail        深圳报价回购委托明细
+    * @param error_info    应答的错误信息
+    * @param request_id    对应请求时传入的序列号
+    * @param is_last       是否是本次请求的最后一笔响应
+    */
+    virtual void OnQuerySZQuoteRepoOrdersRsp(SZQuoteRepoOrderDetail* detail, ErrorInfo* error_info, 
+            int request_id, bool is_last) {}
+
+	/**
+    * 上海报价回购委托应答
+    *
+    * @param rsp           上海报价回购委托应答
+    * @param error_info    应答的错误信息
+    * @param request_id    请求序列号，用于匹配响应，由用户自定义，非0
+    */
+    virtual void OnSHQuoteRepoOrderRsp(SHQuoteRepoOrderRsp* rsp, ErrorInfo* error_info, int request_id) {}
+
+	/**
+    * 上海报价回购不再续做应答
+    *
+    * @param rsp           上海报价回购不再续做应答
+    * @param error_info    应答的错误信息
+    * @param request_id    请求序列号，用于匹配响应，由用户自定义，非0
+    */
+    virtual void OnSHQuoteRepoNoContinueRsp(SHQuoteRepoNoContinueRsp* rsp, ErrorInfo* error_info, int request_id) {}
+
+	/**
+    * 上海报价回购提前购回委托应答
+    *
+    * @param rsp           上海报价回购提前购回委托应答
+    * @param error_info    应答的错误信息
+    * @param request_id    请求序列号，用于匹配响应，由用户自定义，非0
+    */
+    virtual void OnSHQuoteRepoEarlyRepurchaseOrderRsp(SHQuoteRepoEarlyRepurchaseOrderRsp* rsp, ErrorInfo* error_info, int request_id) {}
+
+	/**
+    * 上海报价回购提前购回预约应答
+    *
+    * @param rsp           上海报价回购提前购回预约应答
+    * @param error_info    应答的错误信息
+    * @param request_id    请求序列号，用于匹配响应，由用户自定义，非0
+    */
+    virtual void OnSHQuoteRepoEarlyRepurchaseBookRsp(SHQuoteRepoEarlyRepurchaseBookRsp* rsp, ErrorInfo* error_info, int request_id) {}
+
+    /**
+    * 上海报价回购合约查询应答
+    *
+    * @param detail        上海报价回购合约明细
+    * @param error_info    应答的错误信息
+    * @param request_id    对应请求时传入的序列号
+    * @param is_last       是否是本次请求的最后一笔响应
+    */
+    virtual void OnQuerySHQuoteRepoContractRsp(SHQuoteRepoContractDetail* detail, ErrorInfo* error_info, 
+            int request_id, bool is_last) {}
+
+    /**
+    * 上海报价回购业务查询应答
+    *
+    * @param detail        上海报价回购业务明细
+    * @param error_info    应答的错误信息
+    * @param request_id    对应请求时传入的序列号
+    * @param is_last       是否是本次请求的最后一笔响应
+    */
+    virtual void OnQuerySHQuoteRepoBusinessRsp(SHQuoteRepoBusinessDetail* detail, ErrorInfo* error_info, 
+            int request_id, bool is_last) {}
+
+    /**
+    * 股转发行证券信息查询应答
+    *
+    * @param detail        股转发行证券信息详情
+    * @param error_info    应答的错误信息
+    * @param request_id    请求序列号，用于匹配响应，由用户自定义，非0
+    * @param is_last       是否是本次请求的最后一笔响应
+    * @param pos_str       本次查询最后一条记录的定位串，用于下一次查询
+    */
+    virtual void OnQueryNEEQIPOStockRsp(NEEQIPOStockDetail* detail, ErrorInfo* error_info,
+            int request_id, bool is_last, const char* pos_str) {}
+
 
 };
  
@@ -1308,6 +1618,14 @@ class HFT_TRADER_EXPORT ExtTraderApi : virtual public TraderApi {
      * @param max_interval        最大重连时间间隔，单位秒，最小为6秒
      */
     static void SetReconnectConfig(int max_retry_count, int min_interval, int max_interval);
+
+    /**
+     * 设置应用层心跳参数，只需调用一次
+     *
+     * @param ka_interval         发送应用层心跳时间间隔，单位秒，默认30秒
+     * @param max_probe_cnt       未收到对方心跳，继续发送心跳探测包的最大次数，默认10次
+     */
+    static void SetKeepaliveConfig(int ka_interval, int max_probe_cnt);
 
     /**
      * 基金转托管请求
@@ -2024,7 +2342,7 @@ class HFT_TRADER_EXPORT ExtTraderApi : virtual public TraderApi {
 	virtual int QueryBondPledgeAvailableDiscount(QryBondPledgeAvailableDiscountReq* req, int request_id) = 0;
 
 	/**
-    * 客户总资产明细查询请求
+    * 客户总资产明细查询请求，仅柜台类型为1,4,6,8,9时支持实时更新
     *
     * @param req           客户总资产明细查询请求
     * @param request_id    请求序列号，用于匹配响应，由用户自定义，非0
@@ -2328,6 +2646,17 @@ class HFT_TRADER_EXPORT ExtTraderApi : virtual public TraderApi {
     virtual int SZBondAuctionsTradeReplyOrder(SZBondAuctionsTradeReplyOrderReq* req, int request_id, const char* terminal_info) = 0;
 
     /**
+    * 深圳固收债券回售转售申报请求, 应答OnBondOrderRsp 
+    *
+    * @param req           请求明细
+    * @param request_id    请求序列号，用于匹配响应，由用户自定义，非0
+    * @param terminal_info 交易终端信息，格式需满足交易所要求，格式请见接口说明文档
+    *
+    * @return              成功返回0，失败返回错误码，通过GetApiLastError获取错误信息
+    */
+    virtual int SZBondPutBackResaleOrder(SZBondPutBackResaleOrderReq* req, int request_id) = 0;
+
+    /**
     * 固收债券历史委托扩展信息查询请求
     *
     * @param req           请求详细信息
@@ -2496,6 +2825,16 @@ class HFT_TRADER_EXPORT ExtTraderApi : virtual public TraderApi {
 	* @return              成功返回0，失败返回错误码，通过GetApiLastError获取错误信息
 	*/
     virtual int QCQueryAppointmentContract(QCQueryAppointmentContractReq* req, int request_id) = 0;
+
+    /**
+    * 券池查询客户合约定价信息请求 (数据更新频率为每日更新一次)
+    *
+    * @param req           查询客户合约定价信息请求
+    * @param request_id    请求序列号，用于匹配响应，由用户自定义，非0
+    *
+    * @return              成功返回0，失败返回错误码，通过GetApiLastError获取错误信息
+    */
+    virtual int QCQueryCustContractPriceInfo(QCQueryCustContractPriceInfoReq* req, int request_id) = 0;
 	
 	/**
 	* 券源通预告申报请求
@@ -2516,6 +2855,56 @@ class HFT_TRADER_EXPORT ExtTraderApi : virtual public TraderApi {
 	* @return              成功返回0，失败返回错误码，通过GetApiLastError获取错误信息
 	*/
 	virtual int QytDirectOrder(QytDirectOrderReq* req, int request_id) = 0;
+
+    /**
+    * 券源通标准篮子申报请求
+    *
+    * @param req           券源通标准篮子申报请求
+    * @param request_id    请求序列号，用于匹配响应，由用户自定义，非0
+    *
+    * @return              成功返回0，失败返回错误码，通过GetApiLastError获取错误信息
+    */
+    virtual int QytBasketOrder(QytBasketOrderReq* req, int request_id) = 0;
+
+    /**
+    * 券源通篮子申报撤单请求
+    *
+    * @param req           券源通篮子申报撤单请求
+    * @param request_id    请求序列号，用于匹配响应，由用户自定义，非0
+    *
+    * @return              成功返回0，失败返回错误码，通过GetApiLastError获取错误信息
+    */
+    virtual int CancelQytBasketOrder(CancelQytBasketOrderReq* req, int request_id) = 0;
+
+    /**
+    * 券源通篮子申报查询请求
+    *
+    * @param req           券源通篮子申报查询请求
+    * @param request_id    请求序列号，用于匹配响应，由用户自定义，非0
+    *
+    * @return              成功返回0，失败返回错误码，通过GetApiLastError获取错误信息
+    */
+    virtual int QueryQytBasketOrder(QueryQytBasketOrderReq* req, int request_id) = 0;
+
+    /**
+    * 券源通标准篮子申报详情请求
+    *
+    * @param req           券源通标准篮子申报详情请求
+    * @param request_id    请求序列号，用于匹配响应，由用户自定义，非0
+    *
+    * @return              成功返回0，失败返回错误码，通过GetApiLastError获取错误信息
+    */
+    virtual int QueryQytBasketOrderDetail(QueryQytBasketOrderDetailReq* req, int request_id) = 0;
+
+    /**
+    * 券源通定制篮子申报详情请求
+    *
+    * @param req           券源通定制篮子申报详情请求
+    * @param request_id    请求序列号，用于匹配响应，由用户自定义，非0
+    *
+    * @return              成功返回0，失败返回错误码，通过GetApiLastError获取错误信息
+    */
+    virtual int QueryQytCustBasketOrderDetail(QueryQytCustBasketOrderDetailReq* req, int request_id) = 0;
 
     /**
      * 资产总值分类查询请求
@@ -2567,6 +2956,251 @@ class HFT_TRADER_EXPORT ExtTraderApi : virtual public TraderApi {
 	*/
 	virtual int SignFundRiskGgreement(SignFundRiskGgreementReq* req, int request_id) = 0;
 
+    /**
+    * 资金横向划转请求
+    *
+    * @param req           资金横向划转请求参数
+    * @param request_id    请求序列号，用于匹配响应，由用户自定义，非0
+    *
+    * @return              成功返回0，失败返回错误码，通过GetApiLastError获取错误信息
+    */
+    virtual int LateralTransferOrder(LateralTransferOrderReq* req, int request_id) = 0;
+
+    /**
+    * 查询横向划转流水请求
+    *
+    * @param req           查询横向划转流水请求参数
+    * @param request_id    请求序列号，用于匹配响应，由用户自定义，非0
+    *
+    * @return              成功返回0，失败返回错误码，通过GetApiLastError获取错误信息
+    */
+    virtual int QueryLateralTransferFlow(QueryLateralTransferFlowReq* req, int request_id) = 0;
+
+    /**
+    * 券源通意向登记请求
+    *
+    * @param req           券源通意向登记请求
+    * @param request_id    请求序列号，用于匹配响应，由用户自定义，非0
+    *
+    * @return              成功返回0，失败返回错误码，通过GetApiLastError获取错误信息
+    */
+    virtual int QytIntenRegistra(QytIntenRegistraReq* req, int request_id) = 0;
+    
+    /**
+    * 券源通查询意向登记请求
+    *
+    * @param req           券源通查询意向登记请求
+    * @param request_id    请求序列号，用于匹配响应，由用户自定义，非0
+    *
+    * @return              成功返回0，失败返回错误码，通过GetApiLastError获取错误信息
+    */
+	virtual int QytQueryIntenRegistra(QytQueryIntenRegistraReq* req, int request_id) = 0;
+
+    /**
+    * 券源通提前了结前置判断请求
+    *
+    * @param req           券源通提前了结前置判断请求参数
+    * @param request_id    请求序列号，用于匹配响应，由用户自定义，非0
+    *
+    * @return              成功返回0，失败返回错误码，通过GetApiLastError获取错误信息
+    */
+    virtual int QytSettleEarlyPreJudge(QytSettleEarlyPreJudgeReq* req, int request_id) = 0;
+
+    /**
+    * 券源通提前了结申请请求
+    *
+    * @param req           券源通提前了结申请请求参数
+    * @param request_id    请求序列号，用于匹配响应，由用户自定义，非0
+    *
+    * @return              成功返回0，失败返回错误码，通过GetApiLastError获取错误信息
+    */
+    virtual int QytSettleEarlyOrder(QytSettleEarlyOrderReq* req, int request_id) = 0;
+
+    /**
+    * 券源通提前了结查询请求
+    *
+    * @param req           券源通提前了结查询请求参数
+    * @param request_id    请求序列号，用于匹配响应，由用户自定义，非0
+    *
+    * @return              成功返回0，失败返回错误码，通过GetApiLastError获取错误信息
+    */
+    virtual int QueryQytSettleEarlyOrders(QryQytSettleEarlyOrdersReq* req, int request_id) = 0;
+
+    /**
+    * 券源通提前了结撤单请求
+    *
+    * @param req           券源通提前了结撤单请求参数
+    * @param request_id    请求序列号，用于匹配响应，由用户自定义，非0
+    *
+    * @return              成功返回0，失败返回错误码，通过GetApiLastError获取错误信息
+    */
+    virtual int CancelQytSettleEarlyOrder(CancelQytSettleEarlyOrderReq* req, int request_id) = 0;
+
+	/**
+	* 深圳报价回购合约查询请求
+	*
+	* @param req           请求参数
+	* @param request_id    请求序列号，用于匹配响应，由用户自定义，非0
+	*
+	* @return              成功返回0，失败返回错误码，通过GetApiLastError获取错误信息
+	*/
+	virtual int QuerySZQuoteRepoContract(QrySZQuoteRepoContractReq* req, int request_id) = 0;
+
+	/**
+	* 深圳报价回购委托请求
+	*
+	* @param req           请求参数
+	* @param request_id    请求序列号，用于匹配响应，由用户自定义，非0
+	*
+	* @return              成功返回0，失败返回错误码，通过GetApiLastError获取错误信息
+	*/
+	virtual int SZQuoteRepoOrder(SZQuoteRepoOrderReq* req, int request_id) = 0;
+
+	/**
+	* 深圳报价回购不再续做请求
+	*
+	* @param req           请求参数
+	* @param request_id    请求序列号，用于匹配响应，由用户自定义，非0
+	*
+	* @return              成功返回0，失败返回错误码，通过GetApiLastError获取错误信息
+	*/
+	virtual int SZQuoteRepoNoContinue(SZQuoteRepoNoContinueReq* req, int request_id) = 0;
+
+	/**
+	* 深圳报价回购提前购回委托请求
+	*
+	* @param req           请求参数
+	* @param request_id    请求序列号，用于匹配响应，由用户自定义，非0
+	*
+	* @return              成功返回0，失败返回错误码，通过GetApiLastError获取错误信息
+	*/
+	virtual int SZQuoteRepoEarlyRepurchaseOrder(SZQuoteRepoEarlyRepurchaseOrderReq* req, int request_id) = 0;
+
+	/**
+	* 深圳报价回购提前购回预约请求
+	*
+	* @param req           请求参数
+	* @param request_id    请求序列号，用于匹配响应，由用户自定义，非0
+	*
+	* @return              成功返回0，失败返回错误码，通过GetApiLastError获取错误信息
+	*/
+	virtual int SZQuoteRepoEarlyRepurchaseBook(SZQuoteRepoEarlyRepurchaseBookReq* req, int request_id) = 0;
+
+	/**
+	* 深圳报价回购合约不再续做查询请求
+	*
+	* @param req           请求参数
+	* @param request_id    请求序列号，用于匹配响应，由用户自定义，非0
+	*
+	* @return              成功返回0，失败返回错误码，通过GetApiLastError获取错误信息
+	*/
+	virtual int QuerySZQuoteRepoNoContinueContract(QrySZQuoteRepoNoContinueContractReq* req, int request_id) = 0;
+
+   /**
+    * 报价回购利率额度查询请求
+    *
+    * @param req           报价回购利率额度查询请求参数
+    * @param request_id    请求序列号，用于匹配响应，由用户自定义，非0
+    *
+    * @return              成功返回0，失败返回错误码，通过GetApiLastError获取错误信息
+    */
+    virtual int QueryQuoteRepoInteRateLimit(QryQuoteRepoInteRateLimitReq* req, int request_id) = 0;
+
+   /**
+    * 深圳报价回购产品信息查询请求
+    *
+    * @param req           深圳报价回购产品信息查询请求参数
+    * @param request_id    请求序列号，用于匹配响应，由用户自定义，非0
+    *
+    * @return              成功返回0，失败返回错误码，通过GetApiLastError获取错误信息
+    */
+    virtual int QuerySZQuoteRepoProdInfo(QrySZQuoteRepoProdInfoReq* req, int request_id) = 0;
+
+   /**
+    * 深圳报价回购委托查询请求
+    *
+    * @param req           深圳报价回购委托查询请求参数
+    * @param request_id    请求序列号，用于匹配响应，由用户自定义，非0
+    *
+    * @return              成功返回0，失败返回错误码，通过GetApiLastError获取错误信息
+    */
+    virtual int QuerySZQuoteRepoOrders(QrySZQuoteRepoOrdersReq* req, int request_id) = 0;
+
+    /**
+    * 上海报价回购委托
+    *
+    * @param req           上海报价回购委托请求
+    * @param request_id    请求序列号，用于匹配响应，由用户自定义，非0
+    * @param terminal_info 交易终端信息，格式需满足交易所要求，格式请见接口说明文档
+    *
+    * @return              成功返回0，失败返回错误码，通过GetApiLastError获取错误信息
+    */
+    virtual int SHQuoteRepoOrder(SHQuoteRepoOrderReq* req, int request_id, const char* terminal_info) = 0;
+
+    /**
+    * 上海报价回购不再续做
+    *
+    * @param req           上海报价回购不再续做请求
+    * @param request_id    请求序列号，用于匹配响应，由用户自定义，非0
+    * @param terminal_info 交易终端信息，格式需满足交易所要求，格式请见接口说明文档
+    *
+    * @return              成功返回0，失败返回错误码，通过GetApiLastError获取错误信息
+    */
+    virtual int SHQuoteRepoNoContinue(SHQuoteRepoNoContinueReq* req, int request_id, const char* terminal_info) = 0;
+
+    /**
+    * 上海报价回购提前购回委托
+    *
+    * @param req           上海报价回购提前购回委托请求
+    * @param request_id    请求序列号，用于匹配响应，由用户自定义，非0
+    * @param terminal_info 交易终端信息，格式需满足交易所要求，格式请见接口说明文档
+    *
+    * @return              成功返回0，失败返回错误码，通过GetApiLastError获取错误信息
+    */
+    virtual int SHQuoteRepoEarlyRepurchaseOrder(SHQuoteRepoEarlyRepurchaseOrderReq* req, int request_id, const char* terminal_info) = 0;
+
+    /**
+    * 上海报价回购提前购回预约
+    *
+    * @param req           上海报价回购提前购回预约请求
+    * @param request_id    请求序列号，用于匹配响应，由用户自定义，非0
+    * @param terminal_info 交易终端信息，格式需满足交易所要求，格式请见接口说明文档
+    *
+    * @return              成功返回0，失败返回错误码，通过GetApiLastError获取错误信息
+    */
+    virtual int SHQuoteRepoEarlyRepurchaseBook(SHQuoteRepoEarlyRepurchaseBookReq* req, int request_id, const char* terminal_info) = 0;
+
+   /**
+    * 上海报价回购合约查询请求
+    *
+    * @param req           上海报价回购合约查询请求参数
+    * @param request_id    请求序列号，用于匹配响应，由用户自定义，非0
+    *
+    * @return              成功返回0，失败返回错误码，通过GetApiLastError获取错误信息
+    */
+    virtual int QuerySHQuoteRepoContract(QrySHQuoteRepoContractReq* req, int request_id) = 0;
+
+   /**
+    * 上海报价回购业务查询请求
+    *
+    * @param req           上海报价回购业务查询请求参数
+    * @param request_id    请求序列号，用于匹配响应，由用户自定义，非0
+    *
+    * @return              成功返回0，失败返回错误码，通过GetApiLastError获取错误信息
+    */
+    virtual int QuerySHQuoteRepoBusiness(QrySHQuoteRepoBusinessReq* req, int request_id) = 0;
+
+   /**
+    * 股转发行证券信息查询请求
+    *
+    * @param req           股转发行证券信息查询请求
+    * @param request_id    请求序列号，用于匹配响应，由用户自定义，非0
+    *
+    * @return              成功返回0，失败返回错误码，通过GetApiLastError获取错误信息
+    */
+    virtual int QueryNEEQIPOStock(QueryNEEQIPOStockReq* req, int request_id) = 0;
+
+    
 };
 
 }  // namespace HFT

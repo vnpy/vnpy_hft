@@ -414,8 +414,8 @@ namespace HFT {
 		char8 market;               // 市场，如"SZ SH"，非必传
 		char16 code;                // 代码，非必传
 		int16_t apply_status;       // 申请状态，参考ApplyStatus定义，非必传
-		char32 pos_str;             // 定位串，填""表示第一次从头开始查
-		int32_t query_num;          // 查询数量
+		char32 pos_str;             // 定位串，填""表示第一次从头开始查，仅低延时柜台支持
+		int32_t query_num;          // 查询数量，仅低延时柜台支持
 
 	};
 
@@ -428,7 +428,7 @@ namespace HFT {
 		int32_t apply_date;         // 申请日期YYYYMMDD
 		char32 apply_sno;          // 申请编号
 		int32_t oper_date;          // 操作日期YYYYMMDD
-		int32_t oper_time;          // 操作时间HHMMSS
+		int32_t oper_time;          // 操作时间HHMMSSmmm
 		char32 symbol;              // 交易标的，格式为市场.证券ID
 		char32 name;                // 证券名称
 		int16_t side;               // 买卖方向枚举
@@ -610,6 +610,7 @@ namespace HFT {
 		int64_t apply_sno;          // 申报编号，非必传
 		int16_t hk_busi_type;       // 港股通业务类型，参考HKBusinessType定义，非必传
 		int16_t hk_report_type;     // 港股通申报类型，参考HKBusinessReportType定义，非必传
+		char qry_direct;            // 查询方向，'0'倒序 '1'升序，参考QueryDirection定义，默认升序
 	};
 
 	//港股通公司行为历史明细数据
@@ -652,6 +653,9 @@ namespace HFT {
 		int64_t waiver_qty;         // 弃权数量
 		char32 pos_str;             // 查询定位串
 		int32_t total_num;          // 数据库总条数
+        char64 stk_name;            // 证券名称  
+        int32_t sbqsrq;             // 申报起始日期
+        int32_t sbjzrq;             // 申报截止日期
 	};
 
 	// 港股通登记日权益数量查询请求
@@ -679,7 +683,7 @@ namespace HFT {
 
 	// 查询港股通通知信息
 	struct QryHKNoticeReq {
-		char32 market;				// 交易市场，为空默认查深港通和沪港通
+		char32 market;				// 交易市场，为空默认查深港通和沪港通，清算已切柜台现要求必传
 		char32 code;				// 5位港股证券代码
 		char32 gxdm;				// 公司行为代码或公告编号
 		int32_t business_type;		// 业务类型, HKBusinessType
@@ -891,14 +895,14 @@ namespace HFT {
 		char8 ofcode;				// 基金代码
 		int16_t share_class;		// 收费方式，参考OfShareClass
 		int32_t fund_order_side;	// 交易方向，参考FundOrderSide
-		int32_t order_type;			// 订单类别,限价，参考OrderType
 		Amt_t order_amt;			// 委托金额,需扩大1W倍
-		int64_t fund_order_qty;		// 委托数量,基金份额/需扩大100倍
 		int32_t frozen_date;		// 资金冻结日期，格式为YYYYMMDD,预委托时操作日期
 		int64_t frozen_no;			// 资金冻结流水号,预委托时冻结流水号
 		int16_t pass_flag;			// 通过标识，参考PassFlag
 		char16 ctrl_kinds;			// 控制类别，参考CtrlKinds
 		char32 cl_order_id;			// 客户端订单id，用来引用一个普通订单，由用户自定义，原样返回
+        double order_qty;           // 委托数量,基金份额，有效小数位两位，使用老版本的用户特别注意原来扩大100倍字段已删除，
+                                    // 由此不扩大倍数的字段代替，注意倍数关系做相应变化 
 	};
 
 	// 开方式基金交易接口应答
@@ -922,12 +926,13 @@ namespace HFT {
 		int32_t fund_order_side;	// 交易方向，参考FundOrderSide
 		int32_t order_type;			// 订单类别,限价，参考OrderType
 		Amt_t order_amt;			// 委托金额,需扩大1W倍
-		int64_t fund_order_qty;		// 委托数量,基金份额/需扩大100倍
 		int32_t tsbz_type;			// 开放式基金特殊备注类型，参考OfSpecialRemarkType
 		char256 tsbz;				// 客户定投计划编号,用户中心调用时传入
 		int16_t pass_flag;			// 通过标识，参考PassFlag
 		char16 ctrl_kinds;			// 控制类别，参考CtrlKinds
 		char32 cl_order_id;			// 客户端订单id，用来引用一个普通订单，由用户自定义，原样返回
+        double order_qty;           // 委托数量,基金份额，有效小数位两位，使用老版本的用户特别注意原来扩大100倍字段已删除，
+                                    // 由此不扩大倍数的字段代替，注意倍数关系做相应变化
 	};
 
 	// 开方式基金交易接口应答
@@ -954,11 +959,12 @@ namespace HFT {
 		int32_t fund_order_side;	// 交易方向，参考FundOrderSide
 		int32_t order_type;			// 订单类别,限价，参考OrderType
 		Amt_t order_amt;			// 委托金额,需扩大1W倍
-		int64_t fund_order_qty;		// 委托数量,基金份额/需扩大100倍
 		int16_t redeem_type;		// 巨额赎回标志，参考RedeemType
 		int16_t pass_flag;			// 通过标识，参考PassFlag
 		char16 ctrl_kinds;			// 控制类别，参考CtrlKinds
 		char32 cl_order_id;			// 客户端订单id，用来引用一个普通订单，由用户自定义，原样返回
+        double order_qty;           // 委托数量,基金份额，有效小数位两位，使用老版本的用户特别注意原来扩大100倍字段已删除，
+                                    // 由此不扩大倍数的字段代替，注意倍数关系做相应变化
 	};
 
 	// 基金撤销( 认购/ 申购/ 赎回) 业务
@@ -983,11 +989,12 @@ namespace HFT {
 		int32_t fund_order_side;	// 交易方向，参考FundOrderSide
 		int32_t order_type;			// 订单类别,限价，参考OrderType
 		Amt_t order_amt;			// 委托金额,需扩大1W倍
-		int64_t fund_order_qty;		// 委托数量,基金份额/需扩大100倍
 		int32_t redeem_type;		// 巨额赎回标志，参考RedeemType
 		int32_t old_order_date;		// 原申请日期，格式为YYYYMMDD
 		char32 old_order_sno;		// 原申请单号
 		char8 other_security_id;	// 转换基金代码
+        double order_qty;           // 委托数量,基金份额，有效小数位两位，使用老版本的用户特别注意原来扩大100倍字段已删除，
+                                    // 由此不扩大倍数的字段代替，注意倍数关系做相应变化
 	};
 
 	// 开方式基金接口应答
@@ -1056,33 +1063,35 @@ namespace HFT {
 		char8 cust_orgid;               // 机构编码
 		char8 cust_branchid;            // 分支编码
 
-		int32_t predate;               // 预约的赎回日期
+		int32_t predate;               // 预约的赎回日期，格式为YYYYMMDD
 		char256 extstr2;               // 其他备注
-		int32_t oper_date;             // 发生日期
-		int32_t oper_time;             // 发生时间
-		int32_t order_date;            // 委托日期
+		int32_t oper_date;             // 发生日期，格式为YYYYMMDD
+		int32_t oper_time;             // 发生时间，精确到毫秒，格式HHMMSSmmm，首位为0不显示  
+		int32_t order_date;            // 委托日期，格式为YYYYMMDD
 		char32 sno;                    // 委托流水号
 		int32_t redeemtype;            // 巨额赎回标志
 		int64_t tacode;                // 基金公司
 		char16 taacc;                  // 基金帐号
 		char32 tran_sacc;              // 交易帐号
 		char8 ofcode;                  // 基金代码
-		char16 ofname;                 // 基金名称
+		char64 ofname;                 // 基金名称
 		int32_t share_class;           // 收费方式
 		int32_t trdid;                 // 交易类型
 		int32_t cancel_flag;           // 撤消标志
-		int32_t order_status;          // 委托状态
+		int32_t order_status;          // 委托状态，参考FundOrderStatus定义
 		char32 err_info;			   // 返回错误信息
 		int32_t divid_method;          // 分红方式
 		Amt_t orderamt;                // 委托金额，扩大1W倍
-		int64_t fund_order_qty;        // 委托数量，扩大100倍
-		int64_t fund_matched_qty;      // 已成交数量，扩大100倍
 		char16 other_taacc;            // 对方基金帐号
 		char32 other_transacc;         // 对方交易帐号
 		char8 other_ofcode;            // 转换基金代码
 		Amt_t back_fee;                // 后台收费，扩大1W倍
-		int32_t old_oper_date;         // 原申请日期
+		int32_t old_oper_date;         // 原申请日期，格式为YYYYMMDD
 		char32 old_sno;				   // 原申请单号   	
+
+        // 以下两个字段代替上面两个已删除的数量类字段，倍数由原来扩大100倍改为不扩大倍数，注意做相应倍数处理
+        double order_qty;              // 委托数量，有效小数位两位
+        double matched_qty;            // 已成交数量，有效小数位两位
 	};
 
 	// 开放式基金持仓查询请求
@@ -1112,9 +1121,6 @@ namespace HFT {
 		int32_t share_class;           // 收费方式
 		Amt_t of_last_bal;             // 基金昨日余额，扩大1w倍
 		Amt_t of_bal;                  // 基金余额，扩大1w倍
-		int64_t of_avl;                // 基金可用数，扩大100倍
-		int64_t of_trd_frz;            // 基金交易冻结数，扩大100倍
-		int64_t of_long_frz;           // 基金长期冻结数，扩大100倍
 		Price_t current_cost;          // 基金买入成本，扩大1w倍
 		Amt_t last_cost;               // 基金买入总金额，扩大1w倍
 		Amt_t profit;                  // 基金浮动盈亏，扩大1w倍
@@ -1126,6 +1132,11 @@ namespace HFT {
 		int32_t ztg_flag;              // 可否转托管，参考ZtgFlag定义
 		int32_t divid_method;          // 基金分红方式
 		int32_t update_date;           // 净值更新日期
+
+        // 以下三个字段代替上面三个已删除的数量类字段，倍数由原来扩大100倍改为不扩大倍数，注意做相应倍数处理
+        double of_avl_qty;             // 基金可用数，有效小数位两位
+        double of_trd_frz_qty;         // 基金交易冻结数，有效小数位两位
+        double of_long_frz_qty;        // 基金长期冻结数，有效小数位两位
 	};
 
 	//基金确认信息查询 请求
@@ -1168,33 +1179,34 @@ namespace HFT {
 		char32 order_sno;				// 委托号
 		char16 busitype;				// 业务类型
 		char64 businame;				// 业务名称
-		char divid_method;				// 默认分红方式
-		char32 divid_method_name;		// 默认分红方式
-		char redeem_type;				// 巨额赎回标志
-		char32 redeem_type_name;		// 巨额赎回标志
-		char operway;					// 操作方式
-		char32 operway_name;			// 操作方式
-		Amt_t order_amt;				// 委托金额
-		int64_t order_qty;				// 委托数量
-		int64_t match_qty;				// 成交数量
-		Amt_t match_amt;				// 成交金额
-		Price_t nav;					// 基金单位净值
+		int16_t divid_method;			// 默认分红方式，参考FundDividMethod定义
+		char32 divid_method_name;		// 默认分红方式说明
+		int16_t redeem_type;			// 巨额赎回标志，参考RedeemType定义
+		char32 redeem_type_name;		// 巨额赎回标志说明
+		char operway;					// 操作方式，参考OperWay定义
+		char32 operway_name;			// 操作方式说明
+		Amt_t order_amt;				// 委托金额，扩大一万倍
+		double order_qty;               // 委托数量，有效小数位两位
+		double match_qty;               // 成交数量，有效小数位两位
+		Amt_t match_amt;				// 成交金额，扩大一万倍
+		Price_t nav;					// 基金单位净值，扩大一万倍
 		char32 sendsn;					// 委托流水号（发至登记公司）
 		char16 other_ta_account;		// 对方基金帐号
 		char32 other_trans_account;		// 对方交易帐号
 		char8 other_ofcode;				// 对方基金代码
 		char4 errcode;					// 错误代码
 		char32 errmsg;					// 错误名称
-		Amt_t fee;					    // 所有费用之和
-		Amt_t backfare;				    // 后端收费
-		Amt_t feestamptax;			    // 印花税
-		Amt_t agentfee;				    // 代理费
-		Amt_t otherfee;				    // 其他费用
-		Amt_t confirmed_amt;			// 资金发生数
-		int64_t disc_ratio;				// 分红比例，扩大1亿倍
+		Amt_t fee;					    // 所有费用之和，扩大一万倍
+		Amt_t backfare;				    // 后端收费，扩大一万倍
+		Amt_t feestamptax;			    // 印花税，扩大一万倍
+		Amt_t agentfee;				    // 代理费，扩大一万倍
+		Amt_t otherfee;				    // 其他费用，扩大一万倍
+		Amt_t confirmed_amt;			// 资金发生数，扩大一万倍
+		int64_t disc_ratio;				// 分红比例，扩大一亿倍
 		char256 extstr2;				// 定投计划编号 
-		int64_t trans_qty;				// 目标转换份额
+		double trans_qty;				// 目标转换份额，有效小数位两位
 		int64_t total_num;				// 总记录数（如果查询有结果，返回记录数;如果无结果 返回0）
+		int32_t trdid;                  // 业务类型
 
 	};
 
@@ -1202,7 +1214,7 @@ namespace HFT {
 	struct QryFundMarketDataReq {
 		int64_t ta_code;				// 基金公司,0 表示查全部
 		char8 ofcode;					// 基金代码, 填空标识查所有
-		int32_t risk_level;				// 风险级别, 枚举见FundProdRiskLevel, 填空标识查所有
+		int32_t p_risk_level;			// 产品风险等级, 枚举见FundProdRiskLevel, 填空标识查所有
 		char query_flag;        		// 查询方向 '0'=顺序 '1'=倒序
 		int32_t query_num;    			// 查询数量
 		char32 pos_str;     			// 定位串, 第一次填空   
@@ -1256,11 +1268,12 @@ namespace HFT {
 		int64_t p_calm_hours;        	// 冷静期(小时)
 		int64_t risk_ver;        		// 风险揭示版本
 		int64_t p_per_limit;        	// 人数限制,0代表不限制
-		int64_t redeem_top;        		// 赎回上限，扩大100倍
-		int64_t redeem_low;        		// 赎回下限，扩大100倍
-		int64_t min_hold_qty;        	// 基金最低持有份额，扩大100倍
 		int64_t redeem_days;        	// 赎回资金到帐天数,仅供客户参考，以实际到账时间为准。
-
+        
+        // 以下三个字段代替上面三个已删除的数量类字段，倍数由原来扩大100倍改为不扩大倍数，注意做相应倍数处理
+        double redeem_top_qty;          // 赎回上限，有效小数位两位
+        double redeem_low_qty;          // 赎回下限，有效小数位两位
+        double min_hold_qty_new;        // 基金最低持有份额，有效小数位两位
 	};
 
 	// 基金开户请求
@@ -1327,7 +1340,7 @@ namespace HFT {
 		char32 id_no;					// 证件号码
 		int32_t sex_type;				// 性别, 1-男, 2-女
 		char32 deputy_name;				// 法人姓名
-		int32_t deputy_id_type;			// 法人证件类型
+		int32_t deputy_id_type;			// 法人证件类型，参考IdentifyType定义
 		char32 deputy_id_no;			// 法人证件号码
 		char16 sh_secu_id;				// 上海证券帐户
 		char16 sz_secu_id;				// 深圳证券帐户
@@ -1341,10 +1354,9 @@ namespace HFT {
 		char32  mobil_no;				// 手机号码
 		char32 call;					// 传呼机
 		char32 email;					// 电子邮件
-
 		int32_t open_date;				// 开户日期
-		char8 status;        			// 帐户状态
-		char8 multi_flag;        		// 多渠道开户标志
+		char status;        			// 帐户状态，参考FundAccountStatus定义
+		char multi_flag;        		// 是否多渠道开户标志，参考MultiOpenFlag定义
 	};
 
 	// 新私募债委托处理请求
@@ -1730,7 +1742,6 @@ namespace HFT {
 		char32 counter_order_id;       // 柜台委托号
 		int32_t counter_date;          // 柜台委托日期，夜市委托时与系统日期不同
 		char32 contract_id;           // 委托合同号，仅集中交易和低延时支持应答中返回
-		char32 order_uuid;             // 委托uuid，避免风控无法唯一匹配委托，由请求方生成
 	};
 
 	struct QryRepurchaseIndexDetail
@@ -1835,7 +1846,6 @@ namespace HFT {
 	// 交易所未结算协议回购查询接口
 	struct QryContractBuyBackUnsettledInfoReq {
 		char16 symbol;     				// 证券代码，送空查所有证券
-		int32_t qrytype;     			// 查询类型，ContractBuyBackUnsettledQueryType
 		int32_t status;     			// 状态，ContractBuyBackUnsettledQueryStatus
 	};
 
@@ -1935,7 +1945,7 @@ namespace HFT {
 	// 深圳债券协议回购可质押券查询
 	struct QrySZBondContractBuyBackPledgeAvailableStkReq {
 		char16 symbol;				    // 质押券代码
-		int32_t stkprop;				// 股份性质, ContractBuyBackShareProperty
+		int32_t stkprop;				// 股份性质, 参考ContractBuyBackShareProperty定义，非必传
 	};
 
 	// 深圳债券协议回购可质押券查询应答
@@ -2109,7 +2119,6 @@ namespace HFT {
 		char4 newstkprop;				 // 新质押券股份性质,ContractBuyBackShareProperty
 		char32 cl_order_id;				 // 内部系统委托号
 		int32_t cl_order_date;			 // 内部系统日期 YYYYMMDD
-		char32 order_uuid;				 // 委托uuid，避免风控无法唯一匹配委托，由请求方生成
 		int32_t changetype;				 // 换券模式,ContractBuyBackChangeType
 	};
 
@@ -2150,13 +2159,12 @@ namespace HFT {
 		int32_t acceptsubterm;			 // 是否同意补充条款,AcceptSubterm
 		char32 cl_order_id;				 // 内部系统委托号
 		int32_t cl_order_date;			 // 内部系统日期 yyyymmdd
-		char32 order_uuid;				 // 委托uuid，避免风控无法唯一匹配委托，由请求方生成
 	};
 
 	// 债券质押式回购实际占款天数查询
 	struct QryBondContractBuyBackPledgeOccupyDays {
-		char8 market;					// 根据市场过滤
-		char16 code;					// 根据代码过滤
+		char8 market;					// 市场
+		char16 code;					// 证券代码
 		char32 pos_str;					// 查询定位串，第一次查询传入空，后续查询使用前一次查询返回的定位串
 		int32_t query_num;				// 查询的数量，最大支持500个
 	};
@@ -2288,7 +2296,6 @@ namespace HFT {
 		char32 ex_order_id;         // 交易所订单id，仅低延时柜台支持
 		char32 cl_order_id;         // 客户端订单id，用来引用一个普通订单，由用户自定义，原样返回
 		int32_t cl_order_date;      // 客户端订单日期
-		char32 order_uuid;          // 委托uuid，避免风控无法唯一匹配委托，由SDK请求时自动生成
 	};
 
 	// 质押存量折算查询
@@ -2634,6 +2641,7 @@ namespace HFT {
 		char oper_way;					// 操作方式，集中交易使用，参考OperWay定义
 		char32 seat;					// 席位号
 		char32 sno;						// 流水号
+        int16_t match_type;             // 成交类型，参考TradeReportType定义
 	};
 
 	// 留存业务 当日汇总成交查询请求
@@ -2792,6 +2800,8 @@ struct SZBondQuotationOrderReq {
     char8 oppocomponycode;              // 对手方交易商代码，非必传，买卖方向为询价成交112，113时，必传
     char16 oppotradercode;              // 对手方交易员代码，非必传，买卖方向为询价成交112，113时，必传
     char16 oppoinvestorid;              // 对手方交易主体代码，非必传，买卖方向为询价成交112，113时，必传
+	int32_t settltype;                  // 结算方式,参考SettleType
+	int32_t settlperiod;                // 结算周期,参考SettlePeriod,必传;若结算方式为103，则结算周期取值固定为1（T+1），否则填0（T+0）
 };
 
 // 深圳固收债券报价回复申报委托请求
@@ -2808,6 +2818,8 @@ struct SZBondQuotationReplyOrderReq {
     char16 origtradercode;              // 发起方（本方）交易员代码
     char16 originvestorid;              // 发起方（本方）本方交易主体代码
     char64 secuname;                    // 发起方（本方）客户名称，非必传，本方交易主体类型为3-机构经纪时，必传
+	int32_t settltype;                  // 结算方式,参考SettleType
+	int32_t settlperiod;                // 结算周期,参考SettlePeriod,必传;若结算方式为103，则结算周期取值固定为1（T+1），否则填0（T+0）
 };
 
 // 深圳固收债券询价请求申报委托请求
@@ -2835,6 +2847,8 @@ struct SZBondInquiryOrderReq {
     char16 origtradercode;              // 发起方（本方）交易员代码
     char16 originvestorid;              // 发起方（本方）本方交易主体代码
     char64 secuname;                    // 发起方（本方）客户名称，非必传，本方交易主体类型为3-机构经纪时，必传
+	int32_t settltype;                  // 结算方式,参考SettleType
+	int32_t settlperiod;                // 结算周期,参考SettlePeriod,必传;若结算方式为103，则结算周期取值固定为1（T+1），否则填0（T+0）
 };
 
 // 深圳固收债券当日委托查询请求
@@ -3398,6 +3412,8 @@ struct SZBondTradingBusinessReferenceInfoDetail {
         char16 confirmid;           // 约定号, 经纪业务, 协商成交买和协商成交卖填对手方客户代码，
                                     // 若对手方客户代码超过8位的，截取客户代码后8位;协商成交确认和拒绝填写对应转发消息中约定号
         char128 remark;             // 备注, 非必传
+		int32_t settltype;                  // 结算方式,参考SettleType
+		int32_t settlperiod;                // 结算周期,参考SettlePeriod,必传;若结算方式为103，则结算周期取值固定为1（T+1），否则填0（T+0）
     };
 
     // 深圳固收债券竞买成交出价委托请求
@@ -3422,6 +3438,8 @@ struct SZBondTradingBusinessReferenceInfoDetail {
         char16 origtradercode;      // 发起方（本方）交易员代码
         char16 originvestorid;      // 发起方（本方）交易主体代码
         char64 secuname;            // 发起方（本方）客户名称, 非必传, 本方交易主体类型为3-机构经纪时，必传
+		int32_t settltype;                  // 结算方式,参考SettleType
+		int32_t settlperiod;                // 结算周期,参考SettlePeriod,必传;若结算方式为103，则结算周期取值固定为1（T+1），否则填0（T+0）
     };
 
     // 深圳固收债券竞买成交应价委托请求
@@ -3443,6 +3461,23 @@ struct SZBondTradingBusinessReferenceInfoDetail {
         char16 origtradercode;      // 发起方（本方）交易员代码
         char16 originvestorid;      // 发起方（本方）交易主体代码
         char64 secuname;            // 发起方（本方）客户名称, 非必传, 本方交易主体类型为3-机构经纪时，必传
+		int32_t settltype;                  // 结算方式,参考SettleType
+		int32_t settlperiod;                // 结算周期,参考SettlePeriod,必传;若结算方式为103，则结算周期取值固定为1（T+1），否则填0（T+0）
+    };
+
+    // 深圳固收债券回售转售申报请求
+    struct SZBondPutBackResaleOrderReq {
+        char32 cl_order_id;                 // 客户端订单id，用来引用一个普通订单，由用户自定义，原样返回
+        int32_t cl_order_date;              // 客户端订单日期，格式为YYYYMMDD，原样返回，非必传
+        char32 symbol;                      // 交易标的，格式为市场.证券代码, 目前仅支持深圳市场
+        int16_t side;                       // 买卖方向，参考OrderSide定义，目前仅支持121，122，123类型
+        Price_t price;                      // 委托价格
+        int64_t volume;                     // 委托数量
+        int32_t acceptsubterm;              // 是否同意补充条款, 0=不同意, 1=同意，仅买卖方向为债券回售转售申报121时填写
+        char8 oppseat;                      // 对手方交易单元
+        char16 quoterefid;                  // 转发成交申报编号, 确认、拒绝申报时填写转发成交申报的客户成交申报编号，其他置空
+        char16 confirmid;                   // 约定号, 买卖类别为“债券回售转售申报”填对手方客户代码，若对手方客户代码超过8位的，截取客户代码后8位
+                                            // “债券回售转售确认和拒绝”填写对应转发消息中约定号
     };
 
     // 固收债券历史委托扩展信息查询请求
@@ -3479,12 +3514,12 @@ struct SZBondTradingBusinessReferenceInfoDetail {
 
     // 深圳固收债券协商成交申报查询请求
     struct QrySZBondNegotiatedTradeOrderReq {
-        int16_t applyid;            // 应用标识 必传 参考BondApplyId定义, 目前仅支持411,430
         char16 stk_code;            // 证券代码，非必传
         char8 memberid;             // 接收方交易商代码 非必传
         char16 tradercode;          // 接收方交易员代码 非必传
         char16 investorid;          // 接收方交易主体代码 非必传
         int16_t busiside;           // 业务方向 非必传 参考BusiDirection定义, 目前仅支持1-2
+		char256 applyid;            // 应用标识 必传,参考StrBondApplyId定义, 目前仅支持411,430,41A;可复选,多个选项以英文逗号隔开
     };
 
     // 深圳固收债券协商成交申报明细数据
@@ -3896,6 +3931,8 @@ struct SZBondTradingBusinessReferenceInfoDetail {
         int16_t wy_status;                          // 违约状态，参考ViolationStatus定义
         int64_t qty;                                // 展期数量
         int32_t new_end_date;                       // 展期新到期日，格式为YYYYMMDD
+		char limit_type;                            // 自动展期期限类型，参考QytLimitType定义，非必填
+													// 默认和原合约期限类型一致
     };
     
     // 券源通展期申请委托应答
@@ -3939,6 +3976,7 @@ struct SZBondTradingBusinessReferenceInfoDetail {
         int16_t other_status;                       // 其他状态，参考QytOtherStatus定义
         int16_t proc_status;                        // 处理状态，参考QytProcessStatus定义
         char channel;                               // 渠道，参考QytChannelType定义
+		char limit_type;                            // 自动展期期限类型，参考QytLimitType定义
     };
     
     // 券源通展期申请撤销请求
@@ -3961,6 +3999,7 @@ struct SZBondTradingBusinessReferenceInfoDetail {
 		char hy_status;                          // 合约状态,Y, 参考QC_Ehyzt
 		char32 stkcode;                          // 证券代码 N
 		char128 pos_str;                         // 查询定位串，第一次查询传入空，后续查询使用前一次查询返回的定位串
+		char32 market;                           // 交易市场;一户两地账户必传,非一户两地建议传值用以兼容一户两地,如"SZ"或者"SH"
 	};
 
 	// 查询约券合约应答明细
@@ -3971,6 +4010,7 @@ struct SZBondTradingBusinessReferenceInfoDetail {
 		int16_t account_type;                     // 交易账号类型，参考AccountType定义
 		char32 symbol;							  // 证券标的
 		char32 stkname;                           // 证券简称
+        int32_t sys_date;                         // 系统日期
 		char32 sno;	                              // 合约流水号
 		char hy_status;                           // 合约状态，参考QC_Ehyzt
 		int32_t lock_qty;                         // 锁定数量
@@ -3991,6 +4031,32 @@ struct SZBondTradingBusinessReferenceInfoDetail {
 		char special_book_type;                   // 特殊预约标志，参考QC_Etsyybz
 		char128 pos_str;                          // 查询定位串
 	};
+
+    // 券池客户合约定价信息查询请求
+    struct QCQueryCustContractPriceInfoReq {
+        char32 pos_str;                            // 查询定位串，第一次查询传入空，后续查询使用前一次查询返回的定位串，固定返回100条
+    };
+
+    // 券池客户合约定价信息详情
+    struct QCQueryCustContractPriceInfoDeatil {
+        char16 account_id;                         // 交易账号，目前是资金账号
+        char8 cust_orgid;                          // 机构编码
+        char8 cust_branchid;                       // 分支编码
+        int16_t account_type;                      // 交易账号类型，参考AccountType定义
+        char16 cust_id;                            // 客户代码
+        char32 stk_code;                           // 证券代码
+        char64 stk_name;                           // 证券名称
+        int32_t sys_date;                          // 系统日期
+        char32 sno;                                // 合约流水号
+        int32_t end_date;                          // 到期日期
+        int64_t unused_qty;                        // 当前股数
+        Ratio_t used_fee_rate;                     // 融券费率，扩大1W倍，单位%
+        Ratio_t unused_fee_rate;                   // 约券管理费率，扩大1W倍，单位%
+        char ext_type;                             // 自动展期（展期申请标记），参考QC_Ezqsqfs
+        char have_extend;                          // 展期审批，展期审批，参考QC_HaveExtend
+        Ratio_t down_pricing_fee;                  // 当日参考费率，扩大1W倍，单位%
+        int32_t current_date;                      // 更新日期（当日日期）
+    };
 
     // 券源通预告申报请求
     struct QytForecastOrderReq {
@@ -4039,6 +4105,228 @@ struct SZBondTradingBusinessReferenceInfoDetail {
         int16_t account_type;                     // 交易账号类型，参考AccountType定义
         char32 entrust_no;                        // 委托编号
     };
+
+
+    // 券源通标准篮子申报请求
+    struct QytBasketOrderReq {
+        char client_type;                         // 客户类型,参考QytClientType
+        int32_t valid_endtime;                    // 有效截至日期yyyymmdd
+        int32_t time_limit;                       // 使用期限（最小为3，最大为182）
+        Ratio_t rate;                             // 约券费率,小数点后最多两位;扩大1W倍,单位%
+        int64_t amount;                           // 篮子申报分数（最小为1，最大为1000）
+        Ratio_t admin_rate;                       // 约券管理费率,小数点后最多两位;扩大1W倍,单位%
+        char64 bsk_name;                          // 篮子名称（只能由汉字英文字母和数字组成）
+        char32 bsk_code;                          // 篮子代码
+        char limit_type;                          // 期限类型,参考QytLimitType
+    };
+
+    // 券源通标准篮子申报应答
+    struct QytBasketOrderDetail {
+        char16 account_id;                        // 交易账号，目前是资金账号
+        char8 cust_orgid;                         // 机构编码
+        char8 cust_branchid;                      // 分支编码
+        int16_t account_type;                     // 交易账号类型，参考AccountType定义
+        char32 id;                                // 主键id
+        int32_t trade_day;                        // 交易日YYYYMMDD
+        char32 entrust_no;                        // 委托编号
+        Ratio_t min_satisfy = 4;                  // 最低满足比例，扩大一万倍
+        Ratio_t deal_amount_ratio = 5;            // 当前满足比例，扩大一万倍
+        int64_t amount;                           // 委托份数
+        char direction;                           // 委托方向，参考QytDirection定义
+        char en_type;                             // 委托方式,参考QytBEnType
+        int64_t entrust_time;                     // 委托时间YYYYMMDDHHMMSS
+        int16_t entrust_status;                   // 委托状态，参考QytEntrustStatus定义  
+        int16_t other_status;                     // 其他状态，参考QytOthStatus定义 
+        int16_t allot_status;                     // 调拨状态，参考QytAllotStatus定义
+        char64 bsk_name;                          // 篮子名称
+        char32 bsk_code;                          // 篮子代码
+        char bsk_type;                            // 篮子类型，参考QytBskType定义
+        Ratio_t admin_rate;                       // 管理费率(6.0表示6.0%)，扩大一万倍
+        Ratio_t rate;                             // 费率（6.0表示6.0%），扩大一万倍
+        int32_t time_limit;                       // 期限
+        char limit_type;                          // 期限类型，参考QytLimitType
+        int64_t deal_amount;                      // 已成交份数
+        Ratio_t score;                            // 分数值，扩大一万倍
+        char32 client_id;                         // 客户代码
+        char128 client_name;                      // 客户姓名
+        char client_type;                         // 客户类型，参考QytClientType
+        char32 busin_account;                     // 资金账号
+        char32 stock_account;                     // 股东代码（上海）
+        char32 stock_account_sz;                  // 信用股东账户（深圳）
+        char32 branch_no;                         // 机构代码
+        int64_t valid_start_time;                 // 有效开始时间YYYYMMDDHHMMSS
+        int64_t valid_end_time;                   // 有效截至时间YYYYMMDDHHMMSS
+        int64_t cancel_time;                      // 撤单时间YYYYMMDDHHMMSS
+        int64_t invalid_time;                     // 失效时间YYYYMMDDHHMMSS
+        int64_t deal_time;                        // 最近一次触发成交成交时间YYYYMMDDHHMMSS
+        int32_t new_end_date;                     // 展期申请新到期日YYYYMMDD
+        char channel;                             // 渠道，参考QytChannelType定义
+        char512 remark;                           // 备注
+    };
+
+    // 券源通篮子申报撤单请求
+    struct CancelQytBasketOrderReq {
+        char32 entrust_no;                        // 被撤的原订单id
+    };
+
+    // 券源通篮子申报撤单应答
+    struct CancelQytBasketOrderRsp {
+        char16 account_id;                         // 交易账号，目前是资金账号
+        char8 cust_orgid;                          // 机构编码
+        char8 cust_branchid;                       // 分支编码
+        int16_t account_type;                      // 交易账号类型，参考AccountType定义
+        char256 data;                              // 撤单成功输出文案
+    };
+
+
+    // 券源通篮子申报查询请求
+    struct QueryQytBasketOrderReq {
+        char32 pos_str;                            // 查询定位串，第一次查询传入空，后续查询使用前一次查询返回的定位串，固定返回100条，非必传
+        int64_t begin_date;                        // 委托开始时间 YYYYMMDD，非必传
+        int64_t end_date;                          // 委托截止时间 YYYYMMDD，非必传
+        char32 direction_list;                     // 委托方向集合，参考QytDirection定义，必传
+                                                   // 标准篮子传g，定制篮子传h,全部篮子g,h；多个状态间用','分隔 
+        char32 entrust_status_list;                // 委托状态集合，参考QytEntrustStatus定义，非必传，多个状态间用','分隔
+        char32 entrust_no;                         // 委托单号（查询单个篮子母单时可以只传委托单号），非必传
+    };
+
+    // 券源通篮子申报查询应答明细
+    struct QytBasketOrderRecord {
+        char16 account_id;                        // 交易账号，目前是资金账号
+        char8 cust_orgid;                         // 机构编码
+        char8 cust_branchid;                      // 分支编码
+        int16_t account_type;                     // 交易账号类型，参考AccountType定义
+        int64_t no_deal_amount;                   // 未成交数量
+        int64_t cancel_amount;                    // 撤单数量
+        char64 branch_name;                       // 机构名称
+        Ratio_t weighted_cost_rate;               // 加权成本费率，扩大一万倍
+        char32 id;                                // 主键id
+        int32_t trade_day;                        // 交易日YYYYMMDD
+        char32 entrust_no;                        // 委托编号
+        Ratio_t min_satisfy = 4;                  // 最低满足比例，扩大一万倍
+        Ratio_t deal_amount_ratio = 5;            // 当前满足比例，扩大一万倍
+        int64_t amount;                           // 委托份数
+        char direction;                           // 委托方向，参考QytDirection定义
+        char en_type;                             // 委托方式,参考QytBEnType
+        int64_t entrust_time;                     // 委托时间YYYYMMDDHHMMSS
+        int16_t entrust_status;                   // 委托状态，参考QytEntrustStatus定义  
+        int16_t other_status;                     // 其他状态，参考QytOthStatus定义 
+        int16_t allot_status;                     // 调拨状态，参考QytAllotStatus定义
+        char64 bsk_name;                          // 篮子名称
+        char32 bsk_code;                          // 篮子代码
+        char bsk_type;                            // 篮子类型，参考QytBskType定义
+        Ratio_t admin_rate;                       // 管理费率(6.0表示6.0%)，扩大一万倍
+        Ratio_t rate;                             // 费率（6.0表示6.0%），扩大一万倍
+        int32_t time_limit;                       // 期限
+        char limit_type;                          // 期限类型，参考QytLimitType
+        int64_t deal_amount;                      // 已成交份数
+        Ratio_t score;                            // 分数值，扩大一万倍
+        char32 client_id;                         // 客户代码
+        char128 client_name;                      // 客户姓名
+        char client_type;                         // 客户类型，参考QytClientType
+        char32 busin_account;                     // 资金账号
+        char32 stock_account;                     // 股东代码（上海）
+        char32 stock_account_sz;                  // 信用股东账户（深圳）
+        char32 branch_no;                         // 机构代码
+        int64_t valid_start_time;                 // 有效开始时间YYYYMMDDHHMMSS
+        int64_t valid_end_time;                   // 有效截至时间YYYYMMDDHHMMSS
+        int64_t cancel_time;                      // 撤单时间YYYYMMDDHHMMSS
+        int64_t invalid_time;                     // 失效时间YYYYMMDDHHMMSS
+        int64_t deal_time;                        // 最近一次触发成交成交时间YYYYMMDDHHMMSS
+        int32_t new_end_date;                     // 展期申请新到期日YYYYMMDD
+        char channel;                             // 渠道，参考QytChannelType定义
+        char512 remark;                           // 备注
+    };
+
+    // 券源通标准篮子申报详情请求
+    struct QueryQytBasketOrderDetailReq {
+        char32 basket_entrust_no;              // 关联篮子委托单号，必传
+        char direction;                        // 委托方向，参考QytDirection定义，固定传标准篮子，必传
+        char32 stock_code;                     // 证券代码（查询单个标准篮子子单时使用），非必传
+        char32 pos_str;                        // 查询定位串，第一次查询传入空，后续查询使用前一次查询返回的定位串，固定返回100条，非必传
+    };
+
+    // 标准篮子申报详情明细
+    struct QytBasketOrderDetailRecord {
+        char16 account_id;                        // 交易账号，目前是资金账号
+        char8 cust_orgid;                         // 机构编码
+        char8 cust_branchid;                      // 分支编码
+        int16_t account_type;                     // 交易账号类型，参考AccountType定义
+        char32 id;                                // 主键id
+        int32_t trade_day;                        // 交易日YYYYMMDD
+        char32 entrust_no;                        // 关联委托表的委托单号
+        char direction;                           // 委托方向，参考QytDirection定义
+        int64_t amount;                           // 成交数量
+        int64_t deal_time;                        // 成交时间YYYYMMDDHHMMSS
+        char deal_type;                           // 成交类型，参考QytDealType定义
+        char64 stock_name;                        // 证券名称
+        char32 stock_code;                        // 证券代码
+        char stock_type;                          // 证券类型，参考QytStockType定义
+        Ratio_t rate;                             // 费率（6.0表示6.0%），扩大一万倍
+        Ratio_t admin_rate;                       // 管理费率(6.0表示6.0%)，扩大一万倍
+        int64_t time_limit;                       // 期限
+        char32 deal_no;                           // 成交单号
+        char s_info_type_code;                    // 分类代码，参考QytSInfoTypeCode定义
+        char32 allot_no;                          // 调拨单号
+        char32 stk_id;                            // 券池id
+        int64_t turn_amount;                      // 调拨到账数量
+        char32 client_id;                         // 客户代码
+        char128 client_name;                      // 客户姓名
+        char32 busin_account;                     // 资金账号
+        char32 stock_account;                     // 股东代码
+        char32 branch_no;                         // 机构代码
+        char32 market;			                  // 交易市场，如 "SZ" 或者 "SH"
+        char32 pool_no;                           // 券池id-标签
+        char32 pool_name;                         // 券池名称
+        char32 ls_no;                             // 撮合流水编号
+        int16_t allot_status;                     // 调拨状态，参考QytAllotStatus定义
+        int16_t other_status;                     // 其他状态，参考QytOthStatus定义
+        char32 confirm_user;                     // 确认人
+        int64_t confirm_time;                     // 确认时间YYYYMMDDHHMMSS
+        char512 remark;                           // 备注
+        char32 basket_entrust_no;                 // 关联篮子委托单号
+        Amt_t price;                              // 股价，扩大一万倍
+        int32_t new_start_date;                   // 新合约起始日期YYYYMMDD
+        int32_t new_end_date;                     // 成交到期日YYYYMMDD
+        int16_t process_status;                   // 处理状态，参考QytProcessStatus定义
+        int64_t process_time;                     // 处理时间YYYYMMDDHHMMSS
+        int64_t delay_amount;                     // 实际展期数量
+        int64_t recovery_amount;                  // 处理日回收数量
+        char limit_type;                          // 期限类型，参考QytLimitType定义
+        char32 dxzrt_id;                          // 定向转融通单号C30
+        int32_t sys_date;                         // 系统日期YYYYMMDD
+        char32 sno;                               // 原合约流水号
+        char special_book;                        // 特殊预约标志，参考QytSpecialBook定义
+        char64 branch_name;                       // 机构名称
+        int64_t deal_amount;                      // 成交数量，同amount
+    };
+
+    // 券源通定制篮子申报详情请求
+    struct QueryQytCustBasketOrderDetailReq {
+        char32 basket_entrust_no;              // 关联篮子委托单号，必传
+        char direction;                        // 委托方向，参考QytDirection定义，固定传定制篮子，必传
+        char32 stock_code;                     // 证券代码（查询单个标准篮子子单时使用），非必传
+        char32 pos_str;                        // 查询定位串，第一次查询传入空，后续查询使用前一次查询返回的定位串，固定返回100条，非必传
+    };
+
+    // 定制篮子申报详情明细
+    struct QytCustBasketOrderDetailRecord {
+        char16 account_id;                        // 交易账号，目前是资金账号
+        char8 cust_orgid;                         // 机构编码
+        char8 cust_branchid;                      // 分支编码
+        int16_t account_type;                     // 交易账号类型，参考AccountType定义
+        char32 id;                                // 主键id
+        char32 entrust_no;                        // 定制篮子子单委托编号
+        int64_t amount;                           // 委托数量
+        char64 stock_name;                        // 证券名称
+        char32 stock_code;                        // 证券代码
+        int64_t entrust_time;                     // 委托时间YYYYMMDDHHMMSS
+        int16_t entrust_status;                   // 委托状态，参考QytEntrustStatus定义
+        int64_t deal_amount;                      // 成交数量
+        int64_t arrival_amount;                   // 到账数量
+        int16_t other_status;                     // 其他状态，参考QytOthStatus定义 
+    };
+
 
 	// 资产总值分类查询请求
     struct QryTotalFundAssetDetailReq {
@@ -4127,10 +4415,10 @@ struct SZBondTradingBusinessReferenceInfoDetail {
 		int16_t account_type;               // 交易账号类型，参考AccountType定义
 
 		char32 poststr;                     //定位串
-		Amt_t transqty;                     //转入确认份额,Trdid=240136基金转换出确认
+		double transqty;                    //转入确认份额,Trdid=240136基金转换出确认，有效小数位两位
 		int32_t matchdate;                  //成交日期　
 		int32_t sno;                        //成交流水号　
-		Amt_t discratio;                    //费用折扣率
+		int64_t discratio;                  //费用折扣率，扩大一亿倍
 		int64_t tacode;                     //基金公司　
 		char16 taacc;                       //基金帐号　
 		char32 transacc;                    //交易帐号　
@@ -4141,21 +4429,21 @@ struct SZBondTradingBusinessReferenceInfoDetail {
 		int32_t trdid;                      //交易类型，参考FundOrderSide
 		char32 trdidname;                   //交易类型名
 		int16_t divid_method;		        //分红方式,FundDividMethod
-		Amt_t orderamt;                     //委托金额　　
-		Amt_t orderqty;                     //委托数量　　
-		Amt_t matchqty;                     //成交份数　　
-		Amt_t matchamt;                     //成交金额　　
-		Amt_t nav;                          //基金净值　　
+		Amt_t orderamt;                     //委托金额，扩大一万倍
+		double orderqty;                    //委托数量，有效小数位两位
+		double matchqty;                    //成交份数，有效小数位两位
+		Amt_t matchamt;                     //成交金额，扩大一万倍
+		Amt_t nav;                          //基金净值，扩大一万倍
 		char16 othertaacc;                  //对方基金帐号　
 		char32 othertransacc;               //对方交易帐号　
 		char16 otherofcode;                 //转换基金代码　
 		char8 errcode;                      //错误代码
-		Amt_t fee;                          //费用之和　　
-		Amt_t backfare;                     //后端收费　　
-		Amt_t feestamptax;                  //印花税　　
-		Amt_t agentfee;                     //代理费　　
-		Amt_t otherfee;                     //其他费用　　
-		Amt_t confirmedamt;                 //确认金额
+		Amt_t fee;                          //费用之和，扩大一万倍
+		Amt_t backfare;                     //后端收费，扩大一万倍
+		Amt_t feestamptax;                  //印花税，扩大一万倍
+		Amt_t agentfee;                     //代理费，扩大一万倍
+		Amt_t otherfee;                     //其他费用，扩大一万倍
+		Amt_t confirmedamt;                 //确认金额，扩大一万倍
 		char64 errmsg;                      //错误信息
 		char256 extstr2;                    //其他备注如果tsbztype和tsbz传值时，返回tsbz类型下所有tsbztype条件查询的值，否则查询所有
 	};
@@ -4228,14 +4516,14 @@ struct SZBondTradingBusinessReferenceInfoDetail {
 		int16_t account_type;                 // 交易账号类型，参考AccountType定义
 	
 		char32 poststr;                       //定位串
-		int32_t predate;                      //预约的赎回日期
-		int32_t operdate;                     //发生日期
-		int32_t opertime;                     //发生时间
-		int32_t orderdate;                    //委托日期
+		int32_t predate;                      //预约的赎回日期，格式为YYYYMMDD
+		int32_t operdate;                     //发生日期，格式为YYYYMMDD
+		int32_t opertime;                     //发生时间，精确到毫秒，格式HHMMSSmmm，首位为0不显示
+		int32_t orderdate;                    //委托日期，格式为YYYYMMDD
 		int32_t sno;                          //委托流水号
 		Amt_t backfee;                        //后台收费
 		char redeemtype;                      //巨额赎回标志，参考RedeemType
-		int32_t oldoperdate;                  //原申请日期
+		int32_t oldoperdate;                  //原申请日期，格式为YYYYMMDD
 		char32 oldsn;                         //原申请单号
 		int64_t tacode;                       //基金公司
 		char16 taacc;                         //基金帐号
@@ -4246,16 +4534,18 @@ struct SZBondTradingBusinessReferenceInfoDetail {
 		int32_t trdid;                        //交易类型，参考FundOrderSide
 		char32 trdidname;                     //交易类型名称前台解析
 		int32_t cancel_flag;				  //撤消标志
-		int32_t order_status;				  //委托状态
+		int32_t order_status;				  //委托状态，参考FundOrderStatus定义
 		char32 entrustname;                   //委托状态名称前台解析
 		char32 errinfo;                       //返回错误信息
 		int16_t dividmethod;                  //分红方式，参考FundDividMethod定义
 		Amt_t orderamt;                       //委托金额
-		Amt_t orderqty;                       //委托数量,因柜台浮点型所以扩大1w倍
-		Amt_t havematchqty;                   //已成交数量,因柜台浮点型所以扩大1w倍
 		char16 othertaacc;                    //对方基金帐号
 		char32 othertransacc;                 //对方交易帐号
 		char16 otherofcode;                   //转换基金代码
+        
+        // 以下两个字段代替上面两个已删除的数量类字段，倍数由原来扩大1w倍改为不扩大倍数，注意做相应倍数处理
+        double orderqtynew;                    //委托数量，有效小数位两位
+        double havematchqtynew;                //已成交数量，有效小数位两位
 	};
 
 	//基金产品风险揭示书签署410882
@@ -4273,6 +4563,639 @@ struct SZBondTradingBusinessReferenceInfoDetail {
 		char32 sno;                           // 操作流水号
 	};
 
+	// 资金横向划转请求
+	struct LateralTransferOrderReq {
+	    char8 branch_no_out;                        // 转出营业部编码  
+	    char16 cust_id_out;                         // 转出客户代码，非必传，默认同一一户通下当前客户号  
+	    char32 account_id_out;                      // 转出资金账号  
+	    char16 account_pwd_out;                     // 转出资金密码  
+	    char8 branch_no_in;                         // 转入营业部编码  
+	    char32 account_id_in;                       // 转入资金账号  
+	    Amt_t transfer_value;                       // 划转金额，扩大一万倍，币种人民币 
+	};
+	// 资金横向划转应答
+	struct LateralTransferOrderRsp {
+	    char16 account_id;                          // 交易账号，目前是资金账号
+	    char8 cust_orgid;                           // 机构编码
+	    char8 cust_branchid;                        // 分支编码
+	    int16_t account_type;                       // 交易账号类型，参考AccountType定义
+	    char32 serial_no;                           // 横向划转流水序号
+	};
+	
+	// 查询横向划转流水请求
+	struct QueryLateralTransferFlowReq {
+	    char16 branch_no_out;                       // 转出营业部编码
+	    char16 branch_no_in;                        // 转入营业部编码
+	};
+	// 横向划转流水明细
+	struct LateralTransferFlowDetail {
+	    char16 account_id;                          // 交易账号，目前是资金账号
+	    char8 cust_orgid;                           // 机构编码
+	    char8 cust_branchid;                        // 分支编码
+	    int16_t account_type;                       // 交易账号类型，参考AccountType定义
+	    char32 account_id_out;                      // 转出资金账号  
+	    char32 account_id_in;                       // 转入资金账号  
+	    char32 serial_no;                           // 横向划转流水序号  
+	    int16_t deal_status;                        // 横向划转处理状态，参考LTDealStatus定义  
+	    Amt_t transfer_value;                       // 划转金额  
+	    int32_t deal_date;                          // 发生日期，格式为YYYYMMDD
+	    int64_t deal_time;                          // 发生时间，格式为HHMMSSmmm，首位为0不显示
+	    int16_t lt_digest_code;                     // 横向划转业务摘要，参考LTBusiDigestCode定义  
+	    int16_t currency_type;                      // 货币类型，参考CurrencyType定义
+	    char256 remark;                             // 备注  
+	};
+
+// 券源通意向登记请求
+struct QytIntenRegistraReq{
+	char32 symbol;				                // 证券代码, 格式为市场.证券id
+	char client_type;					        // 客户类型,参考QytClientType
+	char stock_type;					        // 证券类型,参考QytStockType
+	char limit_type;						    // 期限类型,参考QytLimitType
+	char strategy;								// 融券策略,参考QytStrategy
+	int64_t order_qty;						    // 委托数量
+	int64_t min_qty;						    // 最小数量
+	Ratio_t rate;							    // 融券费率,小数点后最多两位;扩大1W倍,单位%
+	int32_t time_limit;					        // 期限
+	int32_t valid_starttime;					// 最早用券日期
+	int32_t valid_endtime;					    // 最晚用券日期
+	char16 mobile;                              // 联系电话(11位)
+};
+
+// 券源通意向登记应答明细
+struct QytIntenRegistraRsp {
+	char16 account_id;                        // 交易账号，目前是资金账号
+	char8 cust_orgid;                         // 机构编码
+	char8 cust_branchid;                      // 分支编码
+	int16_t account_type;                     // 交易账号类型，参考AccountType定义
+	char32 entrust_no;                        // 委托编号
+};
+
+// 券源通意向登记查询请求
+struct QytQueryIntenRegistraReq{
+	char32 pos_str;                             // 起始定位串，填""表示第一次从头开始查 默认是页码，从1开始，固定每页100行 
+	int32_t begin_date;                         // 开始日期YYYYMMDD
+	int32_t end_date;                           // 结束日期YYYYMMDD
+	char16 stk_code;                            // 证券代码，非必传
+	char32 entrust_status_list;                 // 委托状态列表，参考QytEntrustStatus定义，查询全部列举所有,逗号分割
+	char32 other_status_list;                   // 其他状态列表，参考QytOtherStatus定义，查询全部列举所有,逗号分割
+};
+
+// 券源通意向登记查询应答明细
+struct QytQueryIntenRegistraRsp {
+	char16 account_id;                        // 交易账号，目前是资金账号
+	char8 cust_orgid;                         // 机构编码
+	char8 cust_branchid;                      // 分支编码
+	int16_t account_type;                     // 交易账号类型，参考AccountType定义
+	char32 pos_str;                           // 查询定位串
+	int64_t oper_time;                        // 委托时间，精确到毫秒，格式HHMMSSmmm，首位为0不显示
+	char32 stk_name;                          // 证券名称  
+	char16 stk_code;                          // 证券代码  
+	int32_t time_limit;                       // 申请期限  
+	Ratio_t rate;                             // 申请费率,扩大1万倍
+	int64_t order_qty;                        // 申请股数  
+	int64_t min_qty;						  // 最小数量
+	int16_t entrust_status;                   // 委托状态,参考QytEntrustStatus
+	int16_t other_status;                     // 其他状态,参考QytOtherStatus
+	char strategy;                            // 融券策略,参考QytStrategy
+	char limit_type;                          // 期限类型,参考QytLimitType
+	char32 entrust_no;                        // 委托编号  
+	int32_t valid_start_date;                 // 委托生效日期,YYYYMMDD
+	int64_t valid_start_time;                 // 委托生效时间,格式HHMMSSmmm，首位为0不显示
+	int32_t valid_end_date;                   // 委托截止日期,YYYYMMDD
+	int64_t valid_end_time;                   // 委托截止时间,格式HHMMSSmmm，首位为0不显示
+	char16 mobile;                            // 联系电话(11位的手机号)
+};
+
+    // 券源通提前了结前置判断请求
+    struct QytSettleEarlyPreJudgeReq {
+        char32 symbol;                              // 标的代码，格式为市场.证券ID  
+        int64_t qty;                                // 提前了结股数  
+        double rate;                                // 原合约融券费率，有效小数位4位
+        int32_t sys_date;                           // 原合约日期，格式为YYYYMMDD
+        int32_t old_end_date;                       // 原合约到期日，格式为YYYYMMDD
+        char32 sno;                                 // 原合约流水号 
+    };
+    // 券源通提前了结前置判断应答
+    struct QytSettleEarlyPreJudgeRsp {
+        char16 account_id;                          // 交易账号，目前是资金账号
+        char8 cust_orgid;                           // 机构编码
+        char8 cust_branchid;                        // 分支编码
+        int16_t account_type;                       // 交易账号类型，参考AccountType定义
+        char current_flag;                          // 当前时间在15:00前或者后的标志，参考AfterCloseFlag定义  
+        int32_t repay_date;                         // 提前归还日期，格式为YYYYMMDD
+        int32_t new_end_date;                       // 更改后到期日，格式为YYYYMMDD
+        Amt_t admin_cost;                           // 提前了结管理费  
+        int32_t time_limit;                         // 提前了结天数  
+        double early_rate;                          // 提前了结费率，有效小数位6位 
+        int64_t qty;                                // 提前了结股数  
+        Amt_t price;                                // 昨收股价  
+        int64_t ratio_rate;                         // 提前了结系数，扩大一万倍  
+    };
+    
+    // 券源通提前了结申请请求
+    struct QytSettleEarlyOrderReq {
+        int32_t repay_date;                         // 提前归还日期，格式为YYYYMMDD
+        int32_t new_end_date;                       // 更改后到期日，格式为YYYYMMDD
+        int32_t time_limit;                         // 提前了结天数 
+        Amt_t admin_cost;                           // 提前了结管理费 
+        Amt_t price;                                // 昨收股价 
+        int64_t ratio_rate;                         // 提前了结系数，扩大一万倍
+        char current_flag;                          // 当前时间在15:00前或者后的标志，参考AfterCloseFlag定义
+        char32 symbol;                              // 标的代码，格式为市场.证券ID  
+        int64_t qty;                                // 提前了结股数 
+        double rate;                                // 原合约融券费率，有效小数位4位
+        int32_t sys_date;                           // 原合约日期，格式为YYYYMMDD
+        int32_t old_end_date;                       // 原合约到期日，格式为YYYYMMDD
+        char32 sno;                                 // 原合约流水号 
+        char16 branch_no;                           // 机构代码（取原合约的机构代码）
+    };
+    // 券源通提前了结申请应答
+    struct QytSettleEarlyOrderRsp {
+        char16 account_id;                          // 交易账号，目前是资金账号
+        char8 cust_orgid;                           // 机构编码
+        char8 cust_branchid;                        // 分支编码
+        int16_t account_type;                       // 交易账号类型，参考AccountType定义
+        char32 order_id;                            // 申请单号
+    };
+    
+    // 券源通提前了结查询请求
+    struct QryQytSettleEarlyOrdersReq {
+        char32 pos_str;                             // 起始定位串，填""表示第一次从头开始查 默认是页码，从1开始
+        int32_t query_num;                          // 每页记录数，传0时默认查所有，开始日期和结束日期必填，且间隔不超过90天
+        int32_t begin_date;                         // 开始日期YYYYMMDD，非必传，和结束日期须成对出现
+        int32_t end_date;                           // 结束日期YYYYMMDD，非必传，和结束日期须成对出现，间隔不大于90天
+        char16 stk_code;                            // 证券代码，非必传
+    };
+    // 券源通提前了结申请明细
+    struct QytSettleEarlyOrderDetail {
+        char16 account_id;                          // 交易账号，目前是资金账号
+        char8 cust_orgid;                           // 机构编码
+        char8 cust_branchid;                        // 分支编码
+        int16_t account_type;                       // 交易账号类型，参考AccountType定义
+        char32 pos_str;                             // 查询定位串
+        int64_t order_time;                         // 委托时间，精确到毫秒，格式HHMMSSmmm，首位为0不显示
+        char32 stk_name;                            // 证券名称 
+        char16 stk_code;                            // 证券代码
+        int32_t repay_date;                         // 提前归还日期，格式为YYYYMMDD
+        int32_t new_end_date;                       // 提前了结到期日，格式为YYYYMMDD
+        int32_t old_end_date;                       // 原合约到期日，格式为YYYYMMDD
+        int32_t time_limit;                         // 提前了结天数 
+        double rate;                                // 利率（融券费率）有效小数位6位
+        int64_t ratio_rate;                         // 提前了结系数，扩大一万倍
+        Amt_t admin_cost;                           // 提前了结管理费 
+        int64_t qty;                                // 提前了结股数  
+        char32 sno;                                 // 原合约流水号  
+        char32 order_id;                            // 申请单号
+        int32_t sys_date;                           // 原合约日期，格式为YYYYMMDD
+        int16_t entrust_status;                     // 委托状态，参考QytEntrustStatus定义
+        int16_t other_status;                       // 其他状态，参考QytOtherStatus定义
+        int16_t approve_status;                     // 审批状态，参考FrontApprovalStatus定义
+        int32_t belong_date;                        // 审批归属日期，格式为YYYYMMDD
+    };
+    
+    // 券源通提前了结撤单请求
+    struct CancelQytSettleEarlyOrderReq {
+        char32 order_id;                            // 委托编号
+    };
+    // 券源通提前了结撤单应答 
+    struct CancelQytSettleEarlyOrderRsp {
+        char16 account_id;                          // 交易账号，目前是资金账号
+        char8 cust_orgid;                           // 机构编码
+        char8 cust_branchid;                        // 分支编码
+        int16_t account_type;                       // 交易账号类型，参考AccountType定义
+        char128 prompt_msg;                         // 提示信息，撤单成功输出文案，撤单失败不返回任何文案
+    };
+
+	// 深圳报价回购合约查询请求
+	struct QrySZQuoteRepoContractReq {
+		char status;                                // 合约状态,不输入查全部,参考SZQuoteRepoStatus
+		int32_t orderdate;                          // 委托日期
+		char32 orderid;                             // 申报合同序号
+		char16 prodcode;                            // 产品代码N
+	};
+
+	struct QrySZQuoteRepoContractDetail {
+		char16 account_id;                          // 交易账号，目前是资金账号
+		char8 cust_orgid;                 			// 机构编码
+		char8 cust_branchid;              			// 分支编码
+		int16_t account_type;             			// 交易账号类型，参考AccountType定义
+		int32_t orderdate;                			// 委托日期
+		char32 orderid;                   			// 申报合同序号
+		char16 stkcode;                   			// 证券代码
+		char16 prodcode;                  			// 产品代码6位的证券代码+3位购回天数+3位期号
+		char createmethod;                			// 合约生成方式,参考QuoteRepoCreateMethod
+		char contflag;                    			// 自动续约标志,参考QuoteRepoContFlag
+		char yystatus;                    			// 提前购回预约状态,参考QuoteRepoYyStatus
+		char status;                    			// 合约状态,参考SZQuoteRepoStatus
+		Ratio_t lastrate;                 			// 到期利率
+		Ratio_t callrate;                 			// 提前终止利率
+		Amt_t matchamt;                   			// 成交金额
+		int64_t matchqty;                 			// 成交数量
+		int32_t gh_days;                  			// 购回天数
+		char32 matchcode;                 			// 成交编号
+		int32_t matchdate;                			// 成交日期
+		int32_t enddate;                  			// 预计到期日期
+		char32 stkname;                   			// 证券名称
+		int64_t backqty;                  			// 累计己购回数量
+		int64_t backqty_real;             			// 当天购回数量
+		int64_t contqty;                  			// 可续约数量
+		int32_t intbegindate;             			// 计息开始日
+		int32_t intenddate;               			// 计息结束日
+		Amt_t fundintpay;                 			// 累计已支付利息
+		int32_t yydate;                   			// 预约操作日期
+	};
+
+	// 深圳报价回购委托请求
+	struct SZQuoteRepoOrderReq {
+		char32 symbol;							    // 证券代码
+		char32 cl_order_id;                         // 客户端订单id，用来引用一个普通订单，由用户自定义，原样返回
+		int32_t cl_order_date;                      // 客户端订单日期，格式为YYYYMMDD，原样返回，非必传
+		char32 secuid;                              // 股东代码,可选填
+		char32 prodcode;                            // 产品编码
+		int32_t orderqty;                           // 委托数量
+		int32_t orderside;                          // 买卖方向
+		char autoflag;                              // 自动续作,报价回购是否自动续作1是, 0否
+	};
+
+	struct SZQuoteRepoOrderRsp {
+		char16 account_id;                          // 交易账号，目前是资金账号
+		char8 cust_orgid;                 			// 机构编码
+		char8 cust_branchid;              			// 分支编码
+		int16_t account_type;             			// 交易账号类型，参考AccountType定义
+		char32 cl_order_id;                         // 客户端订单id，用来引用一个普通订单，由用户自定义，原样返回
+		int32_t cl_order_date;                      // 客户端订单日期，格式为YYYYMMDD，原样返回，非必传
+		char32 ordersno;                            // 委托序号
+		char32 orderid;                             // 申报合同序号
+		Amt_t orderprice;                           // 柜台返回的实际委托价格
+		int32_t orderqty;                           // 柜台返回的实际委托数量
+		Amt_t orderamt;                             // 柜台返回的实际委托金额
+		Amt_t fundeffect;                           // 委托发生金额
+		int32_t stkeffect;                          // 委托股份发生数
+		int32_t orderdate;                          // 委托日期
+	};
+
+	// 深圳报价回购不再续做请求 410491
+	struct SZQuoteRepoNoContinueReq {
+		char32 matchcode;                           // 成交编号Y
+		int32_t matchdate;                          // 成交日期Y
+	};
+
+	// 深圳报价回购不再续做应答
+	struct SZQuoteRepoNoContinueRsp {
+		char16 account_id;                          // 交易账号，目前是资金账号
+		char8 cust_orgid;                 			// 机构编码
+		char8 cust_branchid;              			// 分支编码
+		int16_t account_type;             			// 交易账号类型，参考AccountType定义;无额外应答信息
+	};
+
+	// 深圳报价回购提前购回委托请求 410492
+	struct SZQuoteRepoEarlyRepurchaseOrderReq {
+		char32 cl_order_id;                         // 客户端订单id，用来引用一个普通订单，由用户自定义，原样返回
+		int32_t cl_order_date;                      // 客户端订单日期，格式为YYYYMMDD，原样返回，非必传
+		int32_t brkqty;                             // 提前购回数量Y
+		char32 matchcode;                           // 原合约成交编号Y
+		int32_t matchdate;                          // 原合约成交日期Y
+	};
+
+	// 深圳报价回购提前购回委托应答
+	struct SZQuoteRepoEarlyRepurchaseOrderRsp {
+		char16 account_id;               // 交易账号，目前是资金账号
+		char8 cust_orgid;                // 机构编码
+		char8 cust_branchid;             // 分支编码
+		int16_t account_type;            // 交易账号类型，参考AccountType
+		char32 cl_order_id;              // 客户端订单id，用来引用一个普通订单，由用户自定义，原样返回
+		int32_t cl_order_date;           // 客户端订单日期，格式为YYYYMMDD，原样返回，非必传
+		int32_t orderdate;               // 委托日期
+		char32 ordersno;                 // 委托序号
+	};
+
+	// 深圳报价回购提前购回预约请求 410493
+	struct SZQuoteRepoEarlyRepurchaseBookReq {
+		char32 matchcode;                           // 成交编号Y
+		int32_t matchdate;                          // 成交日期Y
+		char16 prodcode;                            // 产品编码
+		char32 symbol;							    // 证券代码
+		char32 secuid;                              // 股东代码,可选填
+	};
+
+	// 深圳报价回购提前购回预约应答
+	struct SZQuoteRepoEarlyRepurchaseBookRsp {
+		char16 account_id;                          // 交易账号，目前是资金账号
+		char8 cust_orgid;                 			// 机构编码
+		char8 cust_branchid;              			// 分支编码
+		int16_t account_type;             			// 交易账号类型，参考AccountType定义;无额外应答信息
+	};
+
+	// 深圳报价回购合约不再续做查询请求
+	struct QrySZQuoteRepoNoContinueContractReq {
+		
+	};
+
+	struct QrySZQuoteRepoNoContinueContractDetail {
+		char16 account_id;                          // 交易账号，目前是资金账号
+		char8 cust_orgid;                 			// 机构编码
+		char8 cust_branchid;              			// 分支编码
+		int16_t account_type;             			// 交易账号类型，参考AccountType定义;
+		int32_t orderdate;                          // 委托日期
+		char16 stkcode;                             // 证券代码
+		char16 prodcode;                            // 产品代码6位的证券代码+3位购回天数+3位期号
+		char32 matchcode;                           // 成交编号
+		int32_t matchdate;                          // 成交日期
+		char createmethod;                          // 合约生成方式,参考QuoteRepoCreateMethod
+		char contflag;                              // 自动续约标志,参考QuoteRepoContFlag
+		Ratio_t lastrate;                           // 到期利率
+		Ratio_t callrate;                           // 提前终止利率
+		Amt_t matchamt;                             // 成交金额,
+		int64_t matchqty;                           // 成交数量
+		char128 prodname;                           // 产品名称
+	};
+	
+    // 报价回购利率额度查询请求
+    struct QryQuoteRepoInteRateLimitReq {
+        char32 symbol;                              // 标的代码，格式为市场.证券ID，非必传
+    };
+    // 报价回购利率额度明细
+    struct QuoteRepoInteRateLimitDetail {
+        char16 account_id;                          // 交易账号，目前是资金账号
+        char8 cust_orgid;                           // 机构编码
+        char8 cust_branchid;                        // 分支编码
+        int16_t account_type;                       // 交易账号类型，参考AccountType定义
+        char32 symbol;                              // 标的代码，格式为市场.证券ID
+        char32 stk_name;                            // 证券名称 
+        int64_t due_price;                          // 到期利率，扩大一万倍，单位%
+        int64_t inter_price;                        // 提前终止利率，扩大一万倍，单位%
+        bool oneday_flag;                           // 1天期品种标志 true-是 false-否
+        int64_t gh_days;                            // 购回天数  
+        Amt_t today_avl;                            // 当日可用额度  
+        int32_t upd_date;                           // 更新日期  
+        int16_t continue_flag;                      // 续作标识，参考ContinueFlag定义
+    };
+    
+    // 深圳报价回购产品信息查询请求
+    struct QrySZQuoteRepoProdInfoReq {
+        int32_t gh_days;                // 产品购回天数，非必传
+        char16 prod_code;               // 产品编码，非必传
+    };
+    // 深圳报价回购产品信息明细
+    struct SZQuoteRepoProdInfoDetail {
+        char16 account_id;                          // 交易账号，目前是资金账号
+        char8 cust_orgid;                           // 机构编码
+        char8 cust_branchid;                        // 分支编码
+        int16_t account_type;                       // 交易账号类型，参考AccountType定义
+        char16 prod_code;                           // 产品编码 6位的证券代码+3位购回天数+3位期号
+        char16 prod_name;                           // 产品名称  
+        bool is_valid;                              // 产品是否有效 false.否, true.是
+        char32 symbol;                              // 标的代码 格式为市场.证券代码
+        int64_t gh_days;                            // 购回天数  
+        int32_t begin_date;                         // 发行日期，格式为YYYYMMDD 
+        int32_t end_date;                           // 到期日期，格式为YYYYMMDD 
+        int64_t last_rate;                          // 到期年收益率，扩大一亿倍
+        int64_t call_rate;                                 // 提前终止收益率，扩大一亿倍
+        int16_t buy_flag;                                  // 交易标志，参考QuoteRepoBuyFlag定义 
+        bool auto_buy_flag;                                // 自动续作标志，false-不自动续作,true-自动续作
+        int32_t next_begin_date;                    // 下轮发行日期，格式为YYYYMMDD 
+        int16_t prod_mode;                                 // 产品模式，参考QuoteRepoProdMode定义
+        int16_t special_prod;                              // 特殊产品，参考SpecialProd定义
+        Amt_t bond_avl_amt;                                // 可用额度  
+        int64_t min_qty;                                   // 申报下限  
+        int64_t max_qty;                                   // 申报上限  
+        bool spec_kind;                                        // 特殊控制产品，false-无特殊控制 true-有特殊控
+        bool orgctrl_flag;                                     // 机构控制标记，false-无机构控制 true-有机构控
+        char512 org_list;                                  // 机构控制列表，存放机构列表，逗号分隔符 
+        bool operway_limit;                         // 当期使用委托方式限制标识，false-无限制 true-有限制
+    };
+    
+    // 深圳报价回购委托查询请求
+    struct QrySZQuoteRepoOrdersReq {
+        char32 secuid;                              // 股东代码，非必传
+    };
+    // 深圳报价回购委托明细
+    struct SZQuoteRepoOrderDetail {
+        char16 account_id;                          // 交易账号，目前是资金账号
+        char8 cust_orgid;                           // 机构编码
+        char8 cust_branchid;                        // 分支编码
+        int16_t account_type;                       // 交易账号类型，参考AccountType定义
+        char32 counter_order_id;                    // 柜台委托号
+        char16 order_group;                         // 委托批号  
+        char16 contract_id;                         // 合同序号  
+        int32_t order_date;                         // 委托日期，格式为YYYYMMDD 
+        int64_t oper_time;                          // 委托时间，格式为HHMMSSmmm，首位为0不显示
+        char32 secuid;                              // 股东代码  
+        char32 symbol;                              // 标的代码，格式为市场.证券ID
+        char32 stk_name;                            // 证券名称  
+        int16_t order_side;                         // 买卖标识，参考OrderSide定义  
+        int64_t order_price;                        // 到期利率，扩大一万倍，单位%
+        int64_t order_qty;                          // 委托数量  
+        int64_t match_qty;                          // 成交数量  
+        Amt_t match_amt;                            // 成交金额  
+        int16_t order_status;                       // 委托状态，参考OrderStatus定义
+        Amt_t order_frz_amt;                        // 冻结金额  
+        Amt_t clear_amt;                            // 清算金额  
+        char operway;                               // 委托方式，参考OperWay定义
+        char16 prod_code;                           // 产品编码 6位的证券代码+3位购回天数+3位期号
+        char128 prod_name;                          // 产品名称  
+        int64_t cancel_qty;                         // 撤单数量  
+        int16_t cancel_flag;                        // 撤单标志 参考CancelFlag定义 
+        char16 net_addr;                            // MAC地址  
+        char16 seat;                                // 交易席位  
+        char16 agent_id;                            // 代理人      
+    };
+
+    // 上海报价回购委托请求
+    struct SHQuoteRepoOrderReq {
+        char32 symbol;              // 交易标的，格式为市场.证券代码
+        int16_t side;               // 买卖方向，参考OrderSide定义，报价回购，报价续做
+        Ratio_t price;              // 到期利率，扩大一万倍
+        int64_t volume;             // 委托数量，股票(单位:股)，债券(上海:手，深圳:张)
+        char autoflag;              // 自动续作，报价回购是否自动续作，0续作原期限，1不续作，2续作1天期
+        Ratio_t interprice;         // 提前终止利率，扩大一万倍
+        char32 cl_order_id;         // 客户端订单id，用来引用一个普通订单，由用户自定义，原样返回
+        int32_t cl_order_date;      // 客户端订单日期，格式为YYYYMMDD，原样返回，非必传
+    };
+
+    // 上海报价回购委托应答
+    struct SHQuoteRepoOrderRsp {
+        char16 account_id;          // 交易账号，目前是资金账号
+        int16_t account_type;       // 交易账号类型，参考AccountType定义
+        char8 cust_orgid;           // 机构编码
+        char8 cust_branchid;        // 分支编码
+        char32 order_id;            // 柜台订单id
+        char32 contract_id;         // 委托合同号，仅集中交易和低延时柜台支持应答中返回
+        char32 order_group;		    // 委托批号
+        char32 cl_order_id;         // 客户端订单id，用来引用一个普通订单，由用户自定义，原样返回
+        int32_t cl_order_date;      // 客户端订单日期
+    };
+
+    // 上海报价回购不再续做请求
+    struct SHQuoteRepoNoContinueReq {
+        int32_t order_date;         // 委托日期，格式为YYYYMMDD
+        char32 sno;                 // 流水号
+        char32 cl_order_id;         // 客户端订单id，用来引用一个普通订单，由用户自定义，原样返回
+        int32_t cl_order_date;      // 客户端订单日期，格式为YYYYMMDD，原样返回，非必传
+    };
+
+    // 上海报价回购不再续做应答
+    struct SHQuoteRepoNoContinueRsp {
+        char16 account_id;          // 交易账号，目前是资金账号
+        int16_t account_type;       // 交易账号类型，参考AccountType定义
+        char8 cust_orgid;           // 机构编码
+        char8 cust_branchid;        // 分支编码
+        char32 cl_order_id;         // 客户端订单id，用来引用一个普通订单，由用户自定义，原样返回
+        int32_t cl_order_date;      // 客户端订单日期
+    };
+    
+    // 上海报价回购提前购回委托请求
+    struct SHQuoteRepoEarlyRepurchaseOrderReq {
+        int32_t order_date;         // 委托日期，格式为YYYYMMDD
+        char32 sno;                 // 流水号
+        char32 cl_order_id;         // 客户端订单id，用来引用一个普通订单，由用户自定义，原样返回
+        int32_t cl_order_date;      // 客户端订单日期，格式为YYYYMMDD，原样返回，非必传
+    };
+
+    // 上海报价回购提前购回委托应答
+    struct SHQuoteRepoEarlyRepurchaseOrderRsp {
+        char16 account_id;          // 交易账号，目前是资金账号
+        int16_t account_type;       // 交易账号类型，参考AccountType定义
+        char8 cust_orgid;           // 机构编码
+        char8 cust_branchid;        // 分支编码
+        char32 order_id;            // 柜台订单id
+        char32 cl_order_id;         // 客户端订单id，用来引用一个普通订单，由用户自定义，原样返回
+        int32_t cl_order_date;      // 客户端订单日期
+    };
+
+    // 上海报价回购提前购回预约请求
+    struct SHQuoteRepoEarlyRepurchaseBookReq {
+        int32_t order_date;         // 委托日期，格式为YYYYMMDD
+        char32 sno;                 // 流水号
+        char32 cl_order_id;         // 客户端订单id，用来引用一个普通订单，由用户自定义，原样返回
+        int32_t cl_order_date;      // 客户端订单日期，格式为YYYYMMDD，原样返回，非必传
+    };
+
+    // 上海报价回购提前购回预约应答
+    struct SHQuoteRepoEarlyRepurchaseBookRsp {
+        char16 account_id;          // 交易账号，目前是资金账号
+        int16_t account_type;       // 交易账号类型，参考AccountType定义
+        char8 cust_orgid;           // 机构编码
+        char8 cust_branchid;        // 分支编码
+        char32 cl_order_id;         // 客户端订单id，用来引用一个普通订单，由用户自定义，原样返回
+        int32_t cl_order_date;      // 客户端订单日期
+    };
+
+    // 上海报价回购合约查询请求
+    struct QrySHQuoteRepoContractReq {
+        int16_t status;                             // 合约状态，参考SHQuoteRepoStatus定义，非必传
+    };
+    // 上海报价回购合约明细
+    struct SHQuoteRepoContractDetail {
+        char16 account_id;                          // 交易账号，目前是资金账号
+        char8 cust_orgid;                           // 机构编码
+        char8 cust_branchid;                        // 分支编码
+        int16_t account_type;                       // 交易账号类型，参考AccountType定义
+        int32_t order_date;                         // 委托日期，格式为YYYYMMDD 
+        char16 sno;                                 // 流水号  
+        int16_t order_side;                         // 买卖标识，参考OrderSide定义  
+        int64_t due_price;                          // 到期利率，扩大一万倍，单位%
+        int64_t inter_price;                        // 提前终止利率，扩大一万倍，单位%
+        bool inter_bsflag;                          // 提前终止标志 false 未被提前终止 true 已被提前终止
+        Amt_t match_amt;                            // 成交金额
+        int64_t match_qty;                          // 成交数量
+        int64_t gh_days;                            // 购回天数
+        char32 match_code;                          // 成交编号  
+        int16_t lastyy_status;                      // 上日预约状态，参考QuoteRepoBookStatus定义
+        int32_t match_date;                         // 预计到期日期，格式为YYYYMMDD 
+        char16 stk_code;                            // 证券代码
+        char32 stk_name;                            // 证券名称
+        char32 secuid;                              // 股东代码
+        bool auto_flag;                             // 自动续约标志 false 不自动续约, true 自动续约
+        int32_t first_date;                         // 初始日期，格式为YYYYMMDD 
+    };
+    
+    // 上海报价回购业务查询请求
+    struct QrySHQuoteRepoBusinessReq {
+    };
+    // 上海报价回购业务明细
+    struct SHQuoteRepoBusinessDetail {
+        char16 account_id;                          // 交易账号，目前是资金账号
+        char8 cust_orgid;                           // 机构编码
+        char8 cust_branchid;                        // 分支编码
+        int16_t account_type;                       // 交易账号类型，参考AccountType定义
+        int32_t order_date;                         // 委托日期，格式为YYYYMMDD  
+        char32 counter_order_id;                    // 柜台委托号
+        char16 cust_id;                             // 客户代码  
+        char32 cust_name;                           // 客户姓名  
+        int16_t currency_type;                      // 货币类型，参考CurrencyType定义
+        char32 secuid;                              // 股东代码  
+        int16_t order_side;                         // 买卖标识，参考OrderSide定义  
+        char32 contract_id;                         // 申报合同序号  
+        int64_t report_time;                        // 报盘时间，格式为HHMMSSmmm，首位为0不显示  
+        char32 symbol;                              // 标的代码，格式为市场.证券ID
+        char32 stk_name;                            // 证券名称 
+        int64_t order_price;                        // 年收益率 扩大一万倍，单位% 
+        int64_t bond_intr;                          // 提前购回年收益率 扩大一万倍，单位% 
+        int64_t order_qty;                          // 委托数量  
+        int64_t oper_time;                          // 操作时间，格式为HHMMSSmmm，首位为0不显示
+        Amt_t order_frz_amt;                        // 冻结金额
+        int64_t match_qty;                          // 成交数量
+        Amt_t match_amt;                            // 成交金额
+        int64_t cancel_qty;                         // 撤单数量
+        int32_t order_status;                       // 委托状态，参考OrderStatus定义
+        char16 seat;                                // 交易席位
+        int16_t cancel_flag;                        // 撤单标志 参考CancelFlag定义 
+        char16 net_addr;                            // MAC地址 
+        Price_t match_price;                        // 成交价格  
+        int32_t oper_date;                          // 操作日期，格式为YYYYMMDD
+        char operway;                               // 委托方式
+        Amt_t fund_avl;                             // 资金可用
+        char64 remark;                              // 备注  
+        int32_t credit_type;                        // 信用交易类型
+        char16 credit_digestid;                     // 信用交易摘要
+        char16 prod_code;                           // 产品编码
+        char128 prod_name;                          // 产品名称
+        Amt_t clear_amt;                            // 清算金额
+    };
+
+    // 股转发行证券信息查询请求
+    struct QueryNEEQIPOStockReq {
+        char8 stk_code;                 // 证券代码，非必传
+        char sub_pur_stat;              // 认申购状态 非必传，参考SubscribePurchaseStatus定义
+        int32_t order_date;             // 委托日期，格式为YYYYMMDD
+        char32 pos_str;                 // 定位串，填""表示第一次从头开始查
+        int32_t query_num;              // 查询数量
+        char32 secuid;                  // 股东代码，非必传，默认由系统自动获取。
+                                        // 用户可根据返回的北交所股东代码按需填写
+    };
+
+    // 股转发行证券信息详情
+    struct NEEQIPOStockDetail {
+        char16 account_id;              // 交易账号，目前是资金账号
+        int16_t account_type;           // 交易账号类型，参考AccountType定义
+        char8 cust_orgid;               // 机构编码
+        char8 cust_branchid;            // 分支编码
+        char32 symbol;                  // 标的代码，格式为市场.证券ID
+        char16 underlying_code;         // 正股代码  
+        int32_t sub_start_date;         // 认购起始日期，格式为YYYYMMDD
+        int32_t sub_end_date;           // 认购结束日期，格式为YYYYMMDD
+        int64_t sub_min_qty;            // 最小询价数量  
+        int64_t sub_max_qty;            // 最大询价数量  
+        Price_t sub_min_price;          // 认购下限价格  
+        Price_t sub_max_price;          // 认购上限价格  
+        int64_t sub_pur_unit;           // 认申购单元  
+        int32_t pur_date;               // 申购日期，格式为YYYYMMDD
+        int64_t pur_min_qty;            // 最小申购数量  
+        int64_t pur_max_qty;            // 最大申购数量  
+        Price_t pur_min_price;          // 申购下限价格  
+        Price_t pur_max_price;          // 申购上限价格  
+        int64_t issued_total_qty;       // 总发行量  
+        char32 stk_name;                // 证券简称  
+        char sub_pur_stat;              // 认申购状态，参考SubscribePurchaseStatus定义
+        int32_t update_date;            // 更新日期，格式为YYYYMMDD
+        int64_t sub_confirm_min_qty;    // 询价确认最小申购数量  
+        int64_t sub_confirm_max_qty;    // 询价确认最大申购数量  
+        int16_t sub_confirm_result;     // 询价确认结果，参考SubscribeResult定义
+        int16_t sub_order_status;       // 委托状态，参考SubPurOrderStatus定义
+        int16_t neeq_issue_type;        // 新三板发行方式，参考NEEQIssueType定义
+    };
+ 
 
 }  // namespace HFT
 

@@ -84,7 +84,7 @@ class TraderSpi {
     virtual void OnTradeReport(TradeDetail* trade_detail) {}
 
     /**
-     * 订单状态变化回调
+     * 订单状态变化回调  	注意，集中交易柜台不支持此回调通知
      *
      * @param order_detail  回调的订单对象
      */
@@ -92,7 +92,7 @@ class TraderSpi {
 
     /**
      * 订单委托的响应
-     * Order、BatchOrder、AppointContractSellStockRepay均由此接口响应
+     * Order、BatchOrder均由此接口响应
      *
      * @param order_rsp     订单委托应答
      * @param error_info    应答的错误信息
@@ -466,29 +466,6 @@ class TraderSpi {
      */
     virtual void OnQueryLockSecurityDetailRsp(LockSecurityDetail* detail, ErrorInfo* error_info,
                                               int request_id, bool is_last, const char* pos_str) {}
-
-    /**
-     * 展期应答
-     *
-     * @param rsp           展期应答数据
-     * @param error_info    应答的错误信息
-     * @param request_id    请求序列号，用于匹配响应，由用户自定义，非0
-     */
-    virtual void OnExtendLockSecurityRsp(ExtendLockSecurityRsp* rsp, ErrorInfo* error_info,
-                                         int request_id) {}
-
-    /**
-     * 查询锁券展期申请应答
-     *
-     * @param detail        展期明细数据
-     * @param error_info    应答的错误信息
-     * @param request_id    对应请求时传入的序列号
-     * @param is_last       是否是本次请求的最后一笔响应
-	 * @param pos_str       本次查询最后一条记录的定位串，用于下一次查询
-     */
-    virtual void OnQueryLockSecurityExtensionRsp(LockSecurityExtensionDetail* detail,
-                                                 ErrorInfo* error_info, int request_id,
-                                                 bool is_last, const char* pos_str) {}
 
     /**
      * 查询资金划转流水的响应
@@ -1049,6 +1026,14 @@ class HFT_TRADER_EXPORT TraderApi {
     static void SetReconnectConfig(int max_retry_count, int min_interval, int max_interval);
 
     /**
+     * 设置应用层心跳参数，只需调用一次
+     *
+     * @param ka_interval         发送应用层心跳时间间隔，单位秒，默认30秒
+     * @param max_probe_cnt       未收到对方心跳，继续发送心跳探测包的最大次数，默认10次
+     */
+    static void SetKeepaliveConfig(int ka_interval, int max_probe_cnt);
+
+    /**
      * 不再使用本接口对象时，调用该函数删除接口对象
      */
     virtual void Release() = 0;
@@ -1068,15 +1053,11 @@ class HFT_TRADER_EXPORT TraderApi {
     /**
      * 发起用户登录请求
      *
-     * @param svr_ip        交易服务器ip地址
-     * @param svr_port      交易服务器端口
-     * @param account       接入方交易账户相关信息
-     * @param terminal_info 交易终端信息，格式需满足交易所要求，格式请见接口说明文档，必须UTF8编码
+     * @param req           登录请求相关信息
      * 
      * @return              0表示发起登录请求成功，非0表示发起登录请求失败，通过GetApiLastError获取错误信息
      */
-    virtual int Login(const char* svr_ip, int svr_port, const AccountInfo* account_info,
-                      const char* terminal_info) = 0;
+    virtual int Login(const LoginReq* req) = 0;
 
     /**
      * 获取资金账号绑定的柜台类型，登陆成功后可获取
@@ -1553,26 +1534,6 @@ class HFT_TRADER_EXPORT TraderApi {
     virtual int QueryLockSecurityDetail(QryLockSecurityReq* qry_req, int request_id) = 0;
 
     /**
-     * 锁券展期申请
-     *
-     * @param req           锁券展期请求对象
-     * @param request_id    请求序列号，用于匹配响应，由用户自定义，非0
-     *
-     * @return              成功返回0，失败返回错误码，通过GetApiLastError获取错误信息
-     */
-    virtual int ExtendLockSecurity(ExtendLockSecurityReq* req, int request_id) = 0;
-
-    /**
-     * 查询锁券展期申请请求
-     *
-     * @param req           查询请求数据
-     * @param request_id    请求序列号，用于匹配响应，由用户自定义，非0
-     *
-     * @return              成功返回0，失败返回错误码，通过GetApiLastError获取错误信息
-     */
-    virtual int QueryLockSecurityExtension(QryLockSecurityExtensionReq* req, int request_id) = 0;
-
-    /**
      * 查询极速柜台与集中交易之间的资金划转流水，
      * 仅支持顶点现货
      *
@@ -1902,16 +1863,6 @@ class HFT_TRADER_EXPORT TraderApi {
      * @return              成功返回0，失败返回错误码，通过GetApiLastError获取错误信息
      */
     virtual int QueryNetVoteCount(QryNetVoteCountReq* req, int request_id) = 0;
-
-    /**
-    * 指定合约卖券还款-通过通用普通委托应答确认
-    *
-    * @param req           卖券还款的请求参数构造
-    * @param request_id    请求序列号，用于匹配响应，由用户自定义，非0
-    * @return              成功返回0，失败返回错误码，通过GetApiLastError获取错误信息
-    */
-    virtual int AppointContractSellStockRepay(AppointContractSellStockRepayReq* req,
-                                              int request_id) = 0;
 
 	/**
 	* 股票集中度查询

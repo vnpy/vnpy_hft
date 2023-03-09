@@ -199,6 +199,11 @@ enum OrderSide {
     OrderSide_Bond_Auctions_Trade_Subscribe_Order = 116,       // 竞买成交竞买预约申报                   
     OrderSide_Bond_Auctions_Trade_Send_Order = 117,            // 竞买成交竞买发起申报                   
     OrderSide_Bond_Auctions_Trade_Reply_Order = 118,           // 竞买成交竞买应价申报
+    OrderSide_Bond_QuoteRepo_Order = 119,                      // 报价回购
+    OrderSide_Bond_Quote_Continue = 120,                       // 报价续做
+    OrderSide_Bond_Putback_Resale_Order = 121,                 // 债券回售转售申报
+    OrderSide_Bond_Putback_Resale_Confirm = 122,               // 债券回售转售确认
+    OrderSide_Bond_Putback_Resale_Reject = 123,                // 债券回售转售拒绝
 };
 
 // 持仓类型
@@ -240,10 +245,16 @@ enum CancelFlag {
 
 // ETF申购赎回允许状态
 enum ETFTradeState {
-    ETFTradeState_PurchaseAndRedeem = 1,  // 允许申购和赎回
-    ETFTradeState_Forbidden = 2,          // 不允许申购和赎回
-    ETFTradeState_OnlyPurchase = 3,       // 表示允许申购、不允许赎回
-    ETFTradeState_OnlyRedeem = 4,         // 表示允许赎回、不允许申购
+    ETFTradeState_PurchaseAndRedeem = 1,       // 场内场外全部允许申购和赎回
+    ETFTradeState_Forbidden = 2,               // 场内场外全部不允许申购和赎回
+    ETFTradeState_OnlyPurchase = 3,            // 场内场外全部允许申购、不允许赎回
+    ETFTradeState_OnlyRedeem = 4,              // 场内场外全部允许赎回、不允许申购
+    ETFTradeState_InsideCreateAndRedeem = 5,   // 场内允许申购和赎回
+    ETFTradeState_OutsideCreateAndRedeem = 6,  // 场外允许申购和赎回
+    ETFTradeState_InsideOnlyCreate = 7,        // 场内允许申购、不允许赎回
+    ETFTradeState_InsideOnlyRedeem = 8,        // 场内允许赎回、不允许申购
+    ETFTradeState_OutsideOnlyCreate = 9,       // 场外允许申购、不允许赎回
+    ETFTradeState_OutsideOnlyRedeem = 10,      // 场外允许赎回、不允许申购
 };
 
 // ETF现金替代标识
@@ -577,14 +588,15 @@ enum CounterType {
     CounterType_JZJY = 1,             // 集中交易柜台
     CounterType_APEX_MARGIN = 2,      // 顶点两融HTS柜台
     CounterType_APEX = 3,             // 顶点股票快速柜台
-    CounterType_NGTP = 4,             // 新一代君睿股票快速柜台
-    CounterType_DYC = 5,              // 君睿股票快速柜台
-    CounterType_DYC_MARGIN = 6,       // 君睿两融快速柜台
-    CounterType_DYC_JZJY = 8,         // 君睿股票集中柜台
-    CounterType_DYC_JZJY_MARGIN = 9,  // 君睿两融集中柜台
+    CounterType_NGTP = 4,             // 98机构域股票快速柜台
+    CounterType_DYC = 5,              // 97机构域股票快速柜台
+    CounterType_DYC_MARGIN = 6,       // 低延时两融96域快速节点
+    CounterType_DYC_JZJY = 8,         // 低延时现货96域
+    CounterType_DYC_JZJY_MARGIN = 9,  // 低延时两融96域
     CounterType_DYC_OPTIONS = 10,     // 低延时期权快速柜台
-    CounterType_DYC_ATP = 11,         // 快速订单系统
+    CounterType_DYC_ATP = 11,         // 快速订单系统（华锐超极速）
     CounterType_TYKSGT_OPTIONS = 23,  // 泰琰期权快速柜台
+    CounterType_XCGT = 25,            // 低延时信创快速柜台
     CounterType_PTGT_OPTIONS = 27,    // 金证期权普通柜台
 };
 
@@ -1708,6 +1720,7 @@ enum RedeemType {
 
 // 分红方式
 enum FundDividMethod {
+	FundDividMethod_Placeholder = 0,	// 未定义或者无意义
 	FundDividMethod_Reinvestment = 1,	// 红利转投
 	FundDividMethod_Cash = 2			// 现金分红
 };
@@ -1804,7 +1817,8 @@ enum PermissionFlag {
 enum SubscribeResult {
     SubscribeResult_Allow = 0,          // 可以参与申购
     SubscribeResult_Deny = 1,           // 禁止参与申购
-    SubscribeResult_Must = 2            // 必须参与申购
+    SubscribeResult_Must = 2,           // 必须参与申购
+	SubscribeResult_NotIn = 3           // 未参与询价
 };
 
 // 大宗交易标志
@@ -2033,9 +2047,9 @@ enum ContractBuyBackBsStatus {
 
 // 质押券股份性质
 enum ContractBuyBackShareProperty {
-	ContractBuyBackShareProperty_Placeholder = 0,	//无效值
-	ContractBuyBackShareProperty_1 = 1,			//00无限售流通股
-	ContractBuyBackShareProperty_2 = 2,			//01首发后限售股
+	ContractBuyBackShareProperty_Placeholder = 0,	// 定义或者无意义
+	ContractBuyBackShareProperty_1 = 1,				// 00无限售流通股
+	ContractBuyBackShareProperty_2 = 2,				// 01首发后限售股
 };
 
 // 质押券股份性质
@@ -2065,7 +2079,7 @@ enum ContractBuyBackOwnerType {
 
 // 交易主体类型
 enum ContractBuyBackInvestorType {
-	ContractBuyBackInvestorType_Placeholder = 0,		// 无效值	
+	ContractBuyBackInvestorType_Placeholder = 0,		// 未定义或无意义
 	ContractBuyBackInvestorType_SelfManage = 1,		    //01=自营
 	ContractBuyBackInvestorType_AssetManage = 2,		//02=资管
 	ContractBuyBackInvestorType_Organiz = 3,			//03=机构经纪
@@ -2234,10 +2248,36 @@ enum AccountStatus {
 
 // 股东代码类别
 enum AccountClass {
-       AccountClass_Placeholder = ' ',             // 未定义
-       AccountClass_0 = '0',                       // 股东账户
-       AccountClass_1 = '1',                       // 基金账户
-       AccountClass_H = 'H',                       // H股全流通账户
+    AccountClass_Placeholder = ' ',             // 未定义
+    AccountClass_0 = '0',                       // 股东账户
+    AccountClass_1 = '1',                       // 基金账户
+    AccountClass_H = 'H',                       // H股全流通账户
+};
+
+// 股东账户权限类型
+enum AccountRightType {
+    AccountRightType_Placeholder = ' ',                 // 未定义
+    AccountRightType_1 = '1',                           // 债券协议回购
+    AccountRightType_3 = '3',                           // 沪伦通交易
+    AccountRightType_4 = '4',                           // 三方正回购
+    AccountRightType_5 = '5',                           // 三方逆回购
+    AccountRightType_6 = '6',                           // 沪科创板普通权限
+    AccountRightType_7 = '7',                           // 沪科创板信用权限 
+    AccountRightType_8 = '8',                           // 特定债券权限
+    AccountRightType_9 = '9',                           // 创业板核准制普通权限
+    AccountRightType_a = 'a',                           // 创业板注册制普通权限
+    AccountRightType_b = 'b',                           // 质押指定
+    AccountRightType_c = 'c',                           // 逆回购指定 
+    AccountRightType_d = 'd',                           // 私募债权限
+    AccountRightType_f = 'f',                           // 港股通权限
+    AccountRightType_g = 'g',                           // 优先股转让权限
+};
+
+// 沪港通权限
+enum SHHKAccountRight {
+    SHHKAccountRight_Placeholder = ' ',                 // 未定义
+    SHHKAccountRight_0 = '0',                           // 卖出
+    SHHKAccountRight_1 = '1',                           // 买入卖出
 };
 
 // 集中交易客户类型
@@ -2279,16 +2319,31 @@ enum BiddingMatchType {
 
 // 债券应用标识
 enum BondApplyId {
-    BondApplyId_Placeholder = 0,       // 未定义
-    BondApplyId_410 = 410,             // 债券现券交易匹配成交申报
-    BondApplyId_411 = 411,             // 债券现券交易协商成交申报
-    BondApplyId_412 = 412,             // 债券现券交易点击成交报价申报
-    BondApplyId_413 = 413,             // 债券现券交易点击成交报价回复申报
-    BondApplyId_414 = 414,             // 债券现券交易询价申报
-    BondApplyId_415 = 415,             // 债券现券交易询价成交报价申报
-    BondApplyId_416 = 416,             // 债券现券交易询价成交报价回复申报
-    BondApplyId_417 = 417,             // 债券现券交易竞买成交申报
-    BondApplyId_430 = 430,             // 债券转让业务回售转售申报
+    BondApplyId_Placeholder = 0,      // 未定义
+	BondApplyId_410 = 410,            // 债券现券交易匹配成交申报
+	BondApplyId_411 = 411,            // 债券现券交易协商成交申报
+	BondApplyId_412 = 412,            // 债券现券交易点击成交报价申报
+	BondApplyId_413 = 413,            // 债券现券交易点击成交报价回复申报
+	BondApplyId_414 = 414,            // 债券现券交易询价申报
+	BondApplyId_415 = 415,            // 债券现券交易询价成交报价申报
+	BondApplyId_416 = 416,            // 债券现券交易询价成交报价回复申报
+	BondApplyId_417 = 417,            // 债券现券交易竞买成交申报
+	BondApplyId_430 = 430,            // 债券转让业务回售转售申报
+};
+
+// 债券应用标识
+enum StrBondApplyId {
+#define StrBondApplyId_Placeholder = "0"      // 未定义
+#define StrBondApplyId_410 = "410"            // 债券现券交易匹配成交申报
+#define StrBondApplyId_411 = "411"            // 债券现券交易协商成交申报
+#define StrBondApplyId_412 = "412"            // 债券现券交易点击成交报价申报
+#define StrBondApplyId_413 = "413"            // 债券现券交易点击成交报价回复申报
+#define StrBondApplyId_414 = "414"            // 债券现券交易询价申报
+#define StrBondApplyId_415 = "415"            // 债券现券交易询价成交报价申报
+#define StrBondApplyId_416 = "416"            // 债券现券交易询价成交报价回复申报
+#define StrBondApplyId_417 = "417"            // 债券现券交易竞买成交申报
+#define StrBondApplyId_430 = "430"            // 债券转让业务回售转售申报
+#define StrBondApplyId_41A = "41A"            // 41A债券现券交易协商成交之合并申报
 };
 
 // 信用标识
@@ -2487,6 +2542,29 @@ enum QytEnType {
     QytEnType_bbzq = 'b',            // 篮子展期
 };
 
+// 篮子委托方式
+enum QytBEnType {
+    QytBEnType_Auction = '1',         // 仅竞拍
+    QytBEnType_khzq = '4',            // 客户展期
+    QytBEnType_zdzq = '5',            // 自动展期
+    QytBEnType_glyzq = '6',           // 管理员展期
+};
+
+// 篮子类型
+enum QytBskType {
+    QytBskType_Std = '1',             // 标准篮子
+    QytBskType_Cust = '2',            // 定制篮子
+};
+
+// 成交类型
+enum QytDealType {
+    QytDealType_RT = '1',        // 实时券
+    QytDealType_QC = '3',        // 券池成交
+    QytDealType_TZ = '4',        // 台账成交
+    QytDealType_SP = '5',        // 审批成交（callback展期）
+    QytDealType_QT = '9',        // 其他
+};
+
 //券池直锁方式
 enum Ezsfs {
     Ezsfs_ALL = 0,                    // -1查全部
@@ -2514,6 +2592,7 @@ enum Esctflx {
 //券池类型
 enum QCType {
     //1实时券,2竞价券,3预告券,4约定券
+    QCType_Placeholder = 0,               // 未定义
     QCType_Realtime = 1,
     QCType_Bidding = 2,
     QCType_Forecast = 3,
@@ -2609,9 +2688,11 @@ enum QC_Ezqsqfs {
 
 // QC展期审批
 enum QC_HaveExtend {
-    //0-否; 1-是
-    QC_HaveExtend_No = '0',
-    QC_HaveExtend_Yes = '1',
+    //0-其它；1-审批通过；2-申请中；A(10)-已展期(只对查询约券合约请求--KHD0001生效)
+    QC_HaveExtend_0 = '0',
+    QC_HaveExtend_1 = '1',
+    QC_HaveExtend_2 = '2',
+    QC_HaveExtend_A = 'A',
 };
 
 // QC特殊预约标志
@@ -2621,6 +2702,263 @@ enum QC_Etsyybz {
 	QC_Etsyybz_Pt = '2',
 };
 
+// 横向划转处理状态
+enum LTDealStatus {
+    LTDealStatus_Init = 0,                  // 0：未处理
+    LTDealStatus_Dealing = 1,               // 1：处理中
+    LTDealStatus_Success = 2,               // 2：成功
+    LTDealStatus_Failed = 3,                // 3：失败
+};
+
+// 横向划转业务摘要代码
+enum LTBusiDigestCode {
+    LTBusiDigestCode_Placeholder = 0,           // 未定义或无意义
+    LTBusiDigestCode_0101 = 101,                // 证转证
+    LTBusiDigestCode_0102 = 102,                // 证转信
+    LTBusiDigestCode_0103 = 103,                // 证转投顾
+    LTBusiDigestCode_0104 = 104,                // 证转衍
+    LTBusiDigestCode_0105 = 105,                // 证转贵
+    LTBusiDigestCode_0201 = 201,                // 信转证
+    LTBusiDigestCode_0202 = 202,                // 信转信
+    LTBusiDigestCode_0203 = 203,                // 信转投顾
+    LTBusiDigestCode_0204 = 204,                // 信转衍
+    LTBusiDigestCode_0205 = 205,                // 信转贵
+    LTBusiDigestCode_0301 = 301,                // 投顾转证
+    LTBusiDigestCode_0302 = 302,                // 投顾转信
+    LTBusiDigestCode_0303 = 303,                // 投顾转投顾
+    LTBusiDigestCode_0304 = 304,                // 投顾转衍
+    LTBusiDigestCode_0305 = 305,                // 投顾转贵
+    LTBusiDigestCode_0401 = 401,                // 衍转证
+    LTBusiDigestCode_0402 = 402,                // 衍转信
+    LTBusiDigestCode_0403 = 403,                // 衍转投顾
+    LTBusiDigestCode_0404 = 404,                // 衍转衍
+    LTBusiDigestCode_0405 = 405,                // 衍转贵
+    LTBusiDigestCode_0501 = 501,                // 贵转证
+    LTBusiDigestCode_0502 = 502,                // 贵转信
+    LTBusiDigestCode_0503 = 503,                // 贵转投顾
+    LTBusiDigestCode_0504 = 504,                // 贵转衍
+    LTBusiDigestCode_0505 = 505,                // 贵转贵
+};
+
+// 可交易类型
+enum TradableType {
+    TradableType_Placeholder = 0,              // 未定义或无意义
+    TradableType_0 = '0',                      // 可正常交易
+    TradableType_1 = '1',                      // 缴款
+    TradableType_2 = '2',                      // 申购
+    TradableType_3 = '3',                      // 增发申购
+    TradableType_4 = '4',                      // 配号
+    TradableType_7 = '7',                      // 配售
+    TradableType_8 = '8',                      // 配售配号
+    TradableType_9 = '9',                      // 跨系统转托管
+    TradableType_A = 'A',                      // 设置分红方式
+    TradableType_B = 'B',                      // ETF认购
+    TradableType_C = 'C',                      // ETF申购
+    TradableType_D = 'D',                      // 基金金额认购
+    TradableType_E = 'E',                      // 行权
+    TradableType_F = 'F',                      // 基金转换
+    TradableType_G = 'G',                      // 质押
+    TradableType_H = 'H',                      // 转债回售
+    TradableType_J = 'J',                      // 发行询价
+    TradableType_K = 'K',                      // 发行申购
+    TradableType_X = 'X',                      // 现金替代
+};
+
+// 信用合同状态
+enum CreditContractStatus {
+    CreditContractStatus_Placeholder = 0,       // 未定义或无意义
+    CreditContractStatus_Normal = 1,            // 正常
+    CreditContractStatus_NotStarted = 2,        // 未启用
+    CreditContractStatus_Stoped = 3,            // 终止
+};
+
+// 基金账户状态
+enum FundAccountStatus {
+    FundAccountStatus_Placeholder = ' ',        // 未定义
+    FundAccountStatus_0 = '0',                  // 正常
+    FundAccountStatus_1 = '1',                  // 冻结
+    FundAccountStatus_2 = '2',                  // 挂失
+    FundAccountStatus_4 = '4',                  // 交易帐户待销户
+    FundAccountStatus_5 = '5',                  // 基金帐户待销户
+    FundAccountStatus_6 = '6',                  // 交易帐户销户
+    FundAccountStatus_7 = '7',                  // 基金帐户销户
+    FundAccountStatus_8 = '8',                  // 冻结挂失中
+    FundAccountStatus_9 = '9',                  // 解冻解挂中
+    FundAccountStatus_a = 'a',                  // 内部冻结
+    FundAccountStatus_b = 'b',                  // 基金开户未确认
+    FundAccountStatus_c = 'c',                  // 交易帐户开户未确认
+    FundAccountStatus_d = 'd',                  // 帐户修改未确认
+    FundAccountStatus_e = 'e',                  // 开户失败
+    FundAccountStatus_f = 'f',                  // 变更交易账户未确认
+};
+
+// 证券类型
+enum QytStockType {
+    QytStockType_Placeholder = ' ',        //未定义或无意义
+    QytStockType_1 = '1',                  //实时券（针对意向登记的代表已上市） 
+    QytStockType_2 = '2',                  //竞拍券（针对意向登记的代表未上市）
+    QytStockType_3 = '3',                  //外部券
+    QytStockType_4 = '4',                  //篮子券（针对标准篮子）
+};
+
+// 分类代码
+enum QytSInfoTypeCode {
+    QytSInfoTypeCode_Placeholder = ' ',        //未定义或无意义
+    QytSInfoTypeCode_a001050w01 = '1',         //审批制 
+    QytSInfoTypeCode_a001050w02 = '2',         //核准制
+    QytSInfoTypeCode_a001050w03 = '3',         //注册制
+};
+
+// 融券策略（仅针对融券意向）
+enum QytStrategy {
+    QytStrategy_Placeholder = ' ',         //未定义或无意义
+    QytStrategy_0 = '0',                   //融券策略（仅针对融券意向）	0	其他
+    QytStrategy_1 = '1',                   //融券策略（仅针对融券意向）	1	趋势交易
+    QytStrategy_2 = '2',                   //融券策略（仅针对融券意向）	2	融券对冲
+    QytStrategy_3 = '3',                   //融券策略（仅针对融券意向）	3	套利交易
+};
+
+// 收盘前或收盘后标志(当前时间在15:00前或者后的标志)
+enum AfterCloseFlag {
+    AfterCloseFlag_Placeholder = ' ',   // 未定义或无意义
+    AfterCloseFlag_False = '0',         // 收盘前
+    AfterCloseFlag_True = '1',          // 收盘后
+};
+
+// 审批状态(前端状态)
+enum FrontApprovalStatus {
+    FrontApprovalStatus_Placeholder = 0,    // 未定义或无意义
+    FrontApprovalStatus_Checking = 1,       // 审批中
+    FrontApprovalStatus_CheckSucc = 2,      // 审批通过
+    FrontApprovalStatus_CheckFail = 3,      // 审批拒绝
+    FrontApprovalStatus_Cancelled = 4,      // 已撤单
+};
+
+// 是否多渠道开户标志
+enum MultiOpenFlag {
+    MultiOpenFlag_Placeholder = ' ',    // 未定义或无意义
+    MultiOpenFlag_False = '0',          // 否
+    MultiOpenFlag_True = '1',           // 是
+};
+
+// 基金委托状态定义
+enum FundOrderStatus {
+    FundOrderStatus_Placeholder = 0,        // 定义或无意义
+    FundOrderStatus_NoApply = 1,            // 未报
+    FundOrderStatus_PendingNew = 2,         // 待报
+    FundOrderStatus_New = 3,                // 已报
+    FundOrderStatus_Canceling = 4,          // 已报待撤
+    FundOrderStatus_CancelFilled = 7,       // 已撤
+    FundOrderStatus_PartiallyFilled = 8,    // 部成
+    FundOrderStatus_Filled = 9,             // 已成
+    FundOrderStatus_Rejected = 10,          // 废单
+    FundOrderStatus_Applying = 11,          // 正报
+    FundOrderStatus_Replyed = 12,           // 已回
+};
+
+// 内部调用标识
+enum InnerCallFlag {
+    InnerCallFlag_False = 0,                // 非内部调用
+    InnerCallFlag_True = 1,                 // 内部调用
+};
+
+// 续作标识(报价回购)
+enum ContinueFlag {
+	ContinueFlag_Placeholder = 0,	// 未定义或无意义
+	ContinueFlag_0 = 1,	            // 不允许续做
+	ContinueFlag_1 = 2,	            // 只能续做原期
+	ContinueFlag_2 = 3,	            // 可续做原期或一天期
+};
+
+// 交易标志(报价回购)
+enum QuoteRepoBuyFlag {
+	QuoteRepoBuyFlag_Placeholder = 0,	// 未定义或无意义
+	QuoteRepoBuyFlag_0 = 1,	            // 允许交易
+	QuoteRepoBuyFlag_1 = 2,	            // 禁止交易
+	QuoteRepoBuyFlag_2 = 3,	            // 禁止初始交易
+	QuoteRepoBuyFlag_3 = 4,	            // 禁止提前购回
+};
+
+// 产品模式(报价回购)
+enum QuoteRepoProdMode {
+	QuoteRepoProdMode_Placeholder = 0,	// 未定义或无意义--作为查询入参时，代表查所有
+	QuoteRepoProdMode_0 = 1,	        // 分期模式
+	QuoteRepoProdMode_1 = 2,	        // 长期模式
+};
+
+// 特殊产品(报价回购)
+enum SpecialProd{
+	SpecialProd_Placeholder = 0,	// 未定义或无意义--作为查询入参时，代表查所有
+	SpecialProd_0 = 1,	            // 非特殊产品
+	SpecialProd_1 = 2,	            // 是特殊产品
+};
+
+// 合约状态(上海报价回购)
+enum SHQuoteRepoStatus {
+	SHQuoteRepoStatus_Placeholder = 0,	    // 未定义或无意义--作为查询入参时，代表查所有
+	SHQuoteRepoStatus_0 = 1,	            // 未完成(在途待交收)
+	SHQuoteRepoStatus_1 = 2,	            // 已完成(到期)
+	SHQuoteRepoStatus_2 = 3,	            // 已完成(提前终止)
+};
+
+// 预约状态(报价回购)
+enum QuoteRepoBookStatus {
+	QuoteRepoBookStatus_Placeholder = 0,	// 未定义或无意义
+	QuoteRepoBookStatus_0 = 1,	            // 无预约
+	QuoteRepoBookStatus_1 = 2,	            // 预约等待
+	QuoteRepoBookStatus_2 = 3,	            // 允许预约
+	QuoteRepoBookStatus_3 = 4,	            // 拒绝预约
+};
+
+
+// 深圳合约状态,'0' 己成,'1' 正常 '2' 己了结,'3' 己结束
+enum SZQuoteRepoStatus {
+	SZQuoteRepoStatus_0 = '0',           // 己成
+	SZQuoteRepoStatus_1 = '1',           // 正常
+	SZQuoteRepoStatus_2 = '2',           // 己了结
+	SZQuoteRepoStatus_3 = '3',           // 己结束
+};
+
+//合约生成方式0:正常,1:预约生成,2:续作生成
+enum QuoteRepoCreateMethod {
+	QuoteRepoCreateMethod_Placeholder = ' ', // 未定义或无意义
+    QuoteRepoCreateMethod_0 = '0',           // 己成
+	QuoteRepoCreateMethod_1 = '1',           // 预约生成
+	QuoteRepoCreateMethod_2 = '2',           // 续作生成
+};
+
+//自动续约标志'1'自动续约'0'不自动续约
+enum QuoteRepoContFlag {
+    QuoteRepoContFlag_0 = '0',               //不自动续约
+    QuoteRepoContFlag_1 = '1',               //自动续约
+};
+
+//提前购回预约状态'0'-无预约'2'-已预约
+enum QuoteRepoYyStatus {
+    QuoteRepoYyStatus_0 = '0',               //无预约
+    QuoteRepoYyStatus_2 = '2',               //已预约
+};
+
+// 认申购状态 J:认购阶段 K:申购阶段
+enum SubscribePurchaseStatus {
+    SubscribePurchaseStatus_Placeholder = ' ',      // 未定义或无意义
+    SubscribePurchaseStatus_Sub = 'J',              // 认购阶段
+    SubscribePurchaseStatus_Pur = 'K',              // 申购阶段
+};
+
+// 认申购委托状态
+enum SubPurOrderStatus {
+    SubPurOrderStatus_No = 0,                           // 未申报
+    SubPurOrderStatus_Yes = 1,                          // 已申报
+};
+
+// 新三板发行方式
+enum NEEQIssueType {
+    NEEQIssueType_Placeholder = 0,              // 未定义或无意义
+    NEEQIssueType_Quoto = 1,                        // 询价发行
+    NEEQIssueType_Fix = 2,                      // 定价发行
+    NEEQIssueType_Auction = 3,                 // 竞价发行
+};
 
 }  // namespace HFT
 

@@ -737,6 +737,14 @@ class HFT_TRADER_EXPORT OptionTraderApi {
     static void SetReconnectConfig(int max_retry_count, int min_interval, int max_interval);
 
     /**
+     * 设置应用层心跳参数，只需调用一次
+     *
+     * @param ka_interval         发送应用层心跳时间间隔，单位秒，默认30秒
+     * @param max_probe_cnt       未收到对方心跳，继续发送心跳探测包的最大次数，默认10次
+     */
+    static void SetKeepaliveConfig(int ka_interval, int max_probe_cnt);
+
+    /**
      * 不再使用本接口对象时，调用该函数删除接口对象
      */
     virtual void Release() = 0;
@@ -756,16 +764,11 @@ class HFT_TRADER_EXPORT OptionTraderApi {
     /**
      * 用户登录请求
      *
-     * @param svr_ip        交易服务器ip地址
-     * @param svr_port      交易服务器端口
-     * @param account       接入方交易账户相关信息
-     * @param terminal_info 交易终端信息，格式需满足交易所要求，格式请见接口说明文档，必须UTF8编码
+     * @param req 			登录请求相关信息
      * 
      * @return              0表示发起登录请求成功，非0表示发起登录请求失败，通过GetApiLastError获取错误信息
      */
-    virtual int Login(const char* svr_ip, int svr_port,
-                      const AccountInfo* account_info,
-                      const char* terminal_info) = 0;
+    virtual int Login(const LoginReq* req) = 0;
 
     /**
      * 获取用户绑定的柜台类型，登陆成功后可获取
