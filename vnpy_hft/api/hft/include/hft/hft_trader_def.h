@@ -2440,7 +2440,7 @@ enum InvestType {
 };
 
 // 上交所现金替代资金类型
-enum FundResourcesType{
+enum FundResourcesType {
     FundResourcesType_Placeholder = 0,                     // 0=非上交所现金替代资金类型
     FundResourcesType_SH = 1,                              // 1=沪市资金
     FundResourcesType_SZ = 2,                              // 2=深市资金
@@ -2887,7 +2887,7 @@ enum QuoteRepoProdMode {
 };
 
 // 特殊产品(报价回购)
-enum SpecialProd{
+enum SpecialProd {
 	SpecialProd_Placeholder = 0,	// 未定义或无意义--作为查询入参时，代表查所有
 	SpecialProd_0 = 1,	            // 非特殊产品
 	SpecialProd_1 = 2,	            // 是特殊产品

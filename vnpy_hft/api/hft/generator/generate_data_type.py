@@ -55,8 +55,12 @@ class DataTypeGenerator:
         if len(words) < 3:
             return
 
-        name = words[1]
-        value = words[2]
+        if "=" in words:
+            name = words[1]
+            value = words[3]
+        else:
+            name = words[1]
+            value = words[2]
 
         new_line = f"{name} = {value}\n"
         self.f_define.write(new_line)
