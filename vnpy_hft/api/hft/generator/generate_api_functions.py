@@ -218,6 +218,7 @@ class ApiGenerator:
         filename = f"{self.prefix}_{self.name}_source_function.cpp"
         with open(filename, "w") as f:
             for name, d in self.functions.items():
+                print(name, d)
                 req_name = name[0].lower() + name[1:]
                 args = []
                 end_args = []
@@ -231,6 +232,9 @@ class ApiGenerator:
                     for field, type_ in d.items():
                         if type_ == "int":
                             args.append(f"int {field}")
+                            end_args.append(field)
+                        elif type_ == "int16_t":
+                            args.append(f"int16_t {field}")
                             end_args.append(field)
                         elif type_ == "bool":
                             args.append(f"bool {field}")
@@ -333,6 +337,8 @@ class ApiGenerator:
 
 
 if __name__ == "__main__":
+    td_generator = ApiGenerator("../include/hft/hft_trader_api_new.h", "hft", "td", "TdApi")
+    td_generator.run()
 
-    td_generator = ApiGenerator("../include/hft/hft_trader_api.h", "hft", "td", "TdApi")
+    td_generator = ApiGenerator("../include/hft/hft_option_trader_api_new.h", "hft", "option", "TdApi")
     td_generator.run()

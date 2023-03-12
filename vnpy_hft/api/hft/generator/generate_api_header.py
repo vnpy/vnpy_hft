@@ -36,3 +36,5 @@ def run_generate(filepath: str) -> None:
 
 if __name__ == "__main__":
     run_generate("../include/hft/hft_option_trader_api.h")
+
+    run_generate("../include/hft/hft_trader_api.h")
