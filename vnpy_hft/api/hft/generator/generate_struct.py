@@ -22,14 +22,35 @@ class StructGenerator:
             if "__" not in name:
                 self.typedefs[name] = getattr(module, name)
 
-        self.typedefs["int64_t"] = "long long"
         self.typedefs["int"] = "int"
         self.typedefs["char"] = "char"
+        self.typedefs["bool"] = "bool"
+
         self.typedefs["int32_t"] = "int32_t"
         self.typedefs["int16_t"] = "int16_t"
+        self.typedefs["int64_t"] = "int64_t"
         self.typedefs["uint16_t"] = "uint16_t"
         self.typedefs["uint64_t"] = "uint64_t"
-        self.typedefs["bool"] = "bool"
+
+        self.typedefs["Price_t"] = "int64_t"
+        self.typedefs["Amt_t"] = "int64_t"
+        self.typedefs["Ratio_t"] = "int64_t"
+        self.typedefs["ExchangeRatio_t"] = "int64_t"
+        self.typedefs["Percent_t"] = "int32_t"
+
+        self.typedefs["char4"] = "str"
+        self.typedefs["char8"] = "str"
+        self.typedefs["char16"] = "str"
+        self.typedefs["char32"] = "str"
+        self.typedefs["char40"] = "str"
+        self.typedefs["char64"] = "str"
+        self.typedefs["char128"] = "str"
+        self.typedefs["char256"] = "str"
+        self.typedefs["char512"] = "str"
+        self.typedefs["char1024"] = "str"
+        self.typedefs["char2048"] = "str"
+        self.typedefs["char4096"] = "str"
+        self.typedefs["char*"] = "str"
 
     def run(self):
         """运行生成"""
@@ -94,7 +115,8 @@ class StructGenerator:
         s_type = words[0].replace(" ", "")
         s_type = s_type.replace("		", "")
 
-        py_type = self.typedefs.get(s_type, "SecuidInfo")
+        # 无法识别字段，则映射为str
+        py_type = self.typedefs.get(s_type, "str")
 
         name = words[1]
         if "[" in name:
