@@ -66,7 +66,6 @@ void TdApi::OnLogin(LoginRsp* rsp, ErrorInfo* error_info)
 		data["cust_branchid"] = toUtf(rsp->cust_branchid);
 		data["cust_id"] = toUtf(rsp->cust_id);
 		data["cust_name"] = toUtf(rsp->cust_name);
-		data["secuid_array"] = rsp->secuid_array;
 		data["cif_account"] = toUtf(rsp->cif_account);
 		data["user_code"] = toUtf(rsp->user_code);
 		data["user_token"] = toUtf(rsp->user_token);
@@ -78,8 +77,40 @@ void TdApi::OnLogin(LoginRsp* rsp, ErrorInfo* error_info)
 		data["sys_server_id"] = toUtf(rsp->sys_server_id);
 		data["operway"] = rsp->operway;
 		data["sys_shbond_type"] = rsp->sys_shbond_type;
-		data["ext_secuid_array"] = rsp->ext_secuid_array;
 		data["reg_branchid"] = toUtf(rsp->reg_branchid);
+
+		pybind11::list secuid_list;
+		pybind11::list ext_secuid_list;
+
+		for (int i = 0; i < 10; i++)
+		{
+			SecuidInfo secuid = rsp->secuid_array[i];
+			dict d1;
+			d1["market"] = secuid.market;
+			d1["secuid"] = secuid.secuid;
+			d1["fund_id"] = secuid.fund_id;
+			d1["account_type"] = secuid.account_type;
+			d1["account_status"] = secuid.account_status;
+			d1["account_class"] = secuid.account_class;
+			d1["account_rights"] = secuid.account_rights;
+			d1["account_hgtright"] = secuid.account_hgtright;
+			secuid_list.append(d1);
+
+			SecuidInfo ext_secuid = rsp->ext_secuid_array[i];
+			dict d2;
+			d2["market"] = ext_secuid.market;
+			d2["secuid"] = ext_secuid.secuid;
+			d2["fund_id"] = ext_secuid.fund_id;
+			d2["account_type"] = ext_secuid.account_type;
+			d2["account_status"] = ext_secuid.account_status;
+			d2["account_class"] = ext_secuid.account_class;
+			d2["account_rights"] = ext_secuid.account_rights;
+			d2["account_hgtright"] = ext_secuid.account_hgtright;
+			ext_secuid_list.append(d2);
+		}
+
+		data["secuid_array"] = secuid_list;
+		data["ext_secuid_array"] = ext_secuid_list;
 	}
 	dict error;
 	{
