@@ -20,12 +20,12 @@ void TdApi::OnRiskNotify(RiskNotify* risk_notify)
 	gil_scoped_acquire acquire;
 	dict data;
 	{
-		data["secuid"] = risk_notify->secuid;
-		data["alarm_score"] = risk_notify->alarm_score;
-		data["alarm_status"] = risk_notify->alarm_status;
-		data["alarm_rule"] = risk_notify->alarm_rule;
-		data["alarm_time"] = risk_notify->alarm_time;
-		data["alarm_msg"] = risk_notify->alarm_msg;
+		data["secuid"] = toUtf(risk_notify->secuid);
+		data["alarm_score"] = toUtf(risk_notify->alarm_score);
+		data["alarm_status"] = toUtf(risk_notify->alarm_status);
+		data["alarm_rule"] = toUtf(risk_notify->alarm_rule);
+		data["alarm_time"] = toUtf(risk_notify->alarm_time);
+		data["alarm_msg"] = toUtf(risk_notify->alarm_msg);
 	}
 	this->onRiskNotify(data);
 };
@@ -35,12 +35,12 @@ void TdApi::OnFailBackNotify(FailBackNotify* failback_notify)
 	gil_scoped_acquire acquire;
 	dict data;
 	{
-		data["system_id"] = failback_notify->system_id;
-		data["node_id"] = failback_notify->node_id;
+		data["system_id"] = toUtf(failback_notify->system_id);
+		data["node_id"] = toUtf(failback_notify->node_id);
 		data["status"] = failback_notify->status;
 		data["credit_node_flag"] = failback_notify->credit_node_flag;
 		data["urgent_flag"] = failback_notify->urgent_flag;
-		data["update_source"] = failback_notify->update_source;
+		data["update_source"] = toUtf(failback_notify->update_source);
 	}
 	this->onFailBackNotify(data);
 };
@@ -50,26 +50,26 @@ void TdApi::OnLogin(LoginRsp* rsp, ErrorInfo* error_info)
 	gil_scoped_acquire acquire;
 	dict data;
 	{
-		data["account_id"] = rsp->account_id;
+		data["account_id"] = toUtf(rsp->account_id);
 		data["account_type"] = rsp->account_type;
-		data["cust_orgid"] = rsp->cust_orgid;
-		data["cust_branchid"] = rsp->cust_branchid;
-		data["cust_id"] = rsp->cust_id;
-		data["cust_name"] = rsp->cust_name;
+		data["cust_orgid"] = toUtf(rsp->cust_orgid);
+		data["cust_branchid"] = toUtf(rsp->cust_branchid);
+		data["cust_id"] = toUtf(rsp->cust_id);
+		data["cust_name"] = toUtf(rsp->cust_name);
 		data["secuid_array"] = rsp->secuid_array;
-		data["cif_account"] = rsp->cif_account;
-		data["user_code"] = rsp->user_code;
-		data["user_token"] = rsp->user_token;
-		data["token_serial_no"] = rsp->token_serial_no;
-		data["sm3_cipher"] = rsp->sm3_cipher;
+		data["cif_account"] = toUtf(rsp->cif_account);
+		data["user_code"] = toUtf(rsp->user_code);
+		data["user_token"] = toUtf(rsp->user_token);
+		data["token_serial_no"] = toUtf(rsp->token_serial_no);
+		data["sm3_cipher"] = toUtf(rsp->sm3_cipher);
 		data["sys_node_type"] = rsp->sys_node_type;
 		data["clear_switch_flag"] = rsp->clear_switch_flag;
 		data["trade_switch_flag"] = rsp->trade_switch_flag;
-		data["sys_server_id"] = rsp->sys_server_id;
+		data["sys_server_id"] = toUtf(rsp->sys_server_id);
 		data["operway"] = rsp->operway;
 		data["sys_shbond_type"] = rsp->sys_shbond_type;
 		data["ext_secuid_array"] = rsp->ext_secuid_array;
-		data["reg_branchid"] = rsp->reg_branchid;
+		data["reg_branchid"] = toUtf(rsp->reg_branchid);
 	}
 	dict error;
 	{
@@ -84,29 +84,29 @@ void TdApi::OnTradeReport(TradeDetail* trade_detail)
 	gil_scoped_acquire acquire;
 	dict data;
 	{
-		data["account_id"] = trade_detail->account_id;
+		data["account_id"] = toUtf(trade_detail->account_id);
 		data["account_type"] = trade_detail->account_type;
-		data["cust_orgid"] = trade_detail->cust_orgid;
-		data["cust_branchid"] = trade_detail->cust_branchid;
-		data["order_id"] = trade_detail->order_id;
-		data["cl_order_id"] = trade_detail->cl_order_id;
-		data["symbol"] = trade_detail->symbol;
+		data["cust_orgid"] = toUtf(trade_detail->cust_orgid);
+		data["cust_branchid"] = toUtf(trade_detail->cust_branchid);
+		data["order_id"] = toUtf(trade_detail->order_id);
+		data["cl_order_id"] = toUtf(trade_detail->cl_order_id);
+		data["symbol"] = toUtf(trade_detail->symbol);
 		data["order_type"] = trade_detail->order_type;
 		data["side"] = trade_detail->side;
 		data["report_type"] = trade_detail->report_type;
-		data["report_no"] = trade_detail->report_no;
+		data["report_no"] = toUtf(trade_detail->report_no);
 		data["volume"] = trade_detail->volume;
 		data["price"] = trade_detail->price;
 		data["turnover"] = trade_detail->turnover;
 		data["trade_date"] = trade_detail->trade_date;
 		data["trade_time"] = trade_detail->trade_time;
 		data["err_code"] = trade_detail->err_code;
-		data["err_msg"] = trade_detail->err_msg;
-		data["secuid"] = trade_detail->secuid;
-		data["name"] = trade_detail->name;
-		data["contract_id"] = trade_detail->contract_id;
-		data["ex_report_no"] = trade_detail->ex_report_no;
-		data["ex_order_id"] = trade_detail->ex_order_id;
+		data["err_msg"] = toUtf(trade_detail->err_msg);
+		data["secuid"] = toUtf(trade_detail->secuid);
+		data["name"] = toUtf(trade_detail->name);
+		data["contract_id"] = toUtf(trade_detail->contract_id);
+		data["ex_report_no"] = toUtf(trade_detail->ex_report_no);
+		data["ex_order_id"] = toUtf(trade_detail->ex_order_id);
 		data["margin_amt_type"] = trade_detail->margin_amt_type;
 		data["order_price"] = trade_detail->order_price;
 		data["order_qty"] = trade_detail->order_qty;
@@ -119,14 +119,14 @@ void TdApi::OnOrderStatus(OrderDetail* order_detail)
 	gil_scoped_acquire acquire;
 	dict data;
 	{
-		data["account_id"] = order_detail->account_id;
+		data["account_id"] = toUtf(order_detail->account_id);
 		data["account_type"] = order_detail->account_type;
-		data["cust_orgid"] = order_detail->cust_orgid;
-		data["cust_branchid"] = order_detail->cust_branchid;
-		data["order_id"] = order_detail->order_id;
-		data["cl_order_id"] = order_detail->cl_order_id;
-		data["orig_order_id"] = order_detail->orig_order_id;
-		data["symbol"] = order_detail->symbol;
+		data["cust_orgid"] = toUtf(order_detail->cust_orgid);
+		data["cust_branchid"] = toUtf(order_detail->cust_branchid);
+		data["order_id"] = toUtf(order_detail->order_id);
+		data["cl_order_id"] = toUtf(order_detail->cl_order_id);
+		data["orig_order_id"] = toUtf(order_detail->orig_order_id);
+		data["symbol"] = toUtf(order_detail->symbol);
 		data["order_status"] = order_detail->order_status;
 		data["order_type"] = order_detail->order_type;
 		data["side"] = order_detail->side;
@@ -140,12 +140,12 @@ void TdApi::OnOrderStatus(OrderDetail* order_detail)
 		data["order_date"] = order_detail->order_date;
 		data["order_time"] = order_detail->order_time;
 		data["err_code"] = order_detail->err_code;
-		data["err_msg"] = order_detail->err_msg;
-		data["secuid"] = order_detail->secuid;
-		data["name"] = order_detail->name;
+		data["err_msg"] = toUtf(order_detail->err_msg);
+		data["secuid"] = toUtf(order_detail->secuid);
+		data["name"] = toUtf(order_detail->name);
 		data["freeze_amount"] = order_detail->freeze_amount;
-		data["contract_id"] = order_detail->contract_id;
-		data["ex_order_id"] = order_detail->ex_order_id;
+		data["contract_id"] = toUtf(order_detail->contract_id);
+		data["ex_order_id"] = toUtf(order_detail->ex_order_id);
 	}
 	this->onOrderStatus(data);
 };
@@ -155,15 +155,15 @@ void TdApi::OnOrderRsp(OrderRsp* order_rsp, ErrorInfo* error_info, int request_i
 	gil_scoped_acquire acquire;
 	dict data;
 	{
-		data["account_id"] = order_rsp->account_id;
+		data["account_id"] = toUtf(order_rsp->account_id);
 		data["account_type"] = order_rsp->account_type;
-		data["cust_orgid"] = order_rsp->cust_orgid;
-		data["cust_branchid"] = order_rsp->cust_branchid;
+		data["cust_orgid"] = toUtf(order_rsp->cust_orgid);
+		data["cust_branchid"] = toUtf(order_rsp->cust_branchid);
 		data["order_date"] = order_rsp->order_date;
-		data["order_id"] = order_rsp->order_id;
-		data["cl_order_id"] = order_rsp->cl_order_id;
-		data["contract_id"] = order_rsp->contract_id;
-		data["ex_order_id"] = order_rsp->ex_order_id;
+		data["order_id"] = toUtf(order_rsp->order_id);
+		data["cl_order_id"] = toUtf(order_rsp->cl_order_id);
+		data["contract_id"] = toUtf(order_rsp->contract_id);
+		data["ex_order_id"] = toUtf(order_rsp->ex_order_id);
 	}
 	dict error;
 	{
@@ -178,15 +178,15 @@ void TdApi::OnCancelRsp(CancelRsp* cancel_rsp, ErrorInfo* error_info, int reques
 	gil_scoped_acquire acquire;
 	dict data;
 	{
-		data["account_id"] = cancel_rsp->account_id;
+		data["account_id"] = toUtf(cancel_rsp->account_id);
 		data["account_type"] = cancel_rsp->account_type;
-		data["cust_orgid"] = cancel_rsp->cust_orgid;
-		data["cust_branchid"] = cancel_rsp->cust_branchid;
-		data["order_id"] = cancel_rsp->order_id;
-		data["cl_order_id"] = cancel_rsp->cl_order_id;
-		data["cl_cancel_id"] = cancel_rsp->cl_cancel_id;
-		data["cancel_id"] = cancel_rsp->cancel_id;
-		data["ex_order_id"] = cancel_rsp->ex_order_id;
+		data["cust_orgid"] = toUtf(cancel_rsp->cust_orgid);
+		data["cust_branchid"] = toUtf(cancel_rsp->cust_branchid);
+		data["order_id"] = toUtf(cancel_rsp->order_id);
+		data["cl_order_id"] = toUtf(cancel_rsp->cl_order_id);
+		data["cl_cancel_id"] = toUtf(cancel_rsp->cl_cancel_id);
+		data["cancel_id"] = toUtf(cancel_rsp->cancel_id);
+		data["ex_order_id"] = toUtf(cancel_rsp->ex_order_id);
 	}
 	dict error;
 	{
@@ -201,14 +201,14 @@ void TdApi::OnQueryOrderRsp(OrderDetail* order_detail, ErrorInfo* error_info, in
 	gil_scoped_acquire acquire;
 	dict data;
 	{
-		data["account_id"] = order_detail->account_id;
+		data["account_id"] = toUtf(order_detail->account_id);
 		data["account_type"] = order_detail->account_type;
-		data["cust_orgid"] = order_detail->cust_orgid;
-		data["cust_branchid"] = order_detail->cust_branchid;
-		data["order_id"] = order_detail->order_id;
-		data["cl_order_id"] = order_detail->cl_order_id;
-		data["orig_order_id"] = order_detail->orig_order_id;
-		data["symbol"] = order_detail->symbol;
+		data["cust_orgid"] = toUtf(order_detail->cust_orgid);
+		data["cust_branchid"] = toUtf(order_detail->cust_branchid);
+		data["order_id"] = toUtf(order_detail->order_id);
+		data["cl_order_id"] = toUtf(order_detail->cl_order_id);
+		data["orig_order_id"] = toUtf(order_detail->orig_order_id);
+		data["symbol"] = toUtf(order_detail->symbol);
 		data["order_status"] = order_detail->order_status;
 		data["order_type"] = order_detail->order_type;
 		data["side"] = order_detail->side;
@@ -222,12 +222,12 @@ void TdApi::OnQueryOrderRsp(OrderDetail* order_detail, ErrorInfo* error_info, in
 		data["order_date"] = order_detail->order_date;
 		data["order_time"] = order_detail->order_time;
 		data["err_code"] = order_detail->err_code;
-		data["err_msg"] = order_detail->err_msg;
-		data["secuid"] = order_detail->secuid;
-		data["name"] = order_detail->name;
+		data["err_msg"] = toUtf(order_detail->err_msg);
+		data["secuid"] = toUtf(order_detail->secuid);
+		data["name"] = toUtf(order_detail->name);
 		data["freeze_amount"] = order_detail->freeze_amount;
-		data["contract_id"] = order_detail->contract_id;
-		data["ex_order_id"] = order_detail->ex_order_id;
+		data["contract_id"] = toUtf(order_detail->contract_id);
+		data["ex_order_id"] = toUtf(order_detail->ex_order_id);
 	}
 	dict error;
 	{
@@ -242,29 +242,29 @@ void TdApi::OnQueryTradeRsp(TradeDetail* trade_detail, ErrorInfo* error_info, in
 	gil_scoped_acquire acquire;
 	dict data;
 	{
-		data["account_id"] = trade_detail->account_id;
+		data["account_id"] = toUtf(trade_detail->account_id);
 		data["account_type"] = trade_detail->account_type;
-		data["cust_orgid"] = trade_detail->cust_orgid;
-		data["cust_branchid"] = trade_detail->cust_branchid;
-		data["order_id"] = trade_detail->order_id;
-		data["cl_order_id"] = trade_detail->cl_order_id;
-		data["symbol"] = trade_detail->symbol;
+		data["cust_orgid"] = toUtf(trade_detail->cust_orgid);
+		data["cust_branchid"] = toUtf(trade_detail->cust_branchid);
+		data["order_id"] = toUtf(trade_detail->order_id);
+		data["cl_order_id"] = toUtf(trade_detail->cl_order_id);
+		data["symbol"] = toUtf(trade_detail->symbol);
 		data["order_type"] = trade_detail->order_type;
 		data["side"] = trade_detail->side;
 		data["report_type"] = trade_detail->report_type;
-		data["report_no"] = trade_detail->report_no;
+		data["report_no"] = toUtf(trade_detail->report_no);
 		data["volume"] = trade_detail->volume;
 		data["price"] = trade_detail->price;
 		data["turnover"] = trade_detail->turnover;
 		data["trade_date"] = trade_detail->trade_date;
 		data["trade_time"] = trade_detail->trade_time;
 		data["err_code"] = trade_detail->err_code;
-		data["err_msg"] = trade_detail->err_msg;
-		data["secuid"] = trade_detail->secuid;
-		data["name"] = trade_detail->name;
-		data["contract_id"] = trade_detail->contract_id;
-		data["ex_report_no"] = trade_detail->ex_report_no;
-		data["ex_order_id"] = trade_detail->ex_order_id;
+		data["err_msg"] = toUtf(trade_detail->err_msg);
+		data["secuid"] = toUtf(trade_detail->secuid);
+		data["name"] = toUtf(trade_detail->name);
+		data["contract_id"] = toUtf(trade_detail->contract_id);
+		data["ex_report_no"] = toUtf(trade_detail->ex_report_no);
+		data["ex_order_id"] = toUtf(trade_detail->ex_order_id);
 		data["margin_amt_type"] = trade_detail->margin_amt_type;
 		data["order_price"] = trade_detail->order_price;
 		data["order_qty"] = trade_detail->order_qty;
@@ -282,11 +282,11 @@ void TdApi::OnQueryPositionRsp(PositionDetail* position_detail, ErrorInfo* error
 	gil_scoped_acquire acquire;
 	dict data;
 	{
-		data["account_id"] = position_detail->account_id;
+		data["account_id"] = toUtf(position_detail->account_id);
 		data["account_type"] = position_detail->account_type;
-		data["cust_orgid"] = position_detail->cust_orgid;
-		data["cust_branchid"] = position_detail->cust_branchid;
-		data["symbol"] = position_detail->symbol;
+		data["cust_orgid"] = toUtf(position_detail->cust_orgid);
+		data["cust_branchid"] = toUtf(position_detail->cust_branchid);
+		data["symbol"] = toUtf(position_detail->symbol);
 		data["side"] = position_detail->side;
 		data["volume"] = position_detail->volume;
 		data["avail_volume"] = position_detail->avail_volume;
@@ -294,7 +294,7 @@ void TdApi::OnQueryPositionRsp(PositionDetail* position_detail, ErrorInfo* error
 		data["market_value"] = position_detail->market_value;
 		data["today_buy_volume"] = position_detail->today_buy_volume;
 		data["today_sell_volume"] = position_detail->today_sell_volume;
-		data["secuid"] = position_detail->secuid;
+		data["secuid"] = toUtf(position_detail->secuid);
 		data["cost_price"] = position_detail->cost_price;
 		data["buy_cost"] = position_detail->buy_cost;
 		data["last_price"] = position_detail->last_price;
@@ -305,7 +305,7 @@ void TdApi::OnQueryPositionRsp(PositionDetail* position_detail, ErrorInfo* error
 		data["market"] = position_detail->market;
 		data["security_type"] = position_detail->security_type;
 		data["freeze_volume"] = position_detail->freeze_volume;
-		data["name"] = position_detail->name;
+		data["name"] = toUtf(position_detail->name);
 		data["currency_type"] = position_detail->currency_type;
 		data["security_type_apex"] = position_detail->security_type_apex;
 		data["profit_price"] = position_detail->profit_price;
@@ -323,10 +323,10 @@ void TdApi::OnQueryCashRsp(CashDetail* cash_detail, ErrorInfo* error_info, int r
 	gil_scoped_acquire acquire;
 	dict data;
 	{
-		data["account_id"] = cash_detail->account_id;
+		data["account_id"] = toUtf(cash_detail->account_id);
 		data["account_type"] = cash_detail->account_type;
-		data["cust_orgid"] = cash_detail->cust_orgid;
-		data["cust_branchid"] = cash_detail->cust_branchid;
+		data["cust_orgid"] = toUtf(cash_detail->cust_orgid);
+		data["cust_branchid"] = toUtf(cash_detail->cust_branchid);
 		data["currency_type"] = cash_detail->currency_type;
 		data["total_amount"] = cash_detail->total_amount;
 		data["avail_amount"] = cash_detail->avail_amount;
@@ -381,13 +381,13 @@ void TdApi::OnQueryETFRsp(ETFDetail* etf_detail, ErrorInfo* error_info, int requ
 	gil_scoped_acquire acquire;
 	dict data;
 	{
-		data["account_id"] = etf_detail->account_id;
+		data["account_id"] = toUtf(etf_detail->account_id);
 		data["account_type"] = etf_detail->account_type;
-		data["cust_orgid"] = etf_detail->cust_orgid;
-		data["cust_branchid"] = etf_detail->cust_branchid;
-		data["name"] = etf_detail->name;
-		data["first_symbol"] = etf_detail->first_symbol;
-		data["second_symbol"] = etf_detail->second_symbol;
+		data["cust_orgid"] = toUtf(etf_detail->cust_orgid);
+		data["cust_branchid"] = toUtf(etf_detail->cust_branchid);
+		data["name"] = toUtf(etf_detail->name);
+		data["first_symbol"] = toUtf(etf_detail->first_symbol);
+		data["second_symbol"] = toUtf(etf_detail->second_symbol);
 		data["trade_unit"] = etf_detail->trade_unit;
 		data["cash_component"] = etf_detail->cash_component;
 		data["max_cash_ratio"] = etf_detail->max_cash_ratio;
@@ -422,13 +422,13 @@ void TdApi::OnQueryETFStockRsp(ETFStockDetail* etf_stock_detail, ErrorInfo* erro
 	gil_scoped_acquire acquire;
 	dict data;
 	{
-		data["account_id"] = etf_stock_detail->account_id;
+		data["account_id"] = toUtf(etf_stock_detail->account_id);
 		data["account_type"] = etf_stock_detail->account_type;
-		data["cust_orgid"] = etf_stock_detail->cust_orgid;
-		data["cust_branchid"] = etf_stock_detail->cust_branchid;
-		data["first_symbol"] = etf_stock_detail->first_symbol;
-		data["name"] = etf_stock_detail->name;
-		data["symbol"] = etf_stock_detail->symbol;
+		data["cust_orgid"] = toUtf(etf_stock_detail->cust_orgid);
+		data["cust_branchid"] = toUtf(etf_stock_detail->cust_branchid);
+		data["first_symbol"] = toUtf(etf_stock_detail->first_symbol);
+		data["name"] = toUtf(etf_stock_detail->name);
+		data["symbol"] = toUtf(etf_stock_detail->symbol);
 		data["volume"] = etf_stock_detail->volume;
 		data["replace_flag"] = etf_stock_detail->replace_flag;
 		data["over_price_rate"] = etf_stock_detail->over_price_rate;
@@ -447,10 +447,10 @@ void TdApi::OnQueryMaxOrderQtyRsp(MaxOrderQtyDetail* detail, ErrorInfo* error_in
 	gil_scoped_acquire acquire;
 	dict data;
 	{
-		data["account_id"] = detail->account_id;
+		data["account_id"] = toUtf(detail->account_id);
 		data["account_type"] = detail->account_type;
-		data["cust_orgid"] = detail->cust_orgid;
-		data["cust_branchid"] = detail->cust_branchid;
+		data["cust_orgid"] = toUtf(detail->cust_orgid);
+		data["cust_branchid"] = toUtf(detail->cust_branchid);
 		data["max_qty"] = detail->max_qty;
 		data["actual_max_qty"] = detail->actual_max_qty;
 		data["max_pay_amt"] = detail->max_pay_amt;
@@ -470,14 +470,14 @@ void TdApi::OnQueryIPOMaxPurchaseRsp(IPOMaxPurchaseDetail* detail, ErrorInfo* er
 	gil_scoped_acquire acquire;
 	dict data;
 	{
-		data["account_id"] = detail->account_id;
+		data["account_id"] = toUtf(detail->account_id);
 		data["account_type"] = detail->account_type;
-		data["cust_orgid"] = detail->cust_orgid;
-		data["cust_branchid"] = detail->cust_branchid;
-		data["market"] = detail->market;
+		data["cust_orgid"] = toUtf(detail->cust_orgid);
+		data["cust_branchid"] = toUtf(detail->cust_branchid);
+		data["market"] = toUtf(detail->market);
 		data["max_qty"] = detail->max_qty;
 		data["stib_max_qty"] = detail->stib_max_qty;
-		data["secuid"] = detail->secuid;
+		data["secuid"] = toUtf(detail->secuid);
 	}
 	dict error;
 	{
@@ -492,12 +492,12 @@ void TdApi::OnQueryIPOStockRsp(IPOStockDetail* detail, ErrorInfo* error_info, in
 	gil_scoped_acquire acquire;
 	dict data;
 	{
-		data["account_id"] = detail->account_id;
+		data["account_id"] = toUtf(detail->account_id);
 		data["account_type"] = detail->account_type;
-		data["cust_orgid"] = detail->cust_orgid;
-		data["cust_branchid"] = detail->cust_branchid;
-		data["symbol"] = detail->symbol;
-		data["name"] = detail->name;
+		data["cust_orgid"] = toUtf(detail->cust_orgid);
+		data["cust_branchid"] = toUtf(detail->cust_branchid);
+		data["symbol"] = toUtf(detail->symbol);
+		data["name"] = toUtf(detail->name);
 		data["currency_type"] = detail->currency_type;
 		data["ipo_price"] = detail->ipo_price;
 		data["max_num"] = detail->max_num;
@@ -517,8 +517,8 @@ void TdApi::OnQuerySecurityBaseInfoRsp(SecurityBaseInfo* detail, ErrorInfo* erro
 	gil_scoped_acquire acquire;
 	dict data;
 	{
-		data["symbol"] = detail->symbol;
-		data["name"] = detail->name;
+		data["symbol"] = toUtf(detail->symbol);
+		data["name"] = toUtf(detail->name);
 		data["security_type"] = detail->security_type;
 		data["security_status"] = detail->security_status;
 		data["price_tick"] = detail->price_tick;
@@ -547,13 +547,13 @@ void TdApi::OnCreditMortgageInOutRsp(CreditMortgageInOutRsp* rsp, ErrorInfo* err
 	gil_scoped_acquire acquire;
 	dict data;
 	{
-		data["account_id"] = rsp->account_id;
+		data["account_id"] = toUtf(rsp->account_id);
 		data["account_type"] = rsp->account_type;
-		data["cust_orgid"] = rsp->cust_orgid;
-		data["cust_branchid"] = rsp->cust_branchid;
-		data["cl_order_id"] = rsp->cl_order_id;
-		data["order_id"] = rsp->order_id;
-		data["contract_id"] = rsp->contract_id;
+		data["cust_orgid"] = toUtf(rsp->cust_orgid);
+		data["cust_branchid"] = toUtf(rsp->cust_branchid);
+		data["cl_order_id"] = toUtf(rsp->cl_order_id);
+		data["order_id"] = toUtf(rsp->order_id);
+		data["contract_id"] = toUtf(rsp->contract_id);
 	}
 	dict error;
 	{
@@ -568,13 +568,13 @@ void TdApi::OnCreditStockBackRsp(CreditStockBackRsp* rsp, ErrorInfo* error_info,
 	gil_scoped_acquire acquire;
 	dict data;
 	{
-		data["account_id"] = rsp->account_id;
+		data["account_id"] = toUtf(rsp->account_id);
 		data["account_type"] = rsp->account_type;
-		data["cust_orgid"] = rsp->cust_orgid;
-		data["cust_branchid"] = rsp->cust_branchid;
-		data["cl_order_id"] = rsp->cl_order_id;
-		data["order_id"] = rsp->order_id;
-		data["contract_id"] = rsp->contract_id;
+		data["cust_orgid"] = toUtf(rsp->cust_orgid);
+		data["cust_branchid"] = toUtf(rsp->cust_branchid);
+		data["cl_order_id"] = toUtf(rsp->cl_order_id);
+		data["order_id"] = toUtf(rsp->order_id);
+		data["contract_id"] = toUtf(rsp->contract_id);
 	}
 	dict error;
 	{
@@ -589,12 +589,12 @@ void TdApi::OnCreditPayBackRsp(CreditPayBackRsp* rsp, ErrorInfo* error_info, int
 	gil_scoped_acquire acquire;
 	dict data;
 	{
-		data["account_id"] = rsp->account_id;
+		data["account_id"] = toUtf(rsp->account_id);
 		data["account_type"] = rsp->account_type;
-		data["cust_orgid"] = rsp->cust_orgid;
-		data["cust_branchid"] = rsp->cust_branchid;
+		data["cust_orgid"] = toUtf(rsp->cust_orgid);
+		data["cust_branchid"] = toUtf(rsp->cust_branchid);
 		data["real_back_amt"] = rsp->real_back_amt;
-		data["cl_order_id"] = rsp->cl_order_id;
+		data["cl_order_id"] = toUtf(rsp->cl_order_id);
 	}
 	dict error;
 	{
@@ -609,12 +609,12 @@ void TdApi::OnCreditPayBackByOrderRsp(CreditPayBackRsp* rsp, ErrorInfo* error_in
 	gil_scoped_acquire acquire;
 	dict data;
 	{
-		data["account_id"] = rsp->account_id;
+		data["account_id"] = toUtf(rsp->account_id);
 		data["account_type"] = rsp->account_type;
-		data["cust_orgid"] = rsp->cust_orgid;
-		data["cust_branchid"] = rsp->cust_branchid;
+		data["cust_orgid"] = toUtf(rsp->cust_orgid);
+		data["cust_branchid"] = toUtf(rsp->cust_branchid);
 		data["real_back_amt"] = rsp->real_back_amt;
-		data["cl_order_id"] = rsp->cl_order_id;
+		data["cl_order_id"] = toUtf(rsp->cl_order_id);
 	}
 	dict error;
 	{
@@ -629,12 +629,12 @@ void TdApi::OnQueryCreditStockRsp(CreditStockDetail* detail, ErrorInfo* error_in
 	gil_scoped_acquire acquire;
 	dict data;
 	{
-		data["account_id"] = detail->account_id;
+		data["account_id"] = toUtf(detail->account_id);
 		data["account_type"] = detail->account_type;
-		data["cust_orgid"] = detail->cust_orgid;
-		data["cust_branchid"] = detail->cust_branchid;
-		data["symbol"] = detail->symbol;
-		data["name"] = detail->name;
+		data["cust_orgid"] = toUtf(detail->cust_orgid);
+		data["cust_branchid"] = toUtf(detail->cust_branchid);
+		data["symbol"] = toUtf(detail->symbol);
+		data["name"] = toUtf(detail->name);
 		data["currency_type"] = detail->currency_type;
 		data["credit_fund_ctrl"] = detail->credit_fund_ctrl;
 		data["credit_stk_ctrl"] = detail->credit_stk_ctrl;
@@ -655,12 +655,12 @@ void TdApi::OnQueryCreditMortgageHoldRsp(CreditMortgageHoldDetail* detail, Error
 	gil_scoped_acquire acquire;
 	dict data;
 	{
-		data["account_id"] = detail->account_id;
+		data["account_id"] = toUtf(detail->account_id);
 		data["account_type"] = detail->account_type;
-		data["cust_orgid"] = detail->cust_orgid;
-		data["cust_branchid"] = detail->cust_branchid;
-		data["symbol"] = detail->symbol;
-		data["name"] = detail->name;
+		data["cust_orgid"] = toUtf(detail->cust_orgid);
+		data["cust_branchid"] = toUtf(detail->cust_branchid);
+		data["symbol"] = toUtf(detail->symbol);
+		data["name"] = toUtf(detail->name);
 		data["currency_type"] = detail->currency_type;
 		data["pledge_rate"] = detail->pledge_rate;
 	}
@@ -677,10 +677,10 @@ void TdApi::OnQueryCreditAssetsRsp(CreditAssetsDetail* detail, ErrorInfo* error_
 	gil_scoped_acquire acquire;
 	dict data;
 	{
-		data["account_id"] = detail->account_id;
+		data["account_id"] = toUtf(detail->account_id);
 		data["account_type"] = detail->account_type;
-		data["cust_orgid"] = detail->cust_orgid;
-		data["cust_branchid"] = detail->cust_branchid;
+		data["cust_orgid"] = toUtf(detail->cust_orgid);
+		data["cust_branchid"] = toUtf(detail->cust_branchid);
 		data["currency_type"] = detail->currency_type;
 		data["avail_balance"] = detail->avail_balance;
 		data["fetch_balance"] = detail->fetch_balance;
@@ -727,13 +727,13 @@ void TdApi::OnQueryCreditFinanceRsp(CreditFinanceDetail* detail, ErrorInfo* erro
 	gil_scoped_acquire acquire;
 	dict data;
 	{
-		data["account_id"] = detail->account_id;
+		data["account_id"] = toUtf(detail->account_id);
 		data["account_type"] = detail->account_type;
-		data["cust_orgid"] = detail->cust_orgid;
-		data["cust_branchid"] = detail->cust_branchid;
-		data["symbol"] = detail->symbol;
-		data["name"] = detail->name;
-		data["sno"] = detail->sno;
+		data["cust_orgid"] = toUtf(detail->cust_orgid);
+		data["cust_branchid"] = toUtf(detail->cust_branchid);
+		data["symbol"] = toUtf(detail->symbol);
+		data["name"] = toUtf(detail->name);
+		data["sno"] = toUtf(detail->sno);
 		data["currency_type"] = detail->currency_type;
 		data["life_status"] = detail->life_status;
 		data["occur_date"] = detail->occur_date;
@@ -748,7 +748,7 @@ void TdApi::OnQueryCreditFinanceRsp(CreditFinanceDetail* detail, ErrorInfo* erro
 		data["credit_repay_unfrz"] = detail->credit_repay_unfrz;
 		data["all_fee_unfrz"] = detail->all_fee_unfrz;
 		data["market"] = detail->market;
-		data["pos_str"] = detail->pos_str;
+		data["pos_str"] = toUtf(detail->pos_str);
 		data["end_date"] = detail->end_date;
 	}
 	dict error;
@@ -764,13 +764,13 @@ void TdApi::OnQueryCreditShortsellRsp(CreditShortsellDetail* detail, ErrorInfo* 
 	gil_scoped_acquire acquire;
 	dict data;
 	{
-		data["account_id"] = detail->account_id;
+		data["account_id"] = toUtf(detail->account_id);
 		data["account_type"] = detail->account_type;
-		data["cust_orgid"] = detail->cust_orgid;
-		data["cust_branchid"] = detail->cust_branchid;
-		data["symbol"] = detail->symbol;
-		data["name"] = detail->name;
-		data["sno"] = detail->sno;
+		data["cust_orgid"] = toUtf(detail->cust_orgid);
+		data["cust_branchid"] = toUtf(detail->cust_branchid);
+		data["symbol"] = toUtf(detail->symbol);
+		data["name"] = toUtf(detail->name);
+		data["sno"] = toUtf(detail->sno);
 		data["currency_type"] = detail->currency_type;
 		data["life_status"] = detail->life_status;
 		data["occur_date"] = detail->occur_date;
@@ -799,10 +799,10 @@ void TdApi::OnQueryCreditRepayAmountRsp(CreditRepayAmountDetail* detail, ErrorIn
 	gil_scoped_acquire acquire;
 	dict data;
 	{
-		data["account_id"] = detail->account_id;
+		data["account_id"] = toUtf(detail->account_id);
 		data["account_type"] = detail->account_type;
-		data["cust_orgid"] = detail->cust_orgid;
-		data["cust_branchid"] = detail->cust_branchid;
+		data["cust_orgid"] = toUtf(detail->cust_orgid);
+		data["cust_branchid"] = toUtf(detail->cust_branchid);
 		data["max_back_amt"] = detail->max_back_amt;
 	}
 	dict error;
@@ -818,12 +818,12 @@ void TdApi::OnQueryCreditRepayStockRsp(CreditRepayStockDetail* detail, ErrorInfo
 	gil_scoped_acquire acquire;
 	dict data;
 	{
-		data["account_id"] = detail->account_id;
+		data["account_id"] = toUtf(detail->account_id);
 		data["account_type"] = detail->account_type;
-		data["cust_orgid"] = detail->cust_orgid;
-		data["cust_branchid"] = detail->cust_branchid;
-		data["symbol"] = detail->symbol;
-		data["name"] = detail->name;
+		data["cust_orgid"] = toUtf(detail->cust_orgid);
+		data["cust_branchid"] = toUtf(detail->cust_branchid);
+		data["symbol"] = toUtf(detail->symbol);
+		data["name"] = toUtf(detail->name);
 		data["total_qty"] = detail->total_qty;
 		data["max_back_qty"] = detail->max_back_qty;
 		data["returned_qty"] = detail->returned_qty;
@@ -841,11 +841,11 @@ void TdApi::OnQueryCreditSecuritySellQtyRsp(CreditSecuritySellQtyRsp* rsp, Error
 	gil_scoped_acquire acquire;
 	dict data;
 	{
-		data["account_id"] = rsp->account_id;
+		data["account_id"] = toUtf(rsp->account_id);
 		data["account_type"] = rsp->account_type;
-		data["cust_orgid"] = rsp->cust_orgid;
-		data["cust_branchid"] = rsp->cust_branchid;
-		data["symbol"] = rsp->symbol;
+		data["cust_orgid"] = toUtf(rsp->cust_orgid);
+		data["cust_branchid"] = toUtf(rsp->cust_branchid);
+		data["symbol"] = toUtf(rsp->symbol);
 		data["total_qty"] = rsp->total_qty;
 		data["avail_qty"] = rsp->avail_qty;
 	}
@@ -862,11 +862,11 @@ void TdApi::OnQuerySecuidRightRsp(QrySecuidRightRsp* rsp, ErrorInfo* error_info,
 	gil_scoped_acquire acquire;
 	dict data;
 	{
-		data["account_id"] = rsp->account_id;
+		data["account_id"] = toUtf(rsp->account_id);
 		data["account_type"] = rsp->account_type;
-		data["cust_orgid"] = rsp->cust_orgid;
-		data["cust_branchid"] = rsp->cust_branchid;
-		data["market"] = rsp->market;
+		data["cust_orgid"] = toUtf(rsp->cust_orgid);
+		data["cust_branchid"] = toUtf(rsp->cust_branchid);
+		data["market"] = toUtf(rsp->market);
 		data["secuid_right"] = rsp->secuid_right;
 		data["sign_flag"] = rsp->sign_flag;
 	}
@@ -883,7 +883,7 @@ void TdApi::OnQueryHKRateRsp(HKRateDetail* detail, ErrorInfo* error_info, int re
 	gil_scoped_acquire acquire;
 	dict data;
 	{
-		data["market"] = detail->market;
+		data["market"] = toUtf(detail->market);
 		data["buy_rate"] = detail->buy_rate;
 		data["sale_rate"] = detail->sale_rate;
 		data["mid_rate"] = detail->mid_rate;
@@ -903,8 +903,8 @@ void TdApi::OnQueryHKStockRsp(HKStockDetail* detail, ErrorInfo* error_info, int 
 	gil_scoped_acquire acquire;
 	dict data;
 	{
-		data["symbol"] = detail->symbol;
-		data["name"] = detail->name;
+		data["symbol"] = toUtf(detail->symbol);
+		data["name"] = toUtf(detail->name);
 		data["stktype"] = detail->stktype;
 		data["currency_type"] = detail->currency_type;
 		data["security_type"] = detail->security_type;
@@ -922,10 +922,10 @@ void TdApi::OnQueryHKFundRsp(HKFundDetail* detail, ErrorInfo* error_info, int re
 	gil_scoped_acquire acquire;
 	dict data;
 	{
-		data["account_id"] = detail->account_id;
+		data["account_id"] = toUtf(detail->account_id);
 		data["account_type"] = detail->account_type;
-		data["cust_orgid"] = detail->cust_orgid;
-		data["cust_branchid"] = detail->cust_branchid;
+		data["cust_orgid"] = toUtf(detail->cust_orgid);
+		data["cust_branchid"] = toUtf(detail->cust_branchid);
 		data["currency_type"] = detail->currency_type;
 		data["fund_uncomeavl"] = detail->fund_uncomeavl;
 		data["fund_buy"] = detail->fund_buy;
@@ -946,10 +946,10 @@ void TdApi::OnQueryHKMinPriceUnitRsp(HKMinPriceUnitDetail* detail, ErrorInfo* er
 	gil_scoped_acquire acquire;
 	dict data;
 	{
-		data["account_id"] = detail->account_id;
+		data["account_id"] = toUtf(detail->account_id);
 		data["account_type"] = detail->account_type;
-		data["cust_orgid"] = detail->cust_orgid;
-		data["cust_branchid"] = detail->cust_branchid;
+		data["cust_orgid"] = toUtf(detail->cust_orgid);
+		data["cust_branchid"] = toUtf(detail->cust_branchid);
 		data["stktype"] = detail->stktype;
 		data["begin_price"] = detail->begin_price;
 		data["end_price"] = detail->end_price;
@@ -985,14 +985,14 @@ void TdApi::OnQueryLockSecurityDetailRsp(LockSecurityDetail* detail, ErrorInfo* 
 	gil_scoped_acquire acquire;
 	dict data;
 	{
-		data["account_id"] = detail->account_id;
+		data["account_id"] = toUtf(detail->account_id);
 		data["account_type"] = detail->account_type;
-		data["cust_orgid"] = detail->cust_orgid;
-		data["cust_branchid"] = detail->cust_branchid;
+		data["cust_orgid"] = toUtf(detail->cust_orgid);
+		data["cust_branchid"] = toUtf(detail->cust_branchid);
 		data["sys_date"] = detail->sys_date;
-		data["sno"] = detail->sno;
-		data["symbol"] = detail->symbol;
-		data["name"] = detail->name;
+		data["sno"] = toUtf(detail->sno);
+		data["symbol"] = toUtf(detail->symbol);
+		data["name"] = toUtf(detail->name);
 		data["lock_type"] = detail->lock_type;
 		data["used_fee_rate"] = detail->used_fee_rate;
 		data["unused_fee_rate"] = detail->unused_fee_rate;
@@ -1018,17 +1018,17 @@ void TdApi::OnQueryTransferFundHistoryRsp(TransferFundDetail* detail, ErrorInfo*
 	gil_scoped_acquire acquire;
 	dict data;
 	{
-		data["account_id"] = detail->account_id;
-		data["cust_orgid"] = detail->cust_orgid;
-		data["cust_branchid"] = detail->cust_branchid;
+		data["account_id"] = toUtf(detail->account_id);
+		data["cust_orgid"] = toUtf(detail->cust_orgid);
+		data["cust_branchid"] = toUtf(detail->cust_branchid);
 		data["account_type"] = detail->account_type;
-		data["serial_number"] = detail->serial_number;
+		data["serial_number"] = toUtf(detail->serial_number);
 		data["transact_date"] = detail->transact_date;
 		data["transact_time"] = detail->transact_time;
 		data["transfer_value"] = detail->transfer_value;
 		data["transfer_side"] = detail->transfer_side;
 		data["transfer_status"] = detail->transfer_status;
-		data["remark"] = detail->remark;
+		data["remark"] = toUtf(detail->remark);
 	}
 	dict error;
 	{
@@ -1043,19 +1043,19 @@ void TdApi::OnQueryCreditDebtsFlowRsp(CreditDebtsFlowDetail* detail, ErrorInfo* 
 	gil_scoped_acquire acquire;
 	dict data;
 	{
-		data["account_id"] = detail->account_id;
+		data["account_id"] = toUtf(detail->account_id);
 		data["account_type"] = detail->account_type;
-		data["cust_orgid"] = detail->cust_orgid;
-		data["cust_branchid"] = detail->cust_branchid;
+		data["cust_orgid"] = toUtf(detail->cust_orgid);
+		data["cust_branchid"] = toUtf(detail->cust_branchid);
 		data["currency_type"] = detail->currency_type;
 		data["debt_type"] = detail->debt_type;
 		data["effect_direct"] = detail->effect_direct;
 		data["repay_way"] = detail->repay_way;
-		data["stk_code"] = detail->stk_code;
-		data["stk_name"] = detail->stk_name;
-		data["details_sno"] = detail->details_sno;
+		data["stk_code"] = toUtf(detail->stk_code);
+		data["stk_name"] = toUtf(detail->stk_name);
+		data["details_sno"] = toUtf(detail->details_sno);
 		data["relate_sys_date"] = detail->relate_sys_date;
-		data["relate_sno"] = detail->relate_sno;
+		data["relate_sno"] = toUtf(detail->relate_sno);
 		data["market_id"] = detail->market_id;
 		data["fund_effect"] = detail->fund_effect;
 		data["stk_effect"] = detail->stk_effect;
@@ -1073,31 +1073,31 @@ void TdApi::OnQueryCreditAssetFlowRsp(CreditAssetFlowDetail* detail, ErrorInfo* 
 	gil_scoped_acquire acquire;
 	dict data;
 	{
-		data["account_id"] = detail->account_id;
+		data["account_id"] = toUtf(detail->account_id);
 		data["account_type"] = detail->account_type;
-		data["cust_orgid"] = detail->cust_orgid;
-		data["cust_branchid"] = detail->cust_branchid;
+		data["cust_orgid"] = toUtf(detail->cust_orgid);
+		data["cust_branchid"] = toUtf(detail->cust_branchid);
 		data["biz_date"] = detail->biz_date;
-		data["details_sno"] = detail->details_sno;
+		data["details_sno"] = toUtf(detail->details_sno);
 		data["oper_date"] = detail->oper_date;
 		data["oper_time"] = detail->oper_time;
 		data["digest_id"] = detail->digest_id;
-		data["digest_name"] = detail->digest_name;
+		data["digest_name"] = toUtf(detail->digest_name);
 		data["currency_type"] = detail->currency_type;
-		data["secuid"] = detail->secuid;
+		data["secuid"] = toUtf(detail->secuid);
 		data["market_id"] = detail->market_id;
 		data["fund_effect"] = detail->fund_effect;
 		data["fund_bal"] = detail->fund_bal;
 		data["stk_bal"] = detail->stk_bal;
-		data["stk_code"] = detail->stk_code;
-		data["stk_name"] = detail->stk_name;
-		data["busi_type"] = detail->busi_type;
+		data["stk_code"] = toUtf(detail->stk_code);
+		data["stk_name"] = toUtf(detail->stk_name);
+		data["busi_type"] = toUtf(detail->busi_type);
 		data["side"] = detail->side;
 		data["match_price"] = detail->match_price;
 		data["match_qty"] = detail->match_qty;
 		data["match_amt"] = detail->match_amt;
-		data["order_id"] = detail->order_id;
-		data["pos_str"] = detail->pos_str;
+		data["order_id"] = toUtf(detail->order_id);
+		data["pos_str"] = toUtf(detail->pos_str);
 	}
 	dict error;
 	{
@@ -1112,19 +1112,19 @@ void TdApi::OnQueryCreditDebtsRsp(CreditDebtsDetail* detail, ErrorInfo* error_in
 	gil_scoped_acquire acquire;
 	dict data;
 	{
-		data["account_id"] = detail->account_id;
+		data["account_id"] = toUtf(detail->account_id);
 		data["account_type"] = detail->account_type;
-		data["cust_orgid"] = detail->cust_orgid;
-		data["cust_branchid"] = detail->cust_branchid;
+		data["cust_orgid"] = toUtf(detail->cust_orgid);
+		data["cust_branchid"] = toUtf(detail->cust_branchid);
 		data["sys_date"] = detail->sys_date;
 		data["end_date"] = detail->end_date;
-		data["sno"] = detail->sno;
+		data["sno"] = toUtf(detail->sno);
 		data["currency_type"] = detail->currency_type;
-		data["symbol"] = detail->symbol;
-		data["security_symbol"] = detail->security_symbol;
+		data["symbol"] = toUtf(detail->symbol);
+		data["security_symbol"] = toUtf(detail->security_symbol);
 		data["order_date"] = detail->order_date;
 		data["order_id"] = detail->order_id;
-		data["secuid"] = detail->secuid;
+		data["secuid"] = toUtf(detail->secuid);
 		data["life_status"] = detail->life_status;
 		data["d_stk_bal"] = detail->d_stk_bal;
 		data["f_deal_bal"] = detail->f_deal_bal;
@@ -1150,7 +1150,7 @@ void TdApi::OnQueryCreditDebtsRsp(CreditDebtsDetail* detail, ErrorInfo* error_in
 		data["mkt_val"] = detail->mkt_val;
 		data["buy_cost"] = detail->buy_cost;
 		data["exp_cet_intr"] = detail->exp_cet_intr;
-		data["pos_str"] = detail->pos_str;
+		data["pos_str"] = toUtf(detail->pos_str);
 		data["credit_direct"] = detail->credit_direct;
 		data["match_qty"] = detail->match_qty;
 		data["stk_repay"] = detail->stk_repay;
@@ -1170,17 +1170,17 @@ void TdApi::OnMicroServiceRsp(MicroServiceRsp* rsp, int request_id)
 	gil_scoped_acquire acquire;
 	dict data;
 	{
-		data["account_id"] = rsp->account_id;
+		data["account_id"] = toUtf(rsp->account_id);
 		data["account_type"] = rsp->account_type;
-		data["cust_orgid"] = rsp->cust_orgid;
-		data["cust_branchid"] = rsp->cust_branchid;
+		data["cust_orgid"] = toUtf(rsp->cust_orgid);
+		data["cust_branchid"] = toUtf(rsp->cust_branchid);
 		data["call_status"] = rsp->call_status;
-		data["error_code"] = rsp->error_code;
-		data["error_info"] = rsp->error_info;
-		data["error_extra"] = rsp->error_extra;
-		data["response_list_first"] = rsp->response_list_first;
+		data["error_code"] = toUtf(rsp->error_code);
+		data["error_info"] = toUtf(rsp->error_info);
+		data["error_extra"] = toUtf(rsp->error_extra);
+		data["response_list_first"] = toUtf(rsp->response_list_first);
 		data["first_list_len"] = rsp->first_list_len;
-		data["response_list_second"] = rsp->response_list_second;
+		data["response_list_second"] = toUtf(rsp->response_list_second);
 		data["second_list_len"] = rsp->second_list_len;
 	}
 	this->onMicroServiceRsp(data, request_id);
@@ -1191,9 +1191,9 @@ void TdApi::OnQueryBankBalanceRsp(BankBalanceDetail* detail, ErrorInfo* error_in
 	gil_scoped_acquire acquire;
 	dict data;
 	{
-		data["account_id"] = detail->account_id;
-		data["cust_orgid"] = detail->cust_orgid;
-		data["cust_branchid"] = detail->cust_branchid;
+		data["account_id"] = toUtf(detail->account_id);
+		data["cust_orgid"] = toUtf(detail->cust_orgid);
+		data["cust_branchid"] = toUtf(detail->cust_branchid);
 		data["account_type"] = detail->account_type;
 		data["status"] = detail->status;
 		data["sno"] = detail->sno;
@@ -1212,15 +1212,15 @@ void TdApi::OnQueryBankInfoRsp(BankInfoDetail* detail, ErrorInfo* error_info, in
 	gil_scoped_acquire acquire;
 	dict data;
 	{
-		data["account_id"] = detail->account_id;
-		data["cust_orgid"] = detail->cust_orgid;
-		data["cust_branchid"] = detail->cust_branchid;
+		data["account_id"] = toUtf(detail->account_id);
+		data["cust_orgid"] = toUtf(detail->cust_orgid);
+		data["cust_branchid"] = toUtf(detail->cust_branchid);
 		data["account_type"] = detail->account_type;
-		data["cust_id"] = detail->cust_id;
+		data["cust_id"] = toUtf(detail->cust_id);
 		data["currency_type"] = detail->currency_type;
-		data["bank_code"] = detail->bank_code;
-		data["bank_name"] = detail->bank_name;
-		data["bankid"] = detail->bankid;
+		data["bank_code"] = toUtf(detail->bank_code);
+		data["bank_name"] = toUtf(detail->bank_name);
+		data["bankid"] = toUtf(detail->bankid);
 		data["bankpwdflag"] = detail->bankpwdflag;
 		data["qrybankfund"] = detail->qrybankfund;
 		data["status"] = detail->status;
@@ -1243,9 +1243,9 @@ void TdApi::OnBankSecTransferRsp(BankSecTransferRsp* rsp, ErrorInfo* error_info,
 	gil_scoped_acquire acquire;
 	dict data;
 	{
-		data["account_id"] = rsp->account_id;
-		data["cust_orgid"] = rsp->cust_orgid;
-		data["cust_branchid"] = rsp->cust_branchid;
+		data["account_id"] = toUtf(rsp->account_id);
+		data["cust_orgid"] = toUtf(rsp->cust_orgid);
+		data["cust_branchid"] = toUtf(rsp->cust_branchid);
 		data["account_type"] = rsp->account_type;
 		data["sno"] = rsp->sno;
 		data["busi_type"] = rsp->busi_type;
@@ -1266,24 +1266,24 @@ void TdApi::OnQueryBankSecTransferRsp(BankSecTransferDetail* detail, ErrorInfo* 
 	gil_scoped_acquire acquire;
 	dict data;
 	{
-		data["account_id"] = detail->account_id;
-		data["cust_orgid"] = detail->cust_orgid;
-		data["cust_branchid"] = detail->cust_branchid;
+		data["account_id"] = toUtf(detail->account_id);
+		data["cust_orgid"] = toUtf(detail->cust_orgid);
+		data["cust_branchid"] = toUtf(detail->cust_branchid);
 		data["account_type"] = detail->account_type;
 		data["oper_date"] = detail->oper_date;
 		data["oper_time"] = detail->oper_time;
 		data["currency_type"] = detail->currency_type;
-		data["cust_id"] = detail->cust_id;
-		data["bank_code"] = detail->bank_code;
-		data["bank_name"] = detail->bank_name;
+		data["cust_id"] = toUtf(detail->cust_id);
+		data["bank_code"] = toUtf(detail->bank_code);
+		data["bank_name"] = toUtf(detail->bank_name);
 		data["busi_type"] = detail->busi_type;
 		data["sno"] = detail->sno;
 		data["fund_effect"] = detail->fund_effect;
 		data["fund_bal"] = detail->fund_bal;
-		data["remark"] = detail->remark;
+		data["remark"] = toUtf(detail->remark);
 		data["status"] = detail->status;
-		data["bank_msg_id"] = detail->bank_msg_id;
-		data["bank_msg"] = detail->bank_msg;
+		data["bank_msg_id"] = toUtf(detail->bank_msg_id);
+		data["bank_msg"] = toUtf(detail->bank_msg);
 		data["syserr_id"] = detail->syserr_id;
 	}
 	dict error;
@@ -1299,30 +1299,30 @@ void TdApi::OnQueryHisBankSecTransferRsp(HisBankSecTransferDetail* detail, Error
 	gil_scoped_acquire acquire;
 	dict data;
 	{
-		data["account_id"] = detail->account_id;
-		data["cust_orgid"] = detail->cust_orgid;
-		data["cust_branchid"] = detail->cust_branchid;
+		data["account_id"] = toUtf(detail->account_id);
+		data["cust_orgid"] = toUtf(detail->cust_orgid);
+		data["cust_branchid"] = toUtf(detail->cust_branchid);
 		data["account_type"] = detail->account_type;
-		data["pos_str"] = detail->pos_str;
+		data["pos_str"] = toUtf(detail->pos_str);
 		data["sys_date"] = detail->sys_date;
 		data["oper_date"] = detail->oper_date;
 		data["oper_time"] = detail->oper_time;
 		data["sno"] = detail->sno;
-		data["fund_id"] = detail->fund_id;
+		data["fund_id"] = toUtf(detail->fund_id);
 		data["currency_type"] = detail->currency_type;
-		data["cust_id"] = detail->cust_id;
-		data["cust_name"] = detail->cust_name;
-		data["bank_code"] = detail->bank_code;
-		data["bank_name"] = detail->bank_name;
+		data["cust_id"] = toUtf(detail->cust_id);
+		data["cust_name"] = toUtf(detail->cust_name);
+		data["bank_code"] = toUtf(detail->bank_code);
+		data["bank_name"] = toUtf(detail->bank_name);
 		data["busi_type"] = detail->busi_type;
 		data["fund_effect"] = detail->fund_effect;
 		data["fund_bal"] = detail->fund_bal;
-		data["remark"] = detail->remark;
+		data["remark"] = toUtf(detail->remark);
 		data["status"] = detail->status;
 		data["source_type"] = detail->source_type;
 		data["strike_flag"] = detail->strike_flag;
-		data["bank_msg_id"] = detail->bank_msg_id;
-		data["bank_msg"] = detail->bank_msg;
+		data["bank_msg_id"] = toUtf(detail->bank_msg_id);
+		data["bank_msg"] = toUtf(detail->bank_msg);
 		data["syserr_id"] = detail->syserr_id;
 	}
 	dict error;
@@ -1338,9 +1338,9 @@ void TdApi::OnFundAccountTransferRsp(FundAccountTransferRsp* detail, ErrorInfo* 
 	gil_scoped_acquire acquire;
 	dict data;
 	{
-		data["account_id"] = detail->account_id;
-		data["cust_orgid"] = detail->cust_orgid;
-		data["cust_branchid"] = detail->cust_branchid;
+		data["account_id"] = toUtf(detail->account_id);
+		data["cust_orgid"] = toUtf(detail->cust_orgid);
+		data["cust_branchid"] = toUtf(detail->cust_branchid);
 		data["account_type"] = detail->account_type;
 	}
 	dict error;
@@ -1356,18 +1356,18 @@ void TdApi::OnQueryFundAccountTransferRsp(FundAccountTransferDetail* detail, Err
 	gil_scoped_acquire acquire;
 	dict data;
 	{
-		data["account_id"] = detail->account_id;
-		data["cust_orgid"] = detail->cust_orgid;
-		data["cust_branchid"] = detail->cust_branchid;
+		data["account_id"] = toUtf(detail->account_id);
+		data["cust_orgid"] = toUtf(detail->cust_orgid);
+		data["cust_branchid"] = toUtf(detail->cust_branchid);
 		data["account_type"] = detail->account_type;
 		data["sys_date"] = detail->sys_date;
 		data["oper_date"] = detail->oper_date;
 		data["oper_time"] = detail->oper_time;
-		data["bank_name"] = detail->bank_name;
-		data["digest_id"] = detail->digest_id;
+		data["bank_name"] = toUtf(detail->bank_name);
+		data["digest_id"] = toUtf(detail->digest_id);
 		data["currency_type"] = detail->currency_type;
 		data["fund_effect"] = detail->fund_effect;
-		data["remark"] = detail->remark;
+		data["remark"] = toUtf(detail->remark);
 	}
 	dict error;
 	{
@@ -1382,20 +1382,20 @@ void TdApi::OnQueryHisOrderRsp(HisOrderDetail* detail, ErrorInfo* error_info, in
 	gil_scoped_acquire acquire;
 	dict data;
 	{
-		data["account_id"] = detail->account_id;
-		data["cust_orgid"] = detail->cust_orgid;
-		data["cust_branchid"] = detail->cust_branchid;
+		data["account_id"] = toUtf(detail->account_id);
+		data["cust_orgid"] = toUtf(detail->cust_orgid);
+		data["cust_branchid"] = toUtf(detail->cust_branchid);
 		data["account_type"] = detail->account_type;
-		data["symbol"] = detail->symbol;
+		data["symbol"] = toUtf(detail->symbol);
 		data["oper_date"] = detail->oper_date;
 		data["order_date"] = detail->order_date;
-		data["trd_flow_id"] = detail->trd_flow_id;
-		data["cust_id"] = detail->cust_id;
+		data["trd_flow_id"] = toUtf(detail->trd_flow_id);
+		data["cust_id"] = toUtf(detail->cust_id);
 		data["currency_type"] = detail->currency_type;
-		data["secuid"] = detail->secuid;
+		data["secuid"] = toUtf(detail->secuid);
 		data["order_side"] = detail->order_side;
-		data["order_id"] = detail->order_id;
-		data["stk_name"] = detail->stk_name;
+		data["order_id"] = toUtf(detail->order_id);
+		data["stk_name"] = toUtf(detail->stk_name);
 		data["order_price"] = detail->order_price;
 		data["order_qty"] = detail->order_qty;
 		data["oper_time"] = detail->oper_time;
@@ -1405,11 +1405,11 @@ void TdApi::OnQueryHisOrderRsp(HisOrderDetail* detail, ErrorInfo* error_info, in
 		data["match_amt"] = detail->match_amt;
 		data["cancel_qty"] = detail->cancel_qty;
 		data["order_status"] = detail->order_status;
-		data["seat"] = detail->seat;
+		data["seat"] = toUtf(detail->seat);
 		data["oper_way"] = detail->oper_way;
 		data["cancel_flag"] = detail->cancel_flag;
 		data["extqty1"] = detail->extqty1;
-		data["remark"] = detail->remark;
+		data["remark"] = toUtf(detail->remark);
 		data["total_num"] = detail->total_num;
 		data["order_type"] = detail->order_type;
 	}
@@ -1426,32 +1426,32 @@ void TdApi::OnQueryHisTradeRsp(HisTradeDetail* detail, ErrorInfo* error_info, in
 	gil_scoped_acquire acquire;
 	dict data;
 	{
-		data["account_id"] = detail->account_id;
-		data["cust_orgid"] = detail->cust_orgid;
-		data["cust_branchid"] = detail->cust_branchid;
+		data["account_id"] = toUtf(detail->account_id);
+		data["cust_orgid"] = toUtf(detail->cust_orgid);
+		data["cust_branchid"] = toUtf(detail->cust_branchid);
 		data["account_type"] = detail->account_type;
-		data["symbol"] = detail->symbol;
-		data["busi_flow_id"] = detail->busi_flow_id;
-		data["cust_id"] = detail->cust_id;
+		data["symbol"] = toUtf(detail->symbol);
+		data["busi_flow_id"] = toUtf(detail->busi_flow_id);
+		data["cust_id"] = toUtf(detail->cust_id);
 		data["currency_type"] = detail->currency_type;
-		data["secuid"] = detail->secuid;
-		data["main_seat"] = detail->main_seat;
-		data["trd_seat"] = detail->trd_seat;
+		data["secuid"] = toUtf(detail->secuid);
+		data["main_seat"] = toUtf(detail->main_seat);
+		data["trd_seat"] = toUtf(detail->trd_seat);
 		data["stk_property"] = detail->stk_property;
-		data["busi_type"] = detail->busi_type;
-		data["busi_name"] = detail->busi_name;
-		data["stk_name"] = detail->stk_name;
+		data["busi_type"] = toUtf(detail->busi_type);
+		data["busi_name"] = toUtf(detail->busi_name);
+		data["stk_name"] = toUtf(detail->stk_name);
 		data["order_date"] = detail->order_date;
-		data["apply_code"] = detail->apply_code;
-		data["match_code"] = detail->match_code;
-		data["match_time"] = detail->match_time;
+		data["apply_code"] = toUtf(detail->apply_code);
+		data["match_code"] = toUtf(detail->match_code);
+		data["match_time"] = toUtf(detail->match_time);
 		data["match_amt"] = detail->match_amt;
 		data["match_qty"] = detail->match_qty;
 		data["match_price"] = detail->match_price;
 		data["order_qty"] = detail->order_qty;
 		data["order_price"] = detail->order_price;
 		data["intr_amt"] = detail->intr_amt;
-		data["stk_type"] = detail->stk_type;
+		data["stk_type"] = toUtf(detail->stk_type);
 		data["order_side"] = detail->order_side;
 		data["oper_date"] = detail->oper_date;
 		data["match_date"] = detail->match_date;
@@ -1472,26 +1472,26 @@ void TdApi::OnQueryDeliveryOrderRsp(DeliveryOrderDetail* detail, ErrorInfo* erro
 	gil_scoped_acquire acquire;
 	dict data;
 	{
-		data["account_id"] = detail->account_id;
-		data["cust_orgid"] = detail->cust_orgid;
-		data["cust_branchid"] = detail->cust_branchid;
+		data["account_id"] = toUtf(detail->account_id);
+		data["cust_orgid"] = toUtf(detail->cust_orgid);
+		data["cust_branchid"] = toUtf(detail->cust_branchid);
 		data["account_type"] = detail->account_type;
-		data["symbol"] = detail->symbol;
+		data["symbol"] = toUtf(detail->symbol);
 		data["biz_date"] = detail->biz_date;
-		data["sno"] = detail->sno;
-		data["busi_type"] = detail->busi_type;
-		data["busi_name"] = detail->busi_name;
+		data["sno"] = toUtf(detail->sno);
+		data["busi_type"] = toUtf(detail->busi_type);
+		data["busi_name"] = toUtf(detail->busi_name);
 		data["currency_type"] = detail->currency_type;
-		data["stk_name"] = detail->stk_name;
-		data["secuid"] = detail->secuid;
-		data["main_seat"] = detail->main_seat;
-		data["ta_code"] = detail->ta_code;
-		data["tran_sacct"] = detail->tran_sacct;
-		data["ta_acct"] = detail->ta_acct;
+		data["stk_name"] = toUtf(detail->stk_name);
+		data["secuid"] = toUtf(detail->secuid);
+		data["main_seat"] = toUtf(detail->main_seat);
+		data["ta_code"] = toUtf(detail->ta_code);
+		data["tran_sacct"] = toUtf(detail->tran_sacct);
+		data["ta_acct"] = toUtf(detail->ta_acct);
 		data["order_date"] = detail->order_date;
 		data["order_time"] = detail->order_time;
 		data["order_side"] = detail->order_side;
-		data["apply_code"] = detail->apply_code;
+		data["apply_code"] = toUtf(detail->apply_code);
 		data["order_qty"] = detail->order_qty;
 		data["order_price"] = detail->order_price;
 		data["match_time"] = detail->match_time;
@@ -1531,27 +1531,27 @@ void TdApi::OnQueryStateOrderRsp(StateOrderDetail* detail, ErrorInfo* error_info
 	gil_scoped_acquire acquire;
 	dict data;
 	{
-		data["account_id"] = detail->account_id;
-		data["cust_orgid"] = detail->cust_orgid;
-		data["cust_branchid"] = detail->cust_branchid;
+		data["account_id"] = toUtf(detail->account_id);
+		data["cust_orgid"] = toUtf(detail->cust_orgid);
+		data["cust_branchid"] = toUtf(detail->cust_branchid);
 		data["account_type"] = detail->account_type;
-		data["symbol"] = detail->symbol;
+		data["symbol"] = toUtf(detail->symbol);
 		data["biz_date"] = detail->biz_date;
 		data["clear_date"] = detail->clear_date;
-		data["sno"] = detail->sno;
-		data["busi_type"] = detail->busi_type;
-		data["busi_name"] = detail->busi_name;
+		data["sno"] = toUtf(detail->sno);
+		data["busi_type"] = toUtf(detail->busi_type);
+		data["busi_name"] = toUtf(detail->busi_name);
 		data["currency_type"] = detail->currency_type;
-		data["stk_name"] = detail->stk_name;
-		data["secuid"] = detail->secuid;
-		data["main_seat"] = detail->main_seat;
-		data["ta_code"] = detail->ta_code;
-		data["trans_acct"] = detail->trans_acct;
-		data["ta_acct"] = detail->ta_acct;
+		data["stk_name"] = toUtf(detail->stk_name);
+		data["secuid"] = toUtf(detail->secuid);
+		data["main_seat"] = toUtf(detail->main_seat);
+		data["ta_code"] = toUtf(detail->ta_code);
+		data["trans_acct"] = toUtf(detail->trans_acct);
+		data["ta_acct"] = toUtf(detail->ta_acct);
 		data["order_date"] = detail->order_date;
 		data["order_time"] = detail->order_time;
 		data["order_side"] = detail->order_side;
-		data["apply_code"] = detail->apply_code;
+		data["apply_code"] = toUtf(detail->apply_code);
 		data["order_qty"] = detail->order_qty;
 		data["order_price"] = detail->order_price;
 		data["match_time"] = detail->match_time;
@@ -1577,27 +1577,27 @@ void TdApi::OnQueryExchangeListsRsp(ExchangeDetail* detail, ErrorInfo* error_inf
 	gil_scoped_acquire acquire;
 	dict data;
 	{
-		data["account_id"] = detail->account_id;
-		data["cust_orgid"] = detail->cust_orgid;
-		data["cust_branchid"] = detail->cust_branchid;
+		data["account_id"] = toUtf(detail->account_id);
+		data["cust_orgid"] = toUtf(detail->cust_orgid);
+		data["cust_branchid"] = toUtf(detail->cust_branchid);
 		data["account_type"] = detail->account_type;
-		data["pos_str"] = detail->pos_str;
+		data["pos_str"] = toUtf(detail->pos_str);
 		data["clear_date"] = detail->clear_date;
 		data["biz_date"] = detail->biz_date;
 		data["order_date"] = detail->order_date;
 		data["order_time"] = detail->order_time;
 		data["digest_id"] = detail->digest_id;
-		data["digest_name"] = detail->digest_name;
+		data["digest_name"] = toUtf(detail->digest_name);
 		data["currency_type"] = detail->currency_type;
-		data["symbol"] = detail->symbol;
-		data["secuid"] = detail->secuid;
-		data["cust_name"] = detail->cust_name;
-		data["order_id"] = detail->order_id;
-		data["sno"] = detail->sno;
-		data["stk_name"] = detail->stk_name;
+		data["symbol"] = toUtf(detail->symbol);
+		data["secuid"] = toUtf(detail->secuid);
+		data["cust_name"] = toUtf(detail->cust_name);
+		data["order_id"] = toUtf(detail->order_id);
+		data["sno"] = toUtf(detail->sno);
+		data["stk_name"] = toUtf(detail->stk_name);
 		data["order_side"] = detail->order_side;
 		data["match_time"] = detail->match_time;
-		data["match_code"] = detail->match_code;
+		data["match_code"] = toUtf(detail->match_code);
 		data["match_times"] = detail->match_times;
 		data["match_qty"] = detail->match_qty;
 		data["match_price"] = detail->match_price;
@@ -1618,9 +1618,9 @@ void TdApi::OnQueryExchangeListsRsp(ExchangeDetail* detail, ErrorInfo* error_inf
 		data["order_qty"] = detail->order_qty;
 		data["order_price"] = detail->order_price;
 		data["source_type"] = detail->source_type;
-		data["bank_code"] = detail->bank_code;
-		data["bank_id"] = detail->bank_id;
-		data["counter_order_id"] = detail->counter_order_id;
+		data["bank_code"] = toUtf(detail->bank_code);
+		data["bank_id"] = toUtf(detail->bank_id);
+		data["counter_order_id"] = toUtf(detail->counter_order_id);
 	}
 	dict error;
 	{
@@ -1635,10 +1635,10 @@ void TdApi::OnModifyPasswordRsp(ModifyPasswordRsp* rsp, ErrorInfo* error_info, i
 	gil_scoped_acquire acquire;
 	dict data;
 	{
-		data["account_id"] = rsp->account_id;
+		data["account_id"] = toUtf(rsp->account_id);
 		data["account_type"] = rsp->account_type;
-		data["cust_orgid"] = rsp->cust_orgid;
-		data["cust_branchid"] = rsp->cust_branchid;
+		data["cust_orgid"] = toUtf(rsp->cust_orgid);
+		data["cust_branchid"] = toUtf(rsp->cust_branchid);
 	}
 	dict error;
 	{
@@ -1653,20 +1653,20 @@ void TdApi::OnQueryPHXXRsp(QueryPHXXRecord* detail, ErrorInfo* error_info, int r
 	gil_scoped_acquire acquire;
 	dict data;
 	{
-		data["account_id"] = detail->account_id;
-		data["cust_orgid"] = detail->cust_orgid;
-		data["cust_branchid"] = detail->cust_branchid;
+		data["account_id"] = toUtf(detail->account_id);
+		data["cust_orgid"] = toUtf(detail->cust_orgid);
+		data["cust_branchid"] = toUtf(detail->cust_branchid);
 		data["account_type"] = detail->account_type;
 		data["busi_date"] = detail->busi_date;
-		data["market"] = detail->market;
-		data["secuid"] = detail->secuid;
-		data["stk_name"] = detail->stk_name;
-		data["stk_code"] = detail->stk_code;
+		data["market"] = toUtf(detail->market);
+		data["secuid"] = toUtf(detail->secuid);
+		data["stk_name"] = toUtf(detail->stk_name);
+		data["stk_code"] = toUtf(detail->stk_code);
 		data["match_qty"] = detail->match_qty;
-		data["mate_no"] = detail->mate_no;
+		data["mate_no"] = toUtf(detail->mate_no);
 		data["currency_type"] = detail->currency_type;
-		data["busi_type"] = detail->busi_type;
-		data["link_stk_code"] = detail->link_stk_code;
+		data["busi_type"] = toUtf(detail->busi_type);
+		data["link_stk_code"] = toUtf(detail->link_stk_code);
 		data["next_query_index"] = detail->next_query_index;
 		data["total_num"] = detail->total_num;
 		data["issue_stk_type"] = detail->issue_stk_type;
@@ -1685,23 +1685,23 @@ void TdApi::OnQueryZQXXRsp(QueryZQXXRecord* detail, ErrorInfo* error_info, int r
 	gil_scoped_acquire acquire;
 	dict data;
 	{
-		data["account_id"] = detail->account_id;
-		data["cust_orgid"] = detail->cust_orgid;
-		data["cust_branchid"] = detail->cust_branchid;
+		data["account_id"] = toUtf(detail->account_id);
+		data["cust_orgid"] = toUtf(detail->cust_orgid);
+		data["cust_branchid"] = toUtf(detail->cust_branchid);
 		data["account_type"] = detail->account_type;
 		data["busi_date"] = detail->busi_date;
-		data["market"] = detail->market;
-		data["secuid"] = detail->secuid;
-		data["stk_name"] = detail->stk_name;
-		data["stk_code"] = detail->stk_code;
-		data["stk_type"] = detail->stk_type;
+		data["market"] = toUtf(detail->market);
+		data["secuid"] = toUtf(detail->secuid);
+		data["stk_name"] = toUtf(detail->stk_name);
+		data["stk_code"] = toUtf(detail->stk_code);
+		data["stk_type"] = toUtf(detail->stk_type);
 		data["hit_qty"] = detail->hit_qty;
 		data["match_price"] = detail->match_price;
 		data["order_date"] = detail->order_date;
-		data["order_id"] = detail->order_id;
-		data["mate_no"] = detail->mate_no;
+		data["order_id"] = toUtf(detail->order_id);
+		data["mate_no"] = toUtf(detail->mate_no);
 		data["currency_type"] = detail->currency_type;
-		data["busi_type"] = detail->busi_type;
+		data["busi_type"] = toUtf(detail->busi_type);
 		data["next_query_index"] = detail->next_query_index;
 		data["total_num"] = detail->total_num;
 		data["issue_stk_type"] = detail->issue_stk_type;
@@ -1719,17 +1719,17 @@ void TdApi::OnQueryLockSecurityContractRsp(LockSecurityContractDetail* detail, E
 	gil_scoped_acquire acquire;
 	dict data;
 	{
-		data["account_id"] = detail->account_id;
+		data["account_id"] = toUtf(detail->account_id);
 		data["account_type"] = detail->account_type;
-		data["cust_orgid"] = detail->cust_orgid;
-		data["cust_branchid"] = detail->cust_branchid;
+		data["cust_orgid"] = toUtf(detail->cust_orgid);
+		data["cust_branchid"] = toUtf(detail->cust_branchid);
 		data["sys_date"] = detail->sys_date;
 		data["begin_date"] = detail->begin_date;
 		data["close_date"] = detail->close_date;
-		data["symbol"] = detail->symbol;
-		data["name"] = detail->name;
+		data["symbol"] = toUtf(detail->symbol);
+		data["name"] = toUtf(detail->name);
 		data["status"] = detail->status;
-		data["secuid"] = detail->secuid;
+		data["secuid"] = toUtf(detail->secuid);
 		data["lock_charge_type"] = detail->lock_charge_type;
 		data["first_in_mode"] = detail->first_in_mode;
 		data["reserve_qty"] = detail->reserve_qty;
@@ -1751,7 +1751,7 @@ void TdApi::OnQueryLockSecurityContractRsp(LockSecurityContractDetail* detail, E
 		data["violate_fee"] = detail->violate_fee;
 		data["over_violate_fee"] = detail->over_violate_fee;
 		data["puni_violate_fee"] = detail->puni_violate_fee;
-		data["cust_id"] = detail->cust_id;
+		data["cust_id"] = toUtf(detail->cust_id);
 	}
 	dict error;
 	{
@@ -1766,10 +1766,10 @@ void TdApi::OnQueryCreditContractRsp(CreditContractDetail* detail, ErrorInfo* er
 	gil_scoped_acquire acquire;
 	dict data;
 	{
-		data["account_id"] = detail->account_id;
+		data["account_id"] = toUtf(detail->account_id);
 		data["account_type"] = detail->account_type;
-		data["cust_orgid"] = detail->cust_orgid;
-		data["cust_branchid"] = detail->cust_branchid;
+		data["cust_orgid"] = toUtf(detail->cust_orgid);
+		data["cust_branchid"] = toUtf(detail->cust_branchid);
 		data["f_credit_rate"] = detail->f_credit_rate;
 		data["f_year_mg_fee"] = detail->f_year_mg_fee;
 		data["f_year_sr_fee"] = detail->f_year_sr_fee;
@@ -1784,7 +1784,7 @@ void TdApi::OnQueryCreditContractRsp(CreditContractDetail* detail, ErrorInfo* er
 		data["end_date"] = detail->end_date;
 		data["f_prate"] = detail->f_prate;
 		data["d_prate"] = detail->d_prate;
-		data["contract_id"] = detail->contract_id;
+		data["contract_id"] = toUtf(detail->contract_id);
 	}
 	dict error;
 	{
@@ -1799,13 +1799,13 @@ void TdApi::OnQueryCreditDebtsCollectRsp(CreditDebtsCollectDetail* detail, Error
 	gil_scoped_acquire acquire;
 	dict data;
 	{
-		data["account_id"] = detail->account_id;
+		data["account_id"] = toUtf(detail->account_id);
 		data["account_type"] = detail->account_type;
-		data["cust_orgid"] = detail->cust_orgid;
-		data["cust_branchid"] = detail->cust_branchid;
+		data["cust_orgid"] = toUtf(detail->cust_orgid);
+		data["cust_branchid"] = toUtf(detail->cust_branchid);
 		data["currency_type"] = detail->currency_type;
-		data["symbol"] = detail->symbol;
-		data["name"] = detail->name;
+		data["symbol"] = toUtf(detail->symbol);
+		data["name"] = toUtf(detail->name);
 		data["match_amt"] = detail->match_amt;
 		data["match_qty"] = detail->match_qty;
 		data["credit_repay"] = detail->credit_repay;
@@ -1835,13 +1835,13 @@ void TdApi::OnQueryCreditDataRsp(CreditDataDetail* detail, ErrorInfo* error_info
 	gil_scoped_acquire acquire;
 	dict data;
 	{
-		data["account_id"] = detail->account_id;
+		data["account_id"] = toUtf(detail->account_id);
 		data["account_type"] = detail->account_type;
-		data["cust_orgid"] = detail->cust_orgid;
-		data["cust_branchid"] = detail->cust_branchid;
+		data["cust_orgid"] = toUtf(detail->cust_orgid);
+		data["cust_branchid"] = toUtf(detail->cust_branchid);
 		data["currency_type"] = detail->currency_type;
-		data["symbol"] = detail->symbol;
-		data["name"] = detail->name;
+		data["symbol"] = toUtf(detail->symbol);
+		data["name"] = toUtf(detail->name);
 		data["credit_direct"] = detail->credit_direct;
 		data["margin_avl"] = detail->margin_avl;
 		data["credit_bal"] = detail->credit_bal;
@@ -1877,19 +1877,19 @@ void TdApi::OnQueryPreMaturityDebtsRsp(PreMaturityDebtsDetail* detail, ErrorInfo
 	gil_scoped_acquire acquire;
 	dict data;
 	{
-		data["account_id"] = detail->account_id;
+		data["account_id"] = toUtf(detail->account_id);
 		data["account_type"] = detail->account_type;
-		data["cust_orgid"] = detail->cust_orgid;
-		data["cust_branchid"] = detail->cust_branchid;
-		data["symbol"] = detail->symbol;
-		data["name"] = detail->name;
-		data["secuid"] = detail->secuid;
+		data["cust_orgid"] = toUtf(detail->cust_orgid);
+		data["cust_branchid"] = toUtf(detail->cust_branchid);
+		data["symbol"] = toUtf(detail->symbol);
+		data["name"] = toUtf(detail->name);
+		data["secuid"] = toUtf(detail->secuid);
 		data["currency_type"] = detail->currency_type;
 		data["credit_direct"] = detail->credit_direct;
 		data["life_status"] = detail->life_status;
 		data["sys_date"] = detail->sys_date;
-		data["sno"] = detail->sno;
-		data["order_id"] = detail->order_id;
+		data["sno"] = toUtf(detail->sno);
+		data["order_id"] = toUtf(detail->order_id);
 		data["order_date"] = detail->order_date;
 		data["match_qty"] = detail->match_qty;
 		data["match_amt"] = detail->match_amt;
@@ -1898,11 +1898,11 @@ void TdApi::OnQueryPreMaturityDebtsRsp(PreMaturityDebtsDetail* detail, ErrorInfo
 		data["all_fee"] = detail->all_fee;
 		data["apply_status"] = detail->apply_status;
 		data["apply_date"] = detail->apply_date;
-		data["apply_sno"] = detail->apply_sno;
+		data["apply_sno"] = toUtf(detail->apply_sno);
 		data["apply_end_date"] = detail->apply_end_date;
 		data["oper_date"] = detail->oper_date;
 		data["oper_time"] = detail->oper_time;
-		data["chk_remark"] = detail->chk_remark;
+		data["chk_remark"] = toUtf(detail->chk_remark);
 	}
 	dict error;
 	{
@@ -1917,12 +1917,12 @@ void TdApi::OnExtendPreMaturityDebtsRsp(ExtendPreMaturityDebtsRsp* detail, Error
 	gil_scoped_acquire acquire;
 	dict data;
 	{
-		data["account_id"] = detail->account_id;
+		data["account_id"] = toUtf(detail->account_id);
 		data["account_type"] = detail->account_type;
-		data["cust_orgid"] = detail->cust_orgid;
-		data["cust_branchid"] = detail->cust_branchid;
+		data["cust_orgid"] = toUtf(detail->cust_orgid);
+		data["cust_branchid"] = toUtf(detail->cust_branchid);
 		data["apply_date"] = detail->apply_date;
-		data["apply_sno"] = detail->apply_sno;
+		data["apply_sno"] = toUtf(detail->apply_sno);
 	}
 	dict error;
 	{
@@ -1937,29 +1937,29 @@ void TdApi::OnQueryPreMaturityDebtsExtensionRsp(PreMaturityDebtsExtensionDetail*
 	gil_scoped_acquire acquire;
 	dict data;
 	{
-		data["account_id"] = detail->account_id;
+		data["account_id"] = toUtf(detail->account_id);
 		data["account_type"] = detail->account_type;
-		data["cust_orgid"] = detail->cust_orgid;
-		data["cust_branchid"] = detail->cust_branchid;
-		data["symbol"] = detail->symbol;
-		data["name"] = detail->name;
-		data["secuid"] = detail->secuid;
+		data["cust_orgid"] = toUtf(detail->cust_orgid);
+		data["cust_branchid"] = toUtf(detail->cust_branchid);
+		data["symbol"] = toUtf(detail->symbol);
+		data["name"] = toUtf(detail->name);
+		data["secuid"] = toUtf(detail->secuid);
 		data["currency_type"] = detail->currency_type;
 		data["credit_direct"] = detail->credit_direct;
 		data["life_status"] = detail->life_status;
 		data["apply_status"] = detail->apply_status;
 		data["sys_date"] = detail->sys_date;
 		data["apply_date"] = detail->apply_date;
-		data["apply_sno"] = detail->apply_sno;
-		data["sno"] = detail->sno;
+		data["apply_sno"] = toUtf(detail->apply_sno);
+		data["sno"] = toUtf(detail->sno);
 		data["order_date"] = detail->order_date;
-		data["order_id"] = detail->order_id;
+		data["order_id"] = toUtf(detail->order_id);
 		data["match_qty"] = detail->match_qty;
 		data["match_amt"] = detail->match_amt;
 		data["leave_amt"] = detail->leave_amt;
 		data["leave_value"] = detail->leave_value;
-		data["chk_remark"] = detail->chk_remark;
-		data["cfm_ans"] = detail->cfm_ans;
+		data["chk_remark"] = toUtf(detail->chk_remark);
+		data["cfm_ans"] = toUtf(detail->cfm_ans);
 		data["leave_qty"] = detail->leave_qty;
 	}
 	dict error;
@@ -1975,26 +1975,26 @@ void TdApi::OnQueryVoteProposalRsp(VoteProposalDetail* detail, ErrorInfo* error_
 	gil_scoped_acquire acquire;
 	dict data;
 	{
-		data["account_id"] = detail->account_id;
+		data["account_id"] = toUtf(detail->account_id);
 		data["account_type"] = detail->account_type;
-		data["cust_orgid"] = detail->cust_orgid;
-		data["cust_branchid"] = detail->cust_branchid;
-		data["symbol"] = detail->symbol;
-		data["name"] = detail->name;
-		data["vote_symbol"] = detail->vote_symbol;
-		data["vote_name"] = detail->vote_name;
+		data["cust_orgid"] = toUtf(detail->cust_orgid);
+		data["cust_branchid"] = toUtf(detail->cust_branchid);
+		data["symbol"] = toUtf(detail->symbol);
+		data["name"] = toUtf(detail->name);
+		data["vote_symbol"] = toUtf(detail->vote_symbol);
+		data["vote_name"] = toUtf(detail->vote_name);
 		data["begin_date"] = detail->begin_date;
 		data["end_date"] = detail->end_date;
-		data["meeting_type"] = detail->meeting_type;
-		data["meeting_desc"] = detail->meeting_desc;
-		data["meeting_seq"] = detail->meeting_seq;
-		data["voting_proposal_code"] = detail->voting_proposal_code;
-		data["voting_prososal_desc"] = detail->voting_prososal_desc;
+		data["meeting_type"] = toUtf(detail->meeting_type);
+		data["meeting_desc"] = toUtf(detail->meeting_desc);
+		data["meeting_seq"] = toUtf(detail->meeting_seq);
+		data["voting_proposal_code"] = toUtf(detail->voting_proposal_code);
+		data["voting_prososal_desc"] = toUtf(detail->voting_prososal_desc);
 		data["voting_proposal_type"] = detail->voting_proposal_type;
 		data["cum_voting_chosen_num"] = detail->cum_voting_chosen_num;
-		data["share_holder_role"] = detail->share_holder_role;
-		data["proposal_relation"] = detail->proposal_relation;
-		data["share_class"] = detail->share_class;
+		data["share_holder_role"] = toUtf(detail->share_holder_role);
+		data["proposal_relation"] = toUtf(detail->proposal_relation);
+		data["share_class"] = toUtf(detail->share_class);
 		data["reg_date"] = detail->reg_date;
 	}
 	dict error;
@@ -2010,14 +2010,14 @@ void TdApi::OnQueryCreditVoteCountRsp(CreditVoteCountDetail* detail, ErrorInfo* 
 	gil_scoped_acquire acquire;
 	dict data;
 	{
-		data["account_id"] = detail->account_id;
+		data["account_id"] = toUtf(detail->account_id);
 		data["account_type"] = detail->account_type;
-		data["cust_orgid"] = detail->cust_orgid;
-		data["cust_branchid"] = detail->cust_branchid;
-		data["symbol"] = detail->symbol;
-		data["voting_proposal"] = detail->voting_proposal;
+		data["cust_orgid"] = toUtf(detail->cust_orgid);
+		data["cust_branchid"] = toUtf(detail->cust_branchid);
+		data["symbol"] = toUtf(detail->symbol);
+		data["voting_proposal"] = toUtf(detail->voting_proposal);
 		data["rest_qty"] = detail->rest_qty;
-		data["stk_name"] = detail->stk_name;
+		data["stk_name"] = toUtf(detail->stk_name);
 	}
 	dict error;
 	{
@@ -2032,27 +2032,27 @@ void TdApi::OnQueryCreditVoteRsp(CreditVoteDetail* detail, ErrorInfo* error_info
 	gil_scoped_acquire acquire;
 	dict data;
 	{
-		data["account_id"] = detail->account_id;
+		data["account_id"] = toUtf(detail->account_id);
 		data["account_type"] = detail->account_type;
-		data["cust_orgid"] = detail->cust_orgid;
-		data["cust_branchid"] = detail->cust_branchid;
-		data["symbol"] = detail->symbol;
-		data["secuid"] = detail->secuid;
+		data["cust_orgid"] = toUtf(detail->cust_orgid);
+		data["cust_branchid"] = toUtf(detail->cust_branchid);
+		data["symbol"] = toUtf(detail->symbol);
+		data["secuid"] = toUtf(detail->secuid);
 		data["sys_date"] = detail->sys_date;
 		data["oper_date"] = detail->oper_date;
 		data["oper_time"] = detail->oper_time;
-		data["link_symbol"] = detail->link_symbol;
-		data["voting_proposal"] = detail->voting_proposal;
+		data["link_symbol"] = toUtf(detail->link_symbol);
+		data["voting_proposal"] = toUtf(detail->voting_proposal);
 		data["voting_preference"] = detail->voting_preference;
 		data["stk_bal"] = detail->stk_bal;
-		data["stk_name"] = detail->stk_name;
-		data["link_stk_name"] = detail->link_stk_name;
-		data["meeting_seq"] = detail->meeting_seq;
-		data["meeting_desc"] = detail->meeting_desc;
+		data["stk_name"] = toUtf(detail->stk_name);
+		data["link_stk_name"] = toUtf(detail->link_stk_name);
+		data["meeting_seq"] = toUtf(detail->meeting_seq);
+		data["meeting_desc"] = toUtf(detail->meeting_desc);
 		data["voting_proposal_type"] = detail->voting_proposal_type;
-		data["voting_prososal_desc"] = detail->voting_prososal_desc;
-		data["key_error_code"] = detail->key_error_code;
-		data["key_error_msg"] = detail->key_error_msg;
+		data["voting_prososal_desc"] = toUtf(detail->voting_prososal_desc);
+		data["key_error_code"] = toUtf(detail->key_error_code);
+		data["key_error_msg"] = toUtf(detail->key_error_msg);
 	}
 	dict error;
 	{
@@ -2067,18 +2067,18 @@ void TdApi::OnQueryNetVoteRightsRsp(NetVoteRightsDetail* detail, ErrorInfo* erro
 	gil_scoped_acquire acquire;
 	dict data;
 	{
-		data["account_id"] = detail->account_id;
+		data["account_id"] = toUtf(detail->account_id);
 		data["account_type"] = detail->account_type;
-		data["cust_orgid"] = detail->cust_orgid;
-		data["cust_branchid"] = detail->cust_branchid;
-		data["cust_id"] = detail->cust_id;
-		data["secuid"] = detail->secuid;
-		data["symbol"] = detail->symbol;
-		data["name"] = detail->name;
-		data["meeting_seq"] = detail->meeting_seq;
+		data["cust_orgid"] = toUtf(detail->cust_orgid);
+		data["cust_branchid"] = toUtf(detail->cust_branchid);
+		data["cust_id"] = toUtf(detail->cust_id);
+		data["secuid"] = toUtf(detail->secuid);
+		data["symbol"] = toUtf(detail->symbol);
+		data["name"] = toUtf(detail->name);
+		data["meeting_seq"] = toUtf(detail->meeting_seq);
 		data["reg_date"] = detail->reg_date;
-		data["voting_proposal"] = detail->voting_proposal;
-		data["voting_relation"] = detail->voting_relation;
+		data["voting_proposal"] = toUtf(detail->voting_proposal);
+		data["voting_relation"] = toUtf(detail->voting_relation);
 		data["total_num"] = detail->total_num;
 	}
 	dict error;
@@ -2094,24 +2094,24 @@ void TdApi::OnQueryNetVoteResultRsp(NetVoteResultDetail* detail, ErrorInfo* erro
 	gil_scoped_acquire acquire;
 	dict data;
 	{
-		data["account_id"] = detail->account_id;
+		data["account_id"] = toUtf(detail->account_id);
 		data["account_type"] = detail->account_type;
-		data["cust_orgid"] = detail->cust_orgid;
-		data["cust_branchid"] = detail->cust_branchid;
+		data["cust_orgid"] = toUtf(detail->cust_orgid);
+		data["cust_branchid"] = toUtf(detail->cust_branchid);
 		data["busi_date"] = detail->busi_date;
-		data["contract_id"] = detail->contract_id;
-		data["vote_symbol"] = detail->vote_symbol;
-		data["meeting_seq"] = detail->meeting_seq;
-		data["cust_id"] = detail->cust_id;
-		data["fund_id"] = detail->fund_id;
-		data["secuid"] = detail->secuid;
+		data["contract_id"] = toUtf(detail->contract_id);
+		data["vote_symbol"] = toUtf(detail->vote_symbol);
+		data["meeting_seq"] = toUtf(detail->meeting_seq);
+		data["cust_id"] = toUtf(detail->cust_id);
+		data["fund_id"] = toUtf(detail->fund_id);
+		data["secuid"] = toUtf(detail->secuid);
 		data["vote_qty"] = detail->vote_qty;
 		data["cur_vote_qty"] = detail->cur_vote_qty;
-		data["voting_proposal"] = detail->voting_proposal;
-		data["vote_info"] = detail->vote_info;
+		data["voting_proposal"] = toUtf(detail->voting_proposal);
+		data["vote_info"] = toUtf(detail->vote_info);
 		data["vote_type"] = detail->vote_type;
 		data["total_num"] = detail->total_num;
-		data["vote_name"] = detail->vote_name;
+		data["vote_name"] = toUtf(detail->vote_name);
 	}
 	dict error;
 	{
@@ -2126,10 +2126,10 @@ void TdApi::OnQueryNetVoteCountRsp(NetVoteCountDetail* detail, ErrorInfo* error_
 	gil_scoped_acquire acquire;
 	dict data;
 	{
-		data["account_id"] = detail->account_id;
+		data["account_id"] = toUtf(detail->account_id);
 		data["account_type"] = detail->account_type;
-		data["cust_orgid"] = detail->cust_orgid;
-		data["cust_branchid"] = detail->cust_branchid;
+		data["cust_orgid"] = toUtf(detail->cust_orgid);
+		data["cust_branchid"] = toUtf(detail->cust_branchid);
 		data["vote_qty"] = detail->vote_qty;
 	}
 	dict error;
@@ -2146,8 +2146,8 @@ void TdApi::OnQueryStkConcentrationRsp(StkConcentrationDetail* detail, ErrorInfo
 	dict data;
 	{
 		data["market_id"] = detail->market_id;
-		data["symbol"] = detail->symbol;
-		data["name"] = detail->name;
+		data["symbol"] = toUtf(detail->symbol);
+		data["name"] = toUtf(detail->name);
 		data["keep_rate_begin"] = detail->keep_rate_begin;
 		data["keep_rate_end"] = detail->keep_rate_end;
 		data["debt_begin"] = detail->debt_begin;
@@ -2167,17 +2167,17 @@ void TdApi::OnQueryHKHisOrderRsp(HKHisOrderDetail* detail, ErrorInfo* error_info
 	gil_scoped_acquire acquire;
 	dict data;
 	{
-		data["account_id"] = detail->account_id;
-		data["cust_orgid"] = detail->cust_orgid;
-		data["cust_branchid"] = detail->cust_branchid;
+		data["account_id"] = toUtf(detail->account_id);
+		data["cust_orgid"] = toUtf(detail->cust_orgid);
+		data["cust_branchid"] = toUtf(detail->cust_branchid);
 		data["account_type"] = detail->account_type;
 		data["sys_date"] = detail->sys_date;
-		data["trd_flow_id"] = detail->trd_flow_id;
-		data["order_id"] = detail->order_id;
+		data["trd_flow_id"] = toUtf(detail->trd_flow_id);
+		data["order_id"] = toUtf(detail->order_id);
 		data["order_status"] = detail->order_status;
 		data["currency_type"] = detail->currency_type;
-		data["symbol"] = detail->symbol;
-		data["secuid"] = detail->secuid;
+		data["symbol"] = toUtf(detail->symbol);
+		data["secuid"] = toUtf(detail->secuid);
 		data["order_qty"] = detail->order_qty;
 		data["order_price"] = detail->order_price;
 		data["order_frz_amt"] = detail->order_frz_amt;
@@ -2192,23 +2192,23 @@ void TdApi::OnQueryHKHisOrderRsp(HKHisOrderDetail* detail, ErrorInfo* error_info
 		data["settle_mode"] = detail->settle_mode;
 		data["price_type"] = detail->price_type;
 		data["match_type"] = detail->match_type;
-		data["stk_name"] = detail->stk_name;
+		data["stk_name"] = toUtf(detail->stk_name);
 		data["oper_date"] = detail->oper_date;
 		data["oper_time"] = detail->oper_time;
 		data["match_price"] = detail->match_price;
 		data["match_qty"] = detail->match_qty;
 		data["cancel_qty"] = detail->cancel_qty;
 		data["order_side"] = detail->order_side;
-		data["contract_sno"] = detail->contract_sno;
+		data["contract_sno"] = toUtf(detail->contract_sno);
 		data["refer_rate"] = detail->refer_rate;
-		data["pos_str"] = detail->pos_str;
+		data["pos_str"] = toUtf(detail->pos_str);
 		data["total_num"] = detail->total_num;
-		data["main_seat"] = detail->main_seat;
+		data["main_seat"] = toUtf(detail->main_seat);
 		data["match_amt"] = detail->match_amt;
-		data["remark"] = detail->remark;
+		data["remark"] = toUtf(detail->remark);
 		data["report_time"] = detail->report_time;
-		data["cust_id"] = detail->cust_id;
-		data["cust_name"] = detail->cust_name;
+		data["cust_id"] = toUtf(detail->cust_id);
+		data["cust_name"] = toUtf(detail->cust_name);
 	}
 	dict error;
 	{
@@ -2223,9 +2223,9 @@ void TdApi::OnQueryWithdrawCashRsp(WithdrawCashRecord* detail, ErrorInfo* error_
 	gil_scoped_acquire acquire;
 	dict data;
 	{
-		data["account_id"] = detail->account_id;
-		data["cust_orgid"] = detail->cust_orgid;
-		data["cust_branchid"] = detail->cust_branchid;
+		data["account_id"] = toUtf(detail->account_id);
+		data["cust_orgid"] = toUtf(detail->cust_orgid);
+		data["cust_branchid"] = toUtf(detail->cust_branchid);
 		data["account_type"] = detail->account_type;
 		data["currency_type"] = detail->currency_type;
 		data["total_asset"] = detail->total_asset;
@@ -2246,31 +2246,31 @@ void TdApi::OnQueryNetVoteOrderRsp(NetVoteOrderDetail* detail, ErrorInfo* error_
 	gil_scoped_acquire acquire;
 	dict data;
 	{
-		data["account_id"] = detail->account_id;
+		data["account_id"] = toUtf(detail->account_id);
 		data["account_type"] = detail->account_type;
-		data["cust_orgid"] = detail->cust_orgid;
-		data["cust_branchid"] = detail->cust_branchid;
+		data["cust_orgid"] = toUtf(detail->cust_orgid);
+		data["cust_branchid"] = toUtf(detail->cust_branchid);
 		data["order_id"] = detail->order_id;
 		data["order_group"] = detail->order_group;
-		data["contract_id"] = detail->contract_id;
+		data["contract_id"] = toUtf(detail->contract_id);
 		data["order_date"] = detail->order_date;
-		data["cust_id"] = detail->cust_id;
-		data["cust_name"] = detail->cust_name;
+		data["cust_id"] = toUtf(detail->cust_id);
+		data["cust_name"] = toUtf(detail->cust_name);
 		data["currency_type"] = detail->currency_type;
-		data["symbol"] = detail->symbol;
-		data["name"] = detail->name;
-		data["seat"] = detail->seat;
+		data["symbol"] = toUtf(detail->symbol);
+		data["name"] = toUtf(detail->name);
+		data["seat"] = toUtf(detail->seat);
 		data["stktype"] = detail->stktype;
 		data["side"] = detail->side;
-		data["meeting_seq"] = detail->meeting_seq;
-		data["voting_proposal_code"] = detail->voting_proposal_code;
+		data["meeting_seq"] = toUtf(detail->meeting_seq);
+		data["voting_proposal_code"] = toUtf(detail->voting_proposal_code);
 		data["voting_preference"] = detail->voting_preference;
-		data["voting_segment"] = detail->voting_segment;
+		data["voting_segment"] = toUtf(detail->voting_segment);
 		data["total_qty"] = detail->total_qty;
 		data["counter_order_time"] = detail->counter_order_time;
 		data["order_status"] = detail->order_status;
-		data["secuid"] = detail->secuid;
-		data["remark"] = detail->remark;
+		data["secuid"] = toUtf(detail->secuid);
+		data["remark"] = toUtf(detail->remark);
 	}
 	dict error;
 	{
@@ -2285,29 +2285,29 @@ void TdApi::OnQueryTradeTotalRsp(TradeDetail* trade_detail, ErrorInfo* error_inf
 	gil_scoped_acquire acquire;
 	dict data;
 	{
-		data["account_id"] = trade_detail->account_id;
+		data["account_id"] = toUtf(trade_detail->account_id);
 		data["account_type"] = trade_detail->account_type;
-		data["cust_orgid"] = trade_detail->cust_orgid;
-		data["cust_branchid"] = trade_detail->cust_branchid;
-		data["order_id"] = trade_detail->order_id;
-		data["cl_order_id"] = trade_detail->cl_order_id;
-		data["symbol"] = trade_detail->symbol;
+		data["cust_orgid"] = toUtf(trade_detail->cust_orgid);
+		data["cust_branchid"] = toUtf(trade_detail->cust_branchid);
+		data["order_id"] = toUtf(trade_detail->order_id);
+		data["cl_order_id"] = toUtf(trade_detail->cl_order_id);
+		data["symbol"] = toUtf(trade_detail->symbol);
 		data["order_type"] = trade_detail->order_type;
 		data["side"] = trade_detail->side;
 		data["report_type"] = trade_detail->report_type;
-		data["report_no"] = trade_detail->report_no;
+		data["report_no"] = toUtf(trade_detail->report_no);
 		data["volume"] = trade_detail->volume;
 		data["price"] = trade_detail->price;
 		data["turnover"] = trade_detail->turnover;
 		data["trade_date"] = trade_detail->trade_date;
 		data["trade_time"] = trade_detail->trade_time;
 		data["err_code"] = trade_detail->err_code;
-		data["err_msg"] = trade_detail->err_msg;
-		data["secuid"] = trade_detail->secuid;
-		data["name"] = trade_detail->name;
-		data["contract_id"] = trade_detail->contract_id;
-		data["ex_report_no"] = trade_detail->ex_report_no;
-		data["ex_order_id"] = trade_detail->ex_order_id;
+		data["err_msg"] = toUtf(trade_detail->err_msg);
+		data["secuid"] = toUtf(trade_detail->secuid);
+		data["name"] = toUtf(trade_detail->name);
+		data["contract_id"] = toUtf(trade_detail->contract_id);
+		data["ex_report_no"] = toUtf(trade_detail->ex_report_no);
+		data["ex_order_id"] = toUtf(trade_detail->ex_order_id);
 		data["margin_amt_type"] = trade_detail->margin_amt_type;
 		data["order_price"] = trade_detail->order_price;
 		data["order_qty"] = trade_detail->order_qty;
@@ -2325,14 +2325,14 @@ void TdApi::OnETFSubscriptCancelRsp(ETFSubscriptCancelRsp* order_rsp, ErrorInfo*
 	gil_scoped_acquire acquire;
 	dict data;
 	{
-		data["account_id"] = order_rsp->account_id;
+		data["account_id"] = toUtf(order_rsp->account_id);
 		data["account_type"] = order_rsp->account_type;
-		data["cust_orgid"] = order_rsp->cust_orgid;
-		data["cust_branchid"] = order_rsp->cust_branchid;
+		data["cust_orgid"] = toUtf(order_rsp->cust_orgid);
+		data["cust_branchid"] = toUtf(order_rsp->cust_branchid);
 		data["order_date"] = order_rsp->order_date;
-		data["order_id"] = order_rsp->order_id;
-		data["cl_order_id"] = order_rsp->cl_order_id;
-		data["cl_cancel_id"] = order_rsp->cl_cancel_id;
+		data["order_id"] = toUtf(order_rsp->order_id);
+		data["cl_order_id"] = toUtf(order_rsp->cl_order_id);
+		data["cl_cancel_id"] = toUtf(order_rsp->cl_cancel_id);
 	}
 	dict error;
 	{
@@ -2347,19 +2347,19 @@ void TdApi::OnNetVoteOrderRsp(NetVoteOrderRsp* order_rsp, ErrorInfo* error_info,
 	gil_scoped_acquire acquire;
 	dict data;
 	{
-		data["account_id"] = order_rsp->account_id;
+		data["account_id"] = toUtf(order_rsp->account_id);
 		data["account_type"] = order_rsp->account_type;
-		data["cust_orgid"] = order_rsp->cust_orgid;
-		data["cust_branchid"] = order_rsp->cust_branchid;
-		data["contract_id"] = order_rsp->contract_id;
+		data["cust_orgid"] = toUtf(order_rsp->cust_orgid);
+		data["cust_branchid"] = toUtf(order_rsp->cust_branchid);
+		data["contract_id"] = toUtf(order_rsp->contract_id);
 		data["order_sno"] = order_rsp->order_sno;
 		data["order_status"] = order_rsp->order_status;
 		data["report_time"] = order_rsp->report_time;
-		data["cust_id"] = order_rsp->cust_id;
-		data["secuid"] = order_rsp->secuid;
-		data["symbol"] = order_rsp->symbol;
-		data["reject_code"] = order_rsp->reject_code;
-		data["reject_msg"] = order_rsp->reject_msg;
+		data["cust_id"] = toUtf(order_rsp->cust_id);
+		data["secuid"] = toUtf(order_rsp->secuid);
+		data["symbol"] = toUtf(order_rsp->symbol);
+		data["reject_code"] = toUtf(order_rsp->reject_code);
+		data["reject_msg"] = toUtf(order_rsp->reject_msg);
 		data["order_group"] = order_rsp->order_group;
 	}
 	dict error;
@@ -2375,16 +2375,16 @@ void TdApi::OnCreditNetVoteOrderRsp(CreditNetVoteOrderRsp* order_rsp, ErrorInfo*
 	gil_scoped_acquire acquire;
 	dict data;
 	{
-		data["account_id"] = order_rsp->account_id;
+		data["account_id"] = toUtf(order_rsp->account_id);
 		data["account_type"] = order_rsp->account_type;
-		data["cust_orgid"] = order_rsp->cust_orgid;
-		data["cust_branchid"] = order_rsp->cust_branchid;
-		data["reject_code"] = order_rsp->reject_code;
-		data["reject_msg"] = order_rsp->reject_msg;
-		data["level"] = order_rsp->level;
-		data["cust_id"] = order_rsp->cust_id;
-		data["secuid"] = order_rsp->secuid;
-		data["symbol"] = order_rsp->symbol;
+		data["cust_orgid"] = toUtf(order_rsp->cust_orgid);
+		data["cust_branchid"] = toUtf(order_rsp->cust_branchid);
+		data["reject_code"] = toUtf(order_rsp->reject_code);
+		data["reject_msg"] = toUtf(order_rsp->reject_msg);
+		data["level"] = toUtf(order_rsp->level);
+		data["cust_id"] = toUtf(order_rsp->cust_id);
+		data["secuid"] = toUtf(order_rsp->secuid);
+		data["symbol"] = toUtf(order_rsp->symbol);
 	}
 	dict error;
 	{
@@ -2399,23 +2399,23 @@ void TdApi::OnQueryMSCashRsp(MSCashDetail* detail, ErrorInfo* error_info, int re
 	gil_scoped_acquire acquire;
 	dict data;
 	{
-		data["account_id"] = detail->account_id;
-		data["cust_orgid"] = detail->cust_orgid;
-		data["cust_branchid"] = detail->cust_branchid;
+		data["account_id"] = toUtf(detail->account_id);
+		data["cust_orgid"] = toUtf(detail->cust_orgid);
+		data["cust_branchid"] = toUtf(detail->cust_branchid);
 		data["account_type"] = detail->account_type;
-		data["pos_str"] = detail->pos_str;
+		data["pos_str"] = toUtf(detail->pos_str);
 		data["busidate"] = detail->busidate;
-		data["custid"] = detail->custid;
-		data["fundunit"] = detail->fundunit;
+		data["custid"] = toUtf(detail->custid);
+		data["fundunit"] = toUtf(detail->fundunit);
 		data["currency_type"] = detail->currency_type;
-		data["subjectcode"] = detail->subjectcode;
-		data["settbody"] = detail->settbody;
-		data["orgid"] = detail->orgid;
-		data["brhid"] = detail->brhid;
-		data["trdsysid"] = detail->trdsysid;
-		data["coreid"] = detail->coreid;
-		data["fundid"] = detail->fundid;
-		data["subjectname"] = detail->subjectname;
+		data["subjectcode"] = toUtf(detail->subjectcode);
+		data["settbody"] = toUtf(detail->settbody);
+		data["orgid"] = toUtf(detail->orgid);
+		data["brhid"] = toUtf(detail->brhid);
+		data["trdsysid"] = toUtf(detail->trdsysid);
+		data["coreid"] = toUtf(detail->coreid);
+		data["fundid"] = toUtf(detail->fundid);
+		data["subjectname"] = toUtf(detail->subjectname);
 		data["startbal"] = detail->startbal;
 		data["endbal"] = detail->endbal;
 		data["fundrealcommit"] = detail->fundrealcommit;
@@ -2436,29 +2436,29 @@ void TdApi::OnQueryMSPositionsRsp(MSPositionsDetail* detail, ErrorInfo* error_in
 	gil_scoped_acquire acquire;
 	dict data;
 	{
-		data["account_id"] = detail->account_id;
-		data["cust_orgid"] = detail->cust_orgid;
-		data["cust_branchid"] = detail->cust_branchid;
+		data["account_id"] = toUtf(detail->account_id);
+		data["cust_orgid"] = toUtf(detail->cust_orgid);
+		data["cust_branchid"] = toUtf(detail->cust_branchid);
 		data["account_type"] = detail->account_type;
-		data["pos_str"] = detail->pos_str;
+		data["pos_str"] = toUtf(detail->pos_str);
 		data["busidate"] = detail->busidate;
-		data["custid"] = detail->custid;
-		data["fundunit"] = detail->fundunit;
-		data["stkholdunit"] = detail->stkholdunit;
-		data["secuid"] = detail->secuid;
-		data["mainseat"] = detail->mainseat;
-		data["symbol"] = detail->symbol;
+		data["custid"] = toUtf(detail->custid);
+		data["fundunit"] = toUtf(detail->fundunit);
+		data["stkholdunit"] = toUtf(detail->stkholdunit);
+		data["secuid"] = toUtf(detail->secuid);
+		data["mainseat"] = toUtf(detail->mainseat);
+		data["symbol"] = toUtf(detail->symbol);
 		data["direction"] = detail->direction;
 		data["investtype"] = detail->investtype;
-		data["stkid"] = detail->stkid;
+		data["stkid"] = toUtf(detail->stkid);
 		data["stkproperty"] = detail->stkproperty;
-		data["subjectcode"] = detail->subjectcode;
-		data["settbody"] = detail->settbody;
-		data["trdsysid"] = detail->trdsysid;
-		data["coreid"] = detail->coreid;
+		data["subjectcode"] = toUtf(detail->subjectcode);
+		data["settbody"] = toUtf(detail->settbody);
+		data["trdsysid"] = toUtf(detail->trdsysid);
+		data["coreid"] = toUtf(detail->coreid);
 		data["currency_type"] = detail->currency_type;
-		data["schemeid"] = detail->schemeid;
-		data["subjectname"] = detail->subjectname;
+		data["schemeid"] = toUtf(detail->schemeid);
+		data["subjectname"] = toUtf(detail->subjectname);
 		data["startbal"] = detail->startbal;
 		data["endbal"] = detail->endbal;
 		data["startcost"] = detail->startcost;
@@ -2475,14 +2475,14 @@ void TdApi::OnQueryMSPositionsRsp(MSPositionsDetail* detail, ErrorInfo* error_in
 		data["endintrcost"] = detail->endintrcost;
 		data["startintrprofit"] = detail->startintrprofit;
 		data["endintrprofit"] = detail->endintrprofit;
-		data["tacode"] = detail->tacode;
-		data["transacct"] = detail->transacct;
-		data["taacct"] = detail->taacct;
-		data["linkstkid"] = detail->linkstkid;
+		data["tacode"] = toUtf(detail->tacode);
+		data["transacct"] = toUtf(detail->transacct);
+		data["taacct"] = toUtf(detail->taacct);
+		data["linkstkid"] = toUtf(detail->linkstkid);
 		data["extint"] = detail->extint;
 		data["extamt"] = detail->extamt;
-		data["extchar"] = detail->extchar;
-		data["extstr"] = detail->extstr;
+		data["extchar"] = toUtf(detail->extchar);
+		data["extstr"] = toUtf(detail->extstr);
 		data["totalnum"] = detail->totalnum;
 	}
 	dict error;
@@ -2498,16 +2498,16 @@ void TdApi::OnQueryMSCreditDebtsFlowRsp(MSCreditDebtsFlowDetail* detail, ErrorIn
 	gil_scoped_acquire acquire;
 	dict data;
 	{
-		data["account_id"] = detail->account_id;
-		data["cust_orgid"] = detail->cust_orgid;
-		data["cust_branchid"] = detail->cust_branchid;
+		data["account_id"] = toUtf(detail->account_id);
+		data["cust_orgid"] = toUtf(detail->cust_orgid);
+		data["cust_branchid"] = toUtf(detail->cust_branchid);
 		data["account_type"] = detail->account_type;
-		data["pos_str"] = detail->pos_str;
+		data["pos_str"] = toUtf(detail->pos_str);
 		data["busidate"] = detail->busidate;
 		data["operdate"] = detail->operdate;
 		data["sysdate"] = detail->sysdate;
-		data["logno"] = detail->logno;
-		data["custid"] = detail->custid;
+		data["logno"] = toUtf(detail->logno);
+		data["custid"] = toUtf(detail->custid);
 		data["creditdebtstype"] = detail->creditdebtstype;
 		data["lifekind"] = detail->lifekind;
 		data["direct"] = detail->direct;
@@ -2517,11 +2517,11 @@ void TdApi::OnQueryMSCreditDebtsFlowRsp(MSCreditDebtsFlowDetail* detail, ErrorIn
 		data["stkeffect"] = detail->stkeffect;
 		data["stkbal"] = detail->stkbal;
 		data["reladate"] = detail->reladate;
-		data["relasno"] = detail->relasno;
-		data["symbol"] = detail->symbol;
-		data["remark"] = detail->remark;
+		data["relasno"] = toUtf(detail->relasno);
+		data["symbol"] = toUtf(detail->symbol);
+		data["remark"] = toUtf(detail->remark);
 		data["bizdate"] = detail->bizdate;
-		data["logassetsno"] = detail->logassetsno;
+		data["logassetsno"] = toUtf(detail->logassetsno);
 		data["totalnum"] = detail->totalnum;
 	}
 	dict error;

@@ -2,7 +2,7 @@ void onDisconnect() override
 {
 	try
 	{
-		PYBIND11_OVERLOAD(void, TdApi, onDisconnect);
+		PYBIND11_OVERLOAD(void, OptionApi, onDisconnect);
 	}
 	catch (const error_already_set &e)
 	{
@@ -14,7 +14,7 @@ void onError(const dict &error, int request_id) override
 {
 	try
 	{
-		PYBIND11_OVERLOAD(void, TdApi, onError, error, request_id);
+		PYBIND11_OVERLOAD(void, OptionApi, onError, error, request_id);
 	}
 	catch (const error_already_set &e)
 	{
@@ -26,7 +26,7 @@ void onRiskNotify(const dict &data) override
 {
 	try
 	{
-		PYBIND11_OVERLOAD(void, TdApi, onRiskNotify, data);
+		PYBIND11_OVERLOAD(void, OptionApi, onRiskNotify, data);
 	}
 	catch (const error_already_set &e)
 	{
@@ -38,7 +38,7 @@ void onFailBackNotify(const dict &data) override
 {
 	try
 	{
-		PYBIND11_OVERLOAD(void, TdApi, onFailBackNotify, data);
+		PYBIND11_OVERLOAD(void, OptionApi, onFailBackNotify, data);
 	}
 	catch (const error_already_set &e)
 	{
@@ -50,7 +50,7 @@ void onLogin(const dict &data, const dict &error) override
 {
 	try
 	{
-		PYBIND11_OVERLOAD(void, TdApi, onLogin, data, error);
+		PYBIND11_OVERLOAD(void, OptionApi, onLogin, data, error);
 	}
 	catch (const error_already_set &e)
 	{
@@ -62,7 +62,7 @@ void onTradeReport(const dict &data) override
 {
 	try
 	{
-		PYBIND11_OVERLOAD(void, TdApi, onTradeReport, data);
+		PYBIND11_OVERLOAD(void, OptionApi, onTradeReport, data);
 	}
 	catch (const error_already_set &e)
 	{
@@ -74,7 +74,7 @@ void onOrderStatus(const dict &data) override
 {
 	try
 	{
-		PYBIND11_OVERLOAD(void, TdApi, onOrderStatus, data);
+		PYBIND11_OVERLOAD(void, OptionApi, onOrderStatus, data);
 	}
 	catch (const error_already_set &e)
 	{
@@ -86,7 +86,7 @@ void onOrderRsp(const dict &data, const dict &error, int request_id, bool last) 
 {
 	try
 	{
-		PYBIND11_OVERLOAD(void, TdApi, onOrderRsp, data, error, request_id, last);
+		PYBIND11_OVERLOAD(void, OptionApi, onOrderRsp, data, error, request_id, last);
 	}
 	catch (const error_already_set &e)
 	{
@@ -98,7 +98,7 @@ void onCancelRsp(const dict &data, const dict &error, int request_id, bool last)
 {
 	try
 	{
-		PYBIND11_OVERLOAD(void, TdApi, onCancelRsp, data, error, request_id, last);
+		PYBIND11_OVERLOAD(void, OptionApi, onCancelRsp, data, error, request_id, last);
 	}
 	catch (const error_already_set &e)
 	{
@@ -110,7 +110,7 @@ void onQueryOrderRsp(const dict &data, const dict &error, int request_id, bool l
 {
 	try
 	{
-		PYBIND11_OVERLOAD(void, TdApi, onQueryOrderRsp, data, error, request_id, last, pos_str);
+		PYBIND11_OVERLOAD(void, OptionApi, onQueryOrderRsp, data, error, request_id, last, pos_str);
 	}
 	catch (const error_already_set &e)
 	{
@@ -122,7 +122,7 @@ void onQueryTradeRsp(const dict &data, const dict &error, int request_id, bool l
 {
 	try
 	{
-		PYBIND11_OVERLOAD(void, TdApi, onQueryTradeRsp, data, error, request_id, last, pos_str);
+		PYBIND11_OVERLOAD(void, OptionApi, onQueryTradeRsp, data, error, request_id, last, pos_str);
 	}
 	catch (const error_already_set &e)
 	{
@@ -134,7 +134,7 @@ void onQueryPositionRsp(const dict &data, const dict &error, int request_id, boo
 {
 	try
 	{
-		PYBIND11_OVERLOAD(void, TdApi, onQueryPositionRsp, data, error, request_id, last);
+		PYBIND11_OVERLOAD(void, OptionApi, onQueryPositionRsp, data, error, request_id, last);
 	}
 	catch (const error_already_set &e)
 	{
@@ -146,7 +146,7 @@ void onQueryCashRsp(const dict &data, const dict &error, int request_id) overrid
 {
 	try
 	{
-		PYBIND11_OVERLOAD(void, TdApi, onQueryCashRsp, data, error, request_id);
+		PYBIND11_OVERLOAD(void, OptionApi, onQueryCashRsp, data, error, request_id);
 	}
 	catch (const error_already_set &e)
 	{
@@ -158,7 +158,7 @@ void onQueryJZJYAvailFundRsp(int64_t avail_balance, const dict &error, int reque
 {
 	try
 	{
-		PYBIND11_OVERLOAD(void, TdApi, onQueryJZJYAvailFundRsp, avail_balance, error, request_id);
+		PYBIND11_OVERLOAD(void, OptionApi, onQueryJZJYAvailFundRsp, avail_balance, error, request_id);
 	}
 	catch (const error_already_set &e)
 	{
@@ -170,7 +170,7 @@ void onTransferFundInAndOutRsp(int64_t transfer_value, const dict &error, int re
 {
 	try
 	{
-		PYBIND11_OVERLOAD(void, TdApi, onTransferFundInAndOutRsp, transfer_value, error, request_id);
+		PYBIND11_OVERLOAD(void, OptionApi, onTransferFundInAndOutRsp, transfer_value, error, request_id);
 	}
 	catch (const error_already_set &e)
 	{
@@ -182,7 +182,7 @@ void onExerciseRsp(const dict &data, const dict &error, int request_id) override
 {
 	try
 	{
-		PYBIND11_OVERLOAD(void, TdApi, onExerciseRsp, data, error, request_id);
+		PYBIND11_OVERLOAD(void, OptionApi, onExerciseRsp, data, error, request_id);
 	}
 	catch (const error_already_set &e)
 	{
@@ -194,7 +194,7 @@ void onCancelExerciseRsp(const dict &data, const dict &error, int request_id) ov
 {
 	try
 	{
-		PYBIND11_OVERLOAD(void, TdApi, onCancelExerciseRsp, data, error, request_id);
+		PYBIND11_OVERLOAD(void, OptionApi, onCancelExerciseRsp, data, error, request_id);
 	}
 	catch (const error_already_set &e)
 	{
@@ -206,7 +206,7 @@ void onExerciseStatus(const dict &data) override
 {
 	try
 	{
-		PYBIND11_OVERLOAD(void, TdApi, onExerciseStatus, data);
+		PYBIND11_OVERLOAD(void, OptionApi, onExerciseStatus, data);
 	}
 	catch (const error_already_set &e)
 	{
@@ -218,7 +218,7 @@ void onQueryExerciseRsp(const dict &data, const dict &error, int request_id, boo
 {
 	try
 	{
-		PYBIND11_OVERLOAD(void, TdApi, onQueryExerciseRsp, data, error, request_id, last, pos_str);
+		PYBIND11_OVERLOAD(void, OptionApi, onQueryExerciseRsp, data, error, request_id, last, pos_str);
 	}
 	catch (const error_already_set &e)
 	{
@@ -230,7 +230,7 @@ void onQueryContractInfoRsp(const dict &data, const dict &error, int request_id,
 {
 	try
 	{
-		PYBIND11_OVERLOAD(void, TdApi, onQueryContractInfoRsp, data, error, request_id, last);
+		PYBIND11_OVERLOAD(void, OptionApi, onQueryContractInfoRsp, data, error, request_id, last);
 	}
 	catch (const error_already_set &e)
 	{
@@ -242,7 +242,7 @@ void onQueryStockPositionRsp(const dict &data, const dict &error, int request_id
 {
 	try
 	{
-		PYBIND11_OVERLOAD(void, TdApi, onQueryStockPositionRsp, data, error, request_id, last);
+		PYBIND11_OVERLOAD(void, OptionApi, onQueryStockPositionRsp, data, error, request_id, last);
 	}
 	catch (const error_already_set &e)
 	{
@@ -254,7 +254,7 @@ void onTransferStockStatus(const dict &data) override
 {
 	try
 	{
-		PYBIND11_OVERLOAD(void, TdApi, onTransferStockStatus, data);
+		PYBIND11_OVERLOAD(void, OptionApi, onTransferStockStatus, data);
 	}
 	catch (const error_already_set &e)
 	{
@@ -266,7 +266,7 @@ void onTransferStockRsp(const dict &data, const dict &error, int request_id) ove
 {
 	try
 	{
-		PYBIND11_OVERLOAD(void, TdApi, onTransferStockRsp, data, error, request_id);
+		PYBIND11_OVERLOAD(void, OptionApi, onTransferStockRsp, data, error, request_id);
 	}
 	catch (const error_already_set &e)
 	{
@@ -278,7 +278,7 @@ void onQueryTransferStockRsp(const dict &data, const dict &error, int request_id
 {
 	try
 	{
-		PYBIND11_OVERLOAD(void, TdApi, onQueryTransferStockRsp, data, error, request_id);
+		PYBIND11_OVERLOAD(void, OptionApi, onQueryTransferStockRsp, data, error, request_id);
 	}
 	catch (const error_already_set &e)
 	{
@@ -290,7 +290,7 @@ void onLockOrderStatus(const dict &data) override
 {
 	try
 	{
-		PYBIND11_OVERLOAD(void, TdApi, onLockOrderStatus, data);
+		PYBIND11_OVERLOAD(void, OptionApi, onLockOrderStatus, data);
 	}
 	catch (const error_already_set &e)
 	{
@@ -302,7 +302,7 @@ void onLockOrderRsp(const dict &data, const dict &error, int request_id, bool la
 {
 	try
 	{
-		PYBIND11_OVERLOAD(void, TdApi, onLockOrderRsp, data, error, request_id, last);
+		PYBIND11_OVERLOAD(void, OptionApi, onLockOrderRsp, data, error, request_id, last);
 	}
 	catch (const error_already_set &e)
 	{
@@ -314,7 +314,7 @@ void onQueryLockOrderRsp(const dict &data, const dict &error, int request_id, bo
 {
 	try
 	{
-		PYBIND11_OVERLOAD(void, TdApi, onQueryLockOrderRsp, data, error, request_id, last, pos_str);
+		PYBIND11_OVERLOAD(void, OptionApi, onQueryLockOrderRsp, data, error, request_id, last, pos_str);
 	}
 	catch (const error_already_set &e)
 	{
@@ -326,7 +326,7 @@ void onQueryLockPositionRsp(const dict &data, const dict &error, int request_id,
 {
 	try
 	{
-		PYBIND11_OVERLOAD(void, TdApi, onQueryLockPositionRsp, data, error, request_id, last);
+		PYBIND11_OVERLOAD(void, OptionApi, onQueryLockPositionRsp, data, error, request_id, last);
 	}
 	catch (const error_already_set &e)
 	{
@@ -338,7 +338,7 @@ void onCombOrderStatus(const dict &data) override
 {
 	try
 	{
-		PYBIND11_OVERLOAD(void, TdApi, onCombOrderStatus, data);
+		PYBIND11_OVERLOAD(void, OptionApi, onCombOrderStatus, data);
 	}
 	catch (const error_already_set &e)
 	{
@@ -350,7 +350,7 @@ void onCombOrderRsp(const dict &data, const dict &error, int request_id, bool la
 {
 	try
 	{
-		PYBIND11_OVERLOAD(void, TdApi, onCombOrderRsp, data, error, request_id, last);
+		PYBIND11_OVERLOAD(void, OptionApi, onCombOrderRsp, data, error, request_id, last);
 	}
 	catch (const error_already_set &e)
 	{
@@ -362,7 +362,7 @@ void onCombExerciseStatus(const dict &data) override
 {
 	try
 	{
-		PYBIND11_OVERLOAD(void, TdApi, onCombExerciseStatus, data);
+		PYBIND11_OVERLOAD(void, OptionApi, onCombExerciseStatus, data);
 	}
 	catch (const error_already_set &e)
 	{
@@ -374,7 +374,7 @@ void onCombExerciseRsp(const dict &data, const dict &error, int request_id) over
 {
 	try
 	{
-		PYBIND11_OVERLOAD(void, TdApi, onCombExerciseRsp, data, error, request_id);
+		PYBIND11_OVERLOAD(void, OptionApi, onCombExerciseRsp, data, error, request_id);
 	}
 	catch (const error_already_set &e)
 	{
@@ -386,7 +386,7 @@ void onCancelCombExerciseRsp(const dict &data, const dict &error, int request_id
 {
 	try
 	{
-		PYBIND11_OVERLOAD(void, TdApi, onCancelCombExerciseRsp, data, error, request_id);
+		PYBIND11_OVERLOAD(void, OptionApi, onCancelCombExerciseRsp, data, error, request_id);
 	}
 	catch (const error_already_set &e)
 	{
@@ -398,7 +398,7 @@ void onQueryCombOrderRsp(const dict &data, const dict &error, int request_id, bo
 {
 	try
 	{
-		PYBIND11_OVERLOAD(void, TdApi, onQueryCombOrderRsp, data, error, request_id, last, pos_str);
+		PYBIND11_OVERLOAD(void, OptionApi, onQueryCombOrderRsp, data, error, request_id, last, pos_str);
 	}
 	catch (const error_already_set &e)
 	{
@@ -410,7 +410,7 @@ void onQueryCombExerciseRsp(const dict &data, const dict &error, int request_id,
 {
 	try
 	{
-		PYBIND11_OVERLOAD(void, TdApi, onQueryCombExerciseRsp, data, error, request_id, last, pos_str);
+		PYBIND11_OVERLOAD(void, OptionApi, onQueryCombExerciseRsp, data, error, request_id, last, pos_str);
 	}
 	catch (const error_already_set &e)
 	{
@@ -422,7 +422,7 @@ void onQueryCombPositionRsp(const dict &data, const dict &error, int request_id,
 {
 	try
 	{
-		PYBIND11_OVERLOAD(void, TdApi, onQueryCombPositionRsp, data, error, request_id, last);
+		PYBIND11_OVERLOAD(void, OptionApi, onQueryCombPositionRsp, data, error, request_id, last);
 	}
 	catch (const error_already_set &e)
 	{
@@ -434,7 +434,7 @@ void onQueryCombContractInfoRsp(const dict &data, const dict &error, int request
 {
 	try
 	{
-		PYBIND11_OVERLOAD(void, TdApi, onQueryCombContractInfoRsp, data, error, request_id, last);
+		PYBIND11_OVERLOAD(void, OptionApi, onQueryCombContractInfoRsp, data, error, request_id, last);
 	}
 	catch (const error_already_set &e)
 	{
@@ -446,7 +446,7 @@ void onQueryTransferFundHistoryRsp(const dict &data, const dict &error, int requ
 {
 	try
 	{
-		PYBIND11_OVERLOAD(void, TdApi, onQueryTransferFundHistoryRsp, data, error, request_id, last);
+		PYBIND11_OVERLOAD(void, OptionApi, onQueryTransferFundHistoryRsp, data, error, request_id, last);
 	}
 	catch (const error_already_set &e)
 	{
@@ -458,7 +458,7 @@ void onQueryCombPositionSubDetailRsp(const dict &data, const dict &error, int re
 {
 	try
 	{
-		PYBIND11_OVERLOAD(void, TdApi, onQueryCombPositionSubDetailRsp, data, error, request_id, last);
+		PYBIND11_OVERLOAD(void, OptionApi, onQueryCombPositionSubDetailRsp, data, error, request_id, last);
 	}
 	catch (const error_already_set &e)
 	{
@@ -470,7 +470,7 @@ void onMicroServiceRsp(const dict &data, int request_id) override
 {
 	try
 	{
-		PYBIND11_OVERLOAD(void, TdApi, onMicroServiceRsp, data, request_id);
+		PYBIND11_OVERLOAD(void, OptionApi, onMicroServiceRsp, data, request_id);
 	}
 	catch (const error_already_set &e)
 	{
@@ -482,7 +482,7 @@ void onQueryPositionLimitsRsp(const dict &data, const dict &error, int request_i
 {
 	try
 	{
-		PYBIND11_OVERLOAD(void, TdApi, onQueryPositionLimitsRsp, data, error, request_id, last);
+		PYBIND11_OVERLOAD(void, OptionApi, onQueryPositionLimitsRsp, data, error, request_id, last);
 	}
 	catch (const error_already_set &e)
 	{
@@ -494,7 +494,7 @@ void onQueryAmountLimitsRsp(const dict &data, const dict &error, int request_id)
 {
 	try
 	{
-		PYBIND11_OVERLOAD(void, TdApi, onQueryAmountLimitsRsp, data, error, request_id);
+		PYBIND11_OVERLOAD(void, OptionApi, onQueryAmountLimitsRsp, data, error, request_id);
 	}
 	catch (const error_already_set &e)
 	{
@@ -506,7 +506,7 @@ void onQuerySplitCombMarginDifferenceRsp(const dict &data, const dict &error, in
 {
 	try
 	{
-		PYBIND11_OVERLOAD(void, TdApi, onQuerySplitCombMarginDifferenceRsp, data, error, request_id);
+		PYBIND11_OVERLOAD(void, OptionApi, onQuerySplitCombMarginDifferenceRsp, data, error, request_id);
 	}
 	catch (const error_already_set &e)
 	{
@@ -518,7 +518,7 @@ void onQueryExerciseAppointmentRsp(const dict &data, const dict &error, int requ
 {
 	try
 	{
-		PYBIND11_OVERLOAD(void, TdApi, onQueryExerciseAppointmentRsp, data, error, request_id, last);
+		PYBIND11_OVERLOAD(void, OptionApi, onQueryExerciseAppointmentRsp, data, error, request_id, last);
 	}
 	catch (const error_already_set &e)
 	{
@@ -530,7 +530,7 @@ void onQueryMarginRiskRsp(const dict &data, const dict &error, int request_id) o
 {
 	try
 	{
-		PYBIND11_OVERLOAD(void, TdApi, onQueryMarginRiskRsp, data, error, request_id);
+		PYBIND11_OVERLOAD(void, OptionApi, onQueryMarginRiskRsp, data, error, request_id);
 	}
 	catch (const error_already_set &e)
 	{
@@ -542,7 +542,7 @@ void onQueryOptionMaxOrderVolumeRsp(const dict &data, const dict &error, int req
 {
 	try
 	{
-		PYBIND11_OVERLOAD(void, TdApi, onQueryOptionMaxOrderVolumeRsp, data, error, request_id);
+		PYBIND11_OVERLOAD(void, OptionApi, onQueryOptionMaxOrderVolumeRsp, data, error, request_id);
 	}
 	catch (const error_already_set &e)
 	{
@@ -554,7 +554,7 @@ void onQueryInquiryStockPositionRsp(const dict &data, const dict &error, int req
 {
 	try
 	{
-		PYBIND11_OVERLOAD(void, TdApi, onQueryInquiryStockPositionRsp, data, error, request_id);
+		PYBIND11_OVERLOAD(void, OptionApi, onQueryInquiryStockPositionRsp, data, error, request_id);
 	}
 	catch (const error_already_set &e)
 	{
@@ -566,7 +566,7 @@ void onQueryOptionOrderHistoryRsp(const dict &data, const dict &error, int reque
 {
 	try
 	{
-		PYBIND11_OVERLOAD(void, TdApi, onQueryOptionOrderHistoryRsp, data, error, request_id, last, pos_str);
+		PYBIND11_OVERLOAD(void, OptionApi, onQueryOptionOrderHistoryRsp, data, error, request_id, last, pos_str);
 	}
 	catch (const error_already_set &e)
 	{
@@ -578,7 +578,7 @@ void onQueryOptionTradeHistoryRsp(const dict &data, const dict &error, int reque
 {
 	try
 	{
-		PYBIND11_OVERLOAD(void, TdApi, onQueryOptionTradeHistoryRsp, data, error, request_id, last, pos_str);
+		PYBIND11_OVERLOAD(void, OptionApi, onQueryOptionTradeHistoryRsp, data, error, request_id, last, pos_str);
 	}
 	catch (const error_already_set &e)
 	{
@@ -590,7 +590,7 @@ void onQueryExerciseAppointmentHistoryRsp(const dict &data, const dict &error, i
 {
 	try
 	{
-		PYBIND11_OVERLOAD(void, TdApi, onQueryExerciseAppointmentHistoryRsp, data, error, request_id, last, pos_str);
+		PYBIND11_OVERLOAD(void, OptionApi, onQueryExerciseAppointmentHistoryRsp, data, error, request_id, last, pos_str);
 	}
 	catch (const error_already_set &e)
 	{
@@ -602,7 +602,7 @@ void onQueryOptionDeliveryHistoryRsp(const dict &data, const dict &error, int re
 {
 	try
 	{
-		PYBIND11_OVERLOAD(void, TdApi, onQueryOptionDeliveryHistoryRsp, data, error, request_id, last, pos_str);
+		PYBIND11_OVERLOAD(void, OptionApi, onQueryOptionDeliveryHistoryRsp, data, error, request_id, last, pos_str);
 	}
 	catch (const error_already_set &e)
 	{
@@ -614,7 +614,7 @@ void onQueryExerciseDeliveryHistoryRsp(const dict &data, const dict &error, int 
 {
 	try
 	{
-		PYBIND11_OVERLOAD(void, TdApi, onQueryExerciseDeliveryHistoryRsp, data, error, request_id, last, pos_str);
+		PYBIND11_OVERLOAD(void, OptionApi, onQueryExerciseDeliveryHistoryRsp, data, error, request_id, last, pos_str);
 	}
 	catch (const error_already_set &e)
 	{
@@ -626,7 +626,7 @@ void onQueryOptionContractAssetHistoryRsp(const dict &data, const dict &error, i
 {
 	try
 	{
-		PYBIND11_OVERLOAD(void, TdApi, onQueryOptionContractAssetHistoryRsp, data, error, request_id, last, pos_str);
+		PYBIND11_OVERLOAD(void, OptionApi, onQueryOptionContractAssetHistoryRsp, data, error, request_id, last, pos_str);
 	}
 	catch (const error_already_set &e)
 	{
@@ -638,7 +638,7 @@ void onQueryOptionDeliveryNettingHistoryRsp(const dict &data, const dict &error,
 {
 	try
 	{
-		PYBIND11_OVERLOAD(void, TdApi, onQueryOptionDeliveryNettingHistoryRsp, data, error, request_id, last);
+		PYBIND11_OVERLOAD(void, OptionApi, onQueryOptionDeliveryNettingHistoryRsp, data, error, request_id, last);
 	}
 	catch (const error_already_set &e)
 	{
@@ -650,7 +650,7 @@ void onQueryOptionCombPositionHistoryRsp(const dict &data, const dict &error, in
 {
 	try
 	{
-		PYBIND11_OVERLOAD(void, TdApi, onQueryOptionCombPositionHistoryRsp, data, error, request_id, last, pos_str);
+		PYBIND11_OVERLOAD(void, OptionApi, onQueryOptionCombPositionHistoryRsp, data, error, request_id, last, pos_str);
 	}
 	catch (const error_already_set &e)
 	{
@@ -662,7 +662,7 @@ void onQueryOptionSettlementHistoryRsp(const dict &data, const dict &error, int 
 {
 	try
 	{
-		PYBIND11_OVERLOAD(void, TdApi, onQueryOptionSettlementHistoryRsp, data, error, request_id, last, pos_str);
+		PYBIND11_OVERLOAD(void, OptionApi, onQueryOptionSettlementHistoryRsp, data, error, request_id, last, pos_str);
 	}
 	catch (const error_already_set &e)
 	{
@@ -674,7 +674,7 @@ void onQueryOptionCombStrategyFileRsp(const dict &data, const dict &error, int r
 {
 	try
 	{
-		PYBIND11_OVERLOAD(void, TdApi, onQueryOptionCombStrategyFileRsp, data, error, request_id, last);
+		PYBIND11_OVERLOAD(void, OptionApi, onQueryOptionCombStrategyFileRsp, data, error, request_id, last);
 	}
 	catch (const error_already_set &e)
 	{

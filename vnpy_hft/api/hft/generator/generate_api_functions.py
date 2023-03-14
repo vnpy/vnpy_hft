@@ -138,6 +138,8 @@ class ApiGenerator:
                 for name_, type_ in d.items():
                     if type_ == "int":
                         args_list.append(f"int {name_}")
+                    elif type_ == "int16_t":
+                        args_list.append(f"int16_t {name_}")
                     elif type_ == "bool":
                         args_list.append(f"bool {name_}")
                     elif type_ == "ErrorInfo":
@@ -340,5 +342,5 @@ if __name__ == "__main__":
     td_generator = ApiGenerator("../include/hft/hft_trader_api_new.h", "hft", "td", "TdApi")
     td_generator.run()
 
-    td_generator = ApiGenerator("../include/hft/hft_option_trader_api_new.h", "hft", "option", "TdApi")
+    td_generator = ApiGenerator("../include/hft/hft_option_trader_api_new.h", "hft", "option", "OptionApi")
     td_generator.run()

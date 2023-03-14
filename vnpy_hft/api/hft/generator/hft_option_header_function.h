@@ -48,7 +48,7 @@ int queryStockPositions(int request_id, string symbol);
 
 int transferStock(const dict &req, int request_id);
 
-int queryTransferStocks(int request_id, string symbol, const dict &req);
+int queryTransferStocks(int request_id, string symbol, int16_t transfer_side);
 
 int lockOrder(const dict &req, int request_id);
 
@@ -74,13 +74,13 @@ int queryCombExercise(string order_id, int request_id);
 
 int queryCombExercises(const dict &req, int request_id);
 
-int queryCombPositions(int request_id, string symbol, const dict &req);
+int queryCombPositions(int request_id, string symbol, int16_t comb_strategy);
 
 int queryCombContractInfo(int request_id, string symbol, int comb_strategy);
 
 int queryTransferFundHistory(int request_id);
 
-int queryCombPositionSubDetails(int request_id, string symbol, const dict &req);
+int queryCombPositionSubDetails(int request_id, string symbol, int16_t comb_strategy);
 
 int doMicroServiceReq(const dict &req, int request_id);
 
