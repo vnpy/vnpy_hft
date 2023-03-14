@@ -7,6 +7,7 @@
 ///-------------------------------------------------------------------------------------
 ///C++的回调函数将数据保存到队列中
 ///-------------------------------------------------------------------------------------
+
 void TdApi::OnDisconnect()
 {
 	gil_scoped_acquire acquire;
@@ -65,6 +66,7 @@ void TdApi::OnLogin(LoginRsp* rsp, ErrorInfo* error_info)
 		data["cust_branchid"] = toUtf(rsp->cust_branchid);
 		data["cust_id"] = toUtf(rsp->cust_id);
 		data["cust_name"] = toUtf(rsp->cust_name);
+		data["secuid_array"] = rsp->secuid_array;
 		data["cif_account"] = toUtf(rsp->cif_account);
 		data["user_code"] = toUtf(rsp->user_code);
 		data["user_token"] = toUtf(rsp->user_token);
@@ -76,6 +78,7 @@ void TdApi::OnLogin(LoginRsp* rsp, ErrorInfo* error_info)
 		data["sys_server_id"] = toUtf(rsp->sys_server_id);
 		data["operway"] = rsp->operway;
 		data["sys_shbond_type"] = rsp->sys_shbond_type;
+		data["ext_secuid_array"] = rsp->ext_secuid_array;
 		data["reg_branchid"] = toUtf(rsp->reg_branchid);
 	}
 	dict error;
@@ -539,6 +542,7 @@ void TdApi::OnQuerySecurityBaseInfoRsp(SecurityBaseInfo* detail, ErrorInfo* erro
 		data["limit_up_rate"] = detail->limit_up_rate;
 		data["is_registration"] = detail->is_registration;
 		data["limit_down_rate"] = detail->limit_down_rate;
+		data["trade_id"] = detail->trade_id;
 	}
 	dict error;
 	{
@@ -754,6 +758,8 @@ void TdApi::OnQueryCreditFinanceRsp(CreditFinanceDetail* detail, ErrorInfo* erro
 		data["credit_repay_unfrz"] = detail->credit_repay_unfrz;
 		data["all_fee_unfrz"] = detail->all_fee_unfrz;
 		data["market"] = detail->market;
+		data["pos_str"] = toUtf(detail->pos_str);
+		data["end_date"] = detail->end_date;
 	}
 	dict error;
 	{
@@ -1015,89 +1021,6 @@ void TdApi::OnQueryLockSecurityDetailRsp(LockSecurityDetail* detail, ErrorInfo* 
 		error["err_msg"] = toUtf(error_info->err_msg);
 	}
 	this->onQueryLockSecurityDetailRsp(data, error, request_id, is_last, string(pos_str));
-};
-
-void TdApi::OnExtendLockSecurityRsp(ExtendLockSecurityRsp* rsp, ErrorInfo* error_info, int request_id)
-{
-	gil_scoped_acquire acquire;
-	dict data;
-	{
-		data["account_id"] = toUtf(rsp->account_id);
-		data["account_type"] = rsp->account_type;
-		data["cust_orgid"] = toUtf(rsp->cust_orgid);
-		data["cust_branchid"] = toUtf(rsp->cust_branchid);
-		data["apply_date"] = rsp->apply_date;
-		data["apply_sno"] = toUtf(rsp->apply_sno);
-	}
-	dict error;
-	{
-		error["err_code"] = error_info->err_code;
-		error["err_msg"] = toUtf(error_info->err_msg);
-	}
-	this->onExtendLockSecurityRsp(data, error, request_id);
-};
-
-void TdApi::OnQueryLockSecurityExtensionRsp(LockSecurityExtensionDetail* detail, ErrorInfo* error_info, int request_id, bool is_last, const char* pos_str)
-{
-	gil_scoped_acquire acquire;
-	dict data;
-	{
-		data["account_id"] = toUtf(detail->account_id);
-		data["account_type"] = detail->account_type;
-		data["cust_orgid"] = toUtf(detail->cust_orgid);
-		data["cust_branchid"] = toUtf(detail->cust_branchid);
-		data["apply_date"] = detail->apply_date;
-		data["apply_sno"] = toUtf(detail->apply_sno);
-		data["sys_date"] = detail->sys_date;
-		data["sno"] = toUtf(detail->sno);
-		data["symbol"] = toUtf(detail->symbol);
-		data["name"] = toUtf(detail->name);
-		data["apply_end_date"] = detail->apply_end_date;
-		data["apply_delay_qty"] = detail->apply_delay_qty;
-		data["approval_used_fee_rate"] = detail->approval_used_fee_rate;
-		data["approval_unused_fee_rate"] = detail->approval_unused_fee_rate;
-		data["approval_status"] = detail->approval_status;
-		data["approval_remark"] = toUtf(detail->approval_remark);
-		data["old_end_date"] = detail->old_end_date;
-		data["old_used_fee_rate"] = detail->old_used_fee_rate;
-		data["old_unused_fee_rate"] = detail->old_unused_fee_rate;
-		data["old_left_qty"] = detail->old_left_qty;
-		data["old_violate_fee_rate"] = detail->old_violate_fee_rate;
-		data["old_hs_status"] = detail->old_hs_status;
-		data["apply_used_fee_rate"] = detail->apply_used_fee_rate;
-		data["apply_unused_fee_rate"] = detail->apply_unused_fee_rate;
-		data["apply_delay_days"] = detail->apply_delay_days;
-		data["approval_end_date"] = detail->approval_end_date;
-		data["approval_violate_fee_rate"] = detail->approval_violate_fee_rate;
-		data["approval_delay_qty"] = detail->approval_delay_qty;
-		data["approval_delay_days"] = detail->approval_delay_days;
-		data["hs_status"] = detail->hs_status;
-		data["wy_status"] = detail->wy_status;
-		data["lock_qty"] = detail->lock_qty;
-		data["used_qty"] = detail->used_qty;
-		data["back_qty"] = detail->back_qty;
-		data["delay_qty"] = detail->delay_qty;
-		data["oper_date"] = detail->oper_date;
-		data["oper_time"] = detail->oper_time;
-		data["back_type"] = detail->back_type;
-		data["lock_price"] = detail->lock_price;
-		data["begin_date"] = detail->begin_date;
-		data["end_date"] = detail->end_date;
-		data["real_date"] = detail->real_date;
-		data["last_date"] = detail->last_date;
-		data["deal_back_qty"] = detail->deal_back_qty;
-		data["secuid"] = toUtf(detail->secuid);
-		data["chk_date"] = detail->chk_date;
-		data["chk_time"] = detail->chk_time;
-		data["deal_flag"] = detail->deal_flag;
-		data["deal_date"] = detail->deal_date;
-	}
-	dict error;
-	{
-		error["err_code"] = error_info->err_code;
-		error["err_msg"] = toUtf(error_info->err_msg);
-	}
-	this->onQueryLockSecurityExtensionRsp(data, error, request_id, is_last, string(pos_str));
 };
 
 void TdApi::OnQueryTransferFundHistoryRsp(TransferFundDetail* detail, ErrorInfo* error_info, int request_id, bool is_last)
@@ -2619,6 +2542,7 @@ void TdApi::OnQueryMSCreditDebtsFlowRsp(MSCreditDebtsFlowDetail* detail, ErrorIn
 	this->onQueryMSCreditDebtsFlowRsp(data, error, request_id, is_last, string(pos_str));
 };
 
+
 ///-------------------------------------------------------------------------------------
 ///主动函数
 ///-------------------------------------------------------------------------------------
@@ -2691,9 +2615,9 @@ int TdApi::getCounterType()
     return i;
 };
 
-int TdApi::login(string svr_ip, int svr_port, const dict& req, string terminal_info)
+int TdApi::login(const dict& req)
 {
-	AccountInfo myreq = AccountInfo();
+	LoginReq myreq = LoginReq();
 	memset(&myreq, 0, sizeof(myreq));
 	getString(req, "account_id", myreq.account_id);
 	getInt16_t(req, "account_type", &myreq.account_type);
@@ -2701,36 +2625,70 @@ int TdApi::login(string svr_ip, int svr_port, const dict& req, string terminal_i
 	getString(req, "cust_orgid", myreq.cust_orgid);
 	getString(req, "cust_branchid", myreq.cust_branchid);
 	getString(req, "cl_system_id", myreq.cl_system_id);
-	int i = this->api->Login(svr_ip.c_str(), svr_port, &myreq, terminal_info.c_str());
+	getString(req, "svr_ip", myreq.svr_ip);
+	getInt(req, "svr_port", &myreq.svr_port);
+	getString(req, "terminal_info", myreq.terminal_info);
+	getInt16_t(req, "inner_flag", &myreq.inner_flag);
+	int i = this->api->Login(&myreq);
 	return i;
 };
 
-int TdApi::getSecuidInfo(const dict& req, int count)
+pybind11::list TdApi::getSecuidInfo()
 {
-	SecuidInfo myreq = SecuidInfo();
-	memset(&myreq, 0, sizeof(myreq));
-	getString(req, "market", myreq.market);
-	getString(req, "secuid", myreq.secuid);
-	getString(req, "fund_id", myreq.fund_id);
-	getInt16_t(req, "account_type", &myreq.account_type);
-	getChar(req, "account_status", &myreq.account_status);
-	getChar(req, "account_class", &myreq.account_class);
-	int i = this->api->GetSecuidInfo(&myreq, &count);
-	return i;
+	SecuidInfo secuids[10];
+
+	int count;
+	int i = this->api->GetSecuidInfo(secuids, &count);
+
+	pybind11::list info;
+
+	for (int i = 0; i < count; i++)
+	{
+		SecuidInfo secuid = secuids[i];
+
+		dict data;
+		data["market"] = secuid.market;
+		data["secuid"] = secuid.secuid;
+		data["fund_id"] = secuid.fund_id;
+		data["account_type"] = secuid.account_type;
+		data["account_status"] = secuid.account_status;
+		data["account_class"] = secuid.account_class;
+		data["account_rights"] = secuid.account_rights;
+		data["account_hgtright"] = secuid.account_hgtright;
+
+		info.append(data);
+
+	}
+	return info;
 };
 
-int TdApi::getAllSecuidInfo(const dict& req, int count)
+pybind11::list TdApi::getAllSecuidInfo()
 {
-	SecuidInfo myreq = SecuidInfo();
-	memset(&myreq, 0, sizeof(myreq));
-	getString(req, "market", myreq.market);
-	getString(req, "secuid", myreq.secuid);
-	getString(req, "fund_id", myreq.fund_id);
-	getInt16_t(req, "account_type", &myreq.account_type);
-	getChar(req, "account_status", &myreq.account_status);
-	getChar(req, "account_class", &myreq.account_class);
-	int i = this->api->GetAllSecuidInfo(&myreq, &count);
-	return i;
+	SecuidInfo secuids[10];
+
+	int count;
+	int i = this->api->GetSecuidInfo(secuids, &count);
+
+	pybind11::list info;
+
+	for (int i = 0; i < count; i++)
+	{
+		SecuidInfo secuid = secuids[i];
+
+		dict data;
+		data["market"] = secuid.market;
+		data["secuid"] = secuid.secuid;
+		data["fund_id"] = secuid.fund_id;
+		data["account_type"] = secuid.account_type;
+		data["account_status"] = secuid.account_status;
+		data["account_class"] = secuid.account_class;
+		data["account_rights"] = secuid.account_rights;
+		data["account_hgtright"] = secuid.account_hgtright;
+
+		info.append(data);
+
+	}
+	return info;
 };
 
 int TdApi::getApiLocalAddr(const dict& req)
@@ -2751,8 +2709,8 @@ int TdApi::order(const dict& req, int request_id)
 	getString(req, "symbol", myreq.symbol);
 	getInt16_t(req, "order_type", &myreq.order_type);
 	getInt16_t(req, "side", &myreq.side);
-	getLonglong(req, "volume", &myreq.volume);
-	getLonglong(req, "price", &myreq.price);
+	getInt64_t(req, "volume", &myreq.volume);
+	getInt64_t(req, "price", &myreq.price);
 	getInt16_t(req, "order_flag", &myreq.order_flag);
 	getUint16_t(req, "policy_id", &myreq.policy_id);
 	getInt16_t(req, "share_property", &myreq.share_property);
@@ -2768,8 +2726,8 @@ int TdApi::batchOrder(const dict& req, int count, int request_id)
 	getString(req, "symbol", myreq.symbol);
 	getInt16_t(req, "order_type", &myreq.order_type);
 	getInt16_t(req, "side", &myreq.side);
-	getLonglong(req, "volume", &myreq.volume);
-	getLonglong(req, "price", &myreq.price);
+	getInt64_t(req, "volume", &myreq.volume);
+	getInt64_t(req, "price", &myreq.price);
 	getInt16_t(req, "order_flag", &myreq.order_flag);
 	getUint16_t(req, "policy_id", &myreq.policy_id);
 	getInt16_t(req, "share_property", &myreq.share_property);
@@ -2787,8 +2745,8 @@ int TdApi::cancelOrder(const dict& req, int request_id)
 	getString(req, "symbol", myreq.symbol);
 	getInt16_t(req, "order_type", &myreq.order_type);
 	getInt16_t(req, "side", &myreq.side);
-	getLonglong(req, "volume", &myreq.volume);
-	getLonglong(req, "price", &myreq.price);
+	getInt64_t(req, "volume", &myreq.volume);
+	getInt64_t(req, "price", &myreq.price);
 	int i = this->api->CancelOrder(&myreq, request_id);
 	return i;
 };
@@ -2803,8 +2761,8 @@ int TdApi::batchCancelOrder(const dict& req, int count, int request_id)
 	getString(req, "symbol", myreq.symbol);
 	getInt16_t(req, "order_type", &myreq.order_type);
 	getInt16_t(req, "side", &myreq.side);
-	getLonglong(req, "volume", &myreq.volume);
-	getLonglong(req, "price", &myreq.price);
+	getInt64_t(req, "volume", &myreq.volume);
+	getInt64_t(req, "price", &myreq.price);
 	int i = this->api->BatchCancelOrder(&myreq, count, request_id);
 	return i;
 };
@@ -2941,7 +2899,7 @@ int TdApi::transferFundInAndOut(const dict& req, int request_id)
 	TransferFundReq myreq = TransferFundReq();
 	memset(&myreq, 0, sizeof(myreq));
 	getInt(req, "transfer_side", &myreq.transfer_side);
-	getLonglong(req, "transfer_value", &myreq.transfer_value);
+	getInt64_t(req, "transfer_value", &myreq.transfer_value);
 	getString(req, "market", myreq.market);
 	int i = this->api->TransferFundInAndOut(&myreq, request_id);
 	return i;
@@ -2953,7 +2911,7 @@ int TdApi::transferFundBetweenSecuid(const dict& req, int request_id)
 	memset(&myreq, 0, sizeof(myreq));
 	getString(req, "fund_out_market", myreq.fund_out_market);
 	getString(req, "fund_in_market", myreq.fund_in_market);
-	getLonglong(req, "transfer_value", &myreq.transfer_value);
+	getInt64_t(req, "transfer_value", &myreq.transfer_value);
 	int i = this->api->TransferFundBetweenSecuid(&myreq, request_id);
 	return i;
 };
@@ -2987,7 +2945,7 @@ int TdApi::queryMaxOrderQty(const dict& req, int request_id)
 	getString(req, "symbol", myreq.symbol);
 	getInt16_t(req, "order_type", &myreq.order_type);
 	getInt16_t(req, "side", &myreq.side);
-	getLonglong(req, "price", &myreq.price);
+	getInt64_t(req, "price", &myreq.price);
 	int i = this->api->QueryMaxOrderQty(&myreq, request_id);
 	return i;
 };
@@ -3047,7 +3005,7 @@ int TdApi::creditPayBack(const dict& req, int request_id)
 {
 	CreditPayBackReq myreq = CreditPayBackReq();
 	memset(&myreq, 0, sizeof(myreq));
-	getLonglong(req, "back_amt", &myreq.back_amt);
+	getInt64_t(req, "back_amt", &myreq.back_amt);
 	getString(req, "cl_order_id", myreq.cl_order_id);
 	int i = this->api->CreditPayBack(&myreq, request_id);
 	return i;
@@ -3059,7 +3017,7 @@ int TdApi::creditPayBackByOrder(const dict& req, int request_id)
 	memset(&myreq, 0, sizeof(myreq));
 	getString(req, "sno", myreq.sno);
 	getInt(req, "order_date", &myreq.order_date);
-	getLonglong(req, "back_amt", &myreq.back_amt);
+	getInt64_t(req, "back_amt", &myreq.back_amt);
 	getString(req, "cl_order_id", myreq.cl_order_id);
 	getInt32_t(req, "credit_type", &myreq.credit_type);
 	int i = this->api->CreditPayBackByOrder(&myreq, request_id);
@@ -3184,7 +3142,7 @@ int TdApi::queryHKMinPriceUnit(const dict& req, int request_id)
 	memset(&myreq, 0, sizeof(myreq));
 	getString(req, "market", myreq.market);
 	getString(req, "code", myreq.code);
-	getLonglong(req, "price", &myreq.price);
+	getInt64_t(req, "price", &myreq.price);
 	getString(req, "pos_str", myreq.pos_str);
 	getInt32_t(req, "query_num", &myreq.query_num);
 	int i = this->api->QueryHKMinPriceUnit(&myreq, request_id);
@@ -3212,33 +3170,6 @@ int TdApi::queryLockSecurityDetail(const dict& req, int request_id)
 	getString(req, "pos_str", myreq.pos_str);
 	getInt32_t(req, "query_num", &myreq.query_num);
 	int i = this->api->QueryLockSecurityDetail(&myreq, request_id);
-	return i;
-};
-
-int TdApi::extendLockSecurity(const dict& req, int request_id)
-{
-	ExtendLockSecurityReq myreq = ExtendLockSecurityReq();
-	memset(&myreq, 0, sizeof(myreq));
-	getInt32_t(req, "sys_date", &myreq.sys_date);
-	getString(req, "sno", myreq.sno);
-	getInt32_t(req, "apply_delay_days", &myreq.apply_delay_days);
-	getLonglong(req, "apply_used_fee_rate", &myreq.apply_used_fee_rate);
-	getLonglong(req, "apply_unused_fee_rate", &myreq.apply_unused_fee_rate);
-	getInt32_t(req, "apply_delay_qty", &myreq.apply_delay_qty);
-	getString(req, "symbol", myreq.symbol);
-	int i = this->api->ExtendLockSecurity(&myreq, request_id);
-	return i;
-};
-
-int TdApi::queryLockSecurityExtension(const dict& req, int request_id)
-{
-	QryLockSecurityExtensionReq myreq = QryLockSecurityExtensionReq();
-	memset(&myreq, 0, sizeof(myreq));
-	getInt(req, "start_date", &myreq.start_date);
-	getInt(req, "end_date", &myreq.end_date);
-	getString(req, "pos_str", myreq.pos_str);
-	getInt32_t(req, "query_num", &myreq.query_num);
-	int i = this->api->QueryLockSecurityExtension(&myreq, request_id);
 	return i;
 };
 
@@ -3294,8 +3225,12 @@ int TdApi::doMicroServiceReq(const dict& req, int request_id)
 	getString(req, "cust_branchid", myreq.cust_branchid);
 	getString(req, "function_id", myreq.function_id);
 	getString(req, "tar_sys", myreq.tar_sys);
-	getChar(req, "request_content", myreq.request_content);
 	getInt32_t(req, "request_len", &myreq.request_len);
+
+	char buf[4096];
+	getString(req, "request_content", buf);
+	myreq.request_content = buf;
+
 	int i = this->api->DoMicroServiceReq(&myreq, request_id);
 	return i;
 };
@@ -3326,7 +3261,7 @@ int TdApi::bankSecTransfer(const dict& req, int request_id)
 	getInt(req, "currency_type", &myreq.currency_type);
 	getString(req, "bank_code", myreq.bank_code);
 	getChar(req, "busi_type", &myreq.busi_type);
-	getLonglong(req, "fund_effect", &myreq.fund_effect);
+	getInt64_t(req, "fund_effect", &myreq.fund_effect);
 	getString(req, "gm_fund_pwd", myreq.gm_fund_pwd);
 	getString(req, "bank_pwd", myreq.bank_pwd);
 	int i = this->api->BankSecTransfer(&myreq, request_id);
@@ -3338,7 +3273,7 @@ int TdApi::queryBankSecTransfer(const dict& req, int request_id)
 	QryBankSecTransferReq myreq = QryBankSecTransferReq();
 	memset(&myreq, 0, sizeof(myreq));
 	getInt32_t(req, "currency_type", &myreq.currency_type);
-	getLonglong(req, "sno", &myreq.sno);
+	getInt64_t(req, "sno", &myreq.sno);
 	int i = this->api->QueryBankSecTransfer(&myreq, request_id);
 	return i;
 };
@@ -3366,7 +3301,7 @@ int TdApi::fundAccountTransfer(const dict& req, int request_id)
 	getString(req, "out_orgid", myreq.out_orgid);
 	getString(req, "out_fund_id", myreq.out_fund_id);
 	getInt32_t(req, "currency_type", &myreq.currency_type);
-	getLonglong(req, "fund_effect", &myreq.fund_effect);
+	getInt64_t(req, "fund_effect", &myreq.fund_effect);
 	getString(req, "remark", myreq.remark);
 	int i = this->api->FundAccountTransfer(&myreq, request_id);
 	return i;
@@ -3473,8 +3408,8 @@ int TdApi::queryPHXX(const dict& req, int request_id)
 {
 	QueryPHXXReq myreq = QueryPHXXReq();
 	memset(&myreq, 0, sizeof(myreq));
-	getLonglong(req, "query_index", &myreq.query_index);
-	getLonglong(req, "query_num", &myreq.query_num);
+	getInt64_t(req, "query_index", &myreq.query_index);
+	getInt64_t(req, "query_num", &myreq.query_num);
 	getString(req, "stk_code", myreq.stk_code);
 	getString(req, "secuid", myreq.secuid);
 	getInt32_t(req, "begin_date", &myreq.begin_date);
@@ -3488,8 +3423,8 @@ int TdApi::queryZQXX(const dict& req, int request_id)
 {
 	QueryZQXXReq myreq = QueryZQXXReq();
 	memset(&myreq, 0, sizeof(myreq));
-	getLonglong(req, "query_index", &myreq.query_index);
-	getLonglong(req, "query_num", &myreq.query_num);
+	getInt64_t(req, "query_index", &myreq.query_index);
+	getInt64_t(req, "query_num", &myreq.query_num);
 	getString(req, "stk_code", myreq.stk_code);
 	getString(req, "secuid", myreq.secuid);
 	getInt32_t(req, "begin_date", &myreq.begin_date);
@@ -3646,22 +3581,6 @@ int TdApi::queryNetVoteCount(const dict& req, int request_id)
 	return i;
 };
 
-int TdApi::appointContractSellStockRepay(const dict& req, int request_id)
-{
-	AppointContractSellStockRepayReq myreq = AppointContractSellStockRepayReq();
-	memset(&myreq, 0, sizeof(myreq));
-	getInt32_t(req, "order_date", &myreq.order_date);
-	getString(req, "sno", myreq.sno);
-	getString(req, "cl_order_id", myreq.cl_order_id);
-	getString(req, "symbol", myreq.symbol);
-	getInt16_t(req, "order_type", &myreq.order_type);
-	getInt16_t(req, "side", &myreq.side);
-	getLonglong(req, "volume", &myreq.volume);
-	getLonglong(req, "price", &myreq.price);
-	int i = this->api->AppointContractSellStockRepay(&myreq, request_id);
-	return i;
-};
-
 int TdApi::queryStkConcentration(const dict& req, int request_id)
 {
 	StkConcentrationReq myreq = StkConcentrationReq();
@@ -3746,7 +3665,7 @@ int TdApi::netVoteOrder(const dict& req, int request_id, string terminal_info)
 	memset(&myreq, 0, sizeof(myreq));
 	getString(req, "symbol", myreq.symbol);
 	getString(req, "link_stk_code", myreq.link_stk_code);
-	getLonglong(req, "order_qty", &myreq.order_qty);
+	getInt64_t(req, "order_qty", &myreq.order_qty);
 	getInt32_t(req, "reg_date", &myreq.reg_date);
 	getString(req, "meeting_seq", myreq.meeting_seq);
 	getString(req, "voting_proposal", myreq.voting_proposal);
@@ -3764,7 +3683,7 @@ int TdApi::creditNetVoteOrder(const dict& req, int request_id, string terminal_i
 	getString(req, "link_stk_code", myreq.link_stk_code);
 	getInt32_t(req, "reg_date", &myreq.reg_date);
 	getInt16_t(req, "currency_type", &myreq.currency_type);
-	getLonglong(req, "order_qty", &myreq.order_qty);
+	getInt64_t(req, "order_qty", &myreq.order_qty);
 	getString(req, "meeting_seq", myreq.meeting_seq);
 	getString(req, "voting_proposal", myreq.voting_proposal);
 	getInt16_t(req, "voting_preference", &myreq.voting_preference);
@@ -3808,6 +3727,7 @@ int TdApi::queryMSCreditDebtsFlow(const dict& req, int request_id)
 	int i = this->api->QueryMSCreditDebtsFlow(&myreq, request_id);
 	return i;
 };
+
 
 ///-------------------------------------------------------------------------------------
 ///Boost.Python封装
@@ -4303,30 +4223,6 @@ public:
 		try
 		{
 			PYBIND11_OVERLOAD(void, TdApi, onQueryLockSecurityDetailRsp, data, error, request_id, last, pos_str);
-		}
-		catch (const error_already_set& e)
-		{
-			cout << e.what() << endl;
-		}
-	};
-
-	void onExtendLockSecurityRsp(const dict& data, const dict& error, int request_id) override
-	{
-		try
-		{
-			PYBIND11_OVERLOAD(void, TdApi, onExtendLockSecurityRsp, data, error, request_id);
-		}
-		catch (const error_already_set& e)
-		{
-			cout << e.what() << endl;
-		}
-	};
-
-	void onQueryLockSecurityExtensionRsp(const dict& data, const dict& error, int request_id, bool last, string pos_str) override
-	{
-		try
-		{
-			PYBIND11_OVERLOAD(void, TdApi, onQueryLockSecurityExtensionRsp, data, error, request_id, last, pos_str);
 		}
 		catch (const error_already_set& e)
 		{
@@ -4928,8 +4824,6 @@ PYBIND11_MODULE(vnhfttd, m)
 		.def("queryHKMinPriceUnit", &TdApi::queryHKMinPriceUnit)
 		.def("queryHKTradeCalendar", &TdApi::queryHKTradeCalendar)
 		.def("queryLockSecurityDetail", &TdApi::queryLockSecurityDetail)
-		.def("extendLockSecurity", &TdApi::extendLockSecurity)
-		.def("queryLockSecurityExtension", &TdApi::queryLockSecurityExtension)
 		.def("queryTransferFundHistory", &TdApi::queryTransferFundHistory)
 		.def("queryCreditDebtsFlow", &TdApi::queryCreditDebtsFlow)
 		.def("queryCreditAssetFlow", &TdApi::queryCreditAssetFlow)
@@ -4963,7 +4857,6 @@ PYBIND11_MODULE(vnhfttd, m)
 		.def("queryNetVoteRights", &TdApi::queryNetVoteRights)
 		.def("queryNetVoteResult", &TdApi::queryNetVoteResult)
 		.def("queryNetVoteCount", &TdApi::queryNetVoteCount)
-		.def("appointContractSellStockRepay", &TdApi::appointContractSellStockRepay)
 		.def("queryStkConcentration", &TdApi::queryStkConcentration)
 		.def("queryHKHisOrders", &TdApi::queryHKHisOrders)
 		.def("queryWithdrawCash", &TdApi::queryWithdrawCash)
@@ -5017,8 +4910,6 @@ PYBIND11_MODULE(vnhfttd, m)
 		.def("onQueryHKMinPriceUnitRsp", &TdApi::onQueryHKMinPriceUnitRsp)
 		.def("onQueryHKTradeCalendarRsp", &TdApi::onQueryHKTradeCalendarRsp)
 		.def("onQueryLockSecurityDetailRsp", &TdApi::onQueryLockSecurityDetailRsp)
-		.def("onExtendLockSecurityRsp", &TdApi::onExtendLockSecurityRsp)
-		.def("onQueryLockSecurityExtensionRsp", &TdApi::onQueryLockSecurityExtensionRsp)
 		.def("onQueryTransferFundHistoryRsp", &TdApi::onQueryTransferFundHistoryRsp)
 		.def("onQueryCreditDebtsFlowRsp", &TdApi::onQueryCreditDebtsFlowRsp)
 		.def("onQueryCreditAssetFlowRsp", &TdApi::onQueryCreditAssetFlowRsp)
@@ -5064,5 +4955,4 @@ PYBIND11_MODULE(vnhfttd, m)
 		.def("onQueryMSPositionsRsp", &TdApi::onQueryMSPositionsRsp)
 		.def("onQueryMSCreditDebtsFlowRsp", &TdApi::onQueryMSCreditDebtsFlowRsp)
 		;
-
 }

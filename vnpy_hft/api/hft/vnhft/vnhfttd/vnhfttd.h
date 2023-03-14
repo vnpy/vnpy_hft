@@ -84,7 +84,7 @@ public:
     virtual void OnTradeReport(TradeDetail* trade_detail);
 
     /**
-     * 订单状态变化回调
+     * 订单状态变化回调  	注意，集中交易柜台不支持此回调通知
      *
      * @param order_detail  回调的订单对象
      */
@@ -92,7 +92,7 @@ public:
 
     /**
      * 订单委托的响应
-     * Order、BatchOrder、AppointContractSellStockRepay均由此接口响应
+     * Order、BatchOrder均由此接口响应
      *
      * @param order_rsp     订单委托应答
      * @param error_info    应答的错误信息
@@ -466,29 +466,6 @@ public:
      */
     virtual void OnQueryLockSecurityDetailRsp(LockSecurityDetail* detail, ErrorInfo* error_info,
         int request_id, bool is_last, const char* pos_str);
-
-    /**
-     * 展期应答
-     *
-     * @param rsp           展期应答数据
-     * @param error_info    应答的错误信息
-     * @param request_id    请求序列号，用于匹配响应，由用户自定义，非0
-     */
-    virtual void OnExtendLockSecurityRsp(ExtendLockSecurityRsp* rsp, ErrorInfo* error_info,
-        int request_id);
-
-    /**
-     * 查询锁券展期申请应答
-     *
-     * @param detail        展期明细数据
-     * @param error_info    应答的错误信息
-     * @param request_id    对应请求时传入的序列号
-     * @param is_last       是否是本次请求的最后一笔响应
-     * @param pos_str       本次查询最后一条记录的定位串，用于下一次查询
-     */
-    virtual void OnQueryLockSecurityExtensionRsp(LockSecurityExtensionDetail* detail,
-        ErrorInfo* error_info, int request_id,
-        bool is_last, const char* pos_str);
 
     /**
      * 查询资金划转流水的响应
@@ -995,6 +972,7 @@ public:
     //last：是否为最后返回
     //i：整数
     //-------------------------------------------------------------------------------------
+
     virtual void onDisconnect() {};
 
     virtual void onError(const dict& error, int request_id) {};
@@ -1076,10 +1054,6 @@ public:
     virtual void onQueryHKTradeCalendarRsp(const dict& data, const dict& error, int request_id, bool last) {};
 
     virtual void onQueryLockSecurityDetailRsp(const dict& data, const dict& error, int request_id, bool last, string pos_str) {};
-
-    virtual void onExtendLockSecurityRsp(const dict& data, const dict& error, int request_id) {};
-
-    virtual void onQueryLockSecurityExtensionRsp(const dict& data, const dict& error, int request_id, bool last, string pos_str) {};
 
     virtual void onQueryTransferFundHistoryRsp(const dict& data, const dict& error, int request_id, bool last) {};
 
@@ -1192,13 +1166,13 @@ public:
 
     dict getApiLastError();
 
-    int login(string svr_ip, int svr_port, const dict& req, string terminal_info);
+    int login(const dict& req);
 
     int getCounterType();
 
-    int getSecuidInfo(const dict& req, int count);
+    pybind11::list getSecuidInfo();
 
-    int getAllSecuidInfo(const dict& req, int count);
+    pybind11::list getAllSecuidInfo();
 
     int getApiLocalAddr(const dict& req);
 
@@ -1288,10 +1262,6 @@ public:
 
     int queryLockSecurityDetail(const dict& req, int request_id);
 
-    int extendLockSecurity(const dict& req, int request_id);
-
-    int queryLockSecurityExtension(const dict& req, int request_id);
-
     int queryTransferFundHistory(int request_id);
 
     int queryCreditDebtsFlow(const dict& req, int request_id);
@@ -1358,8 +1328,6 @@ public:
 
     int queryNetVoteCount(const dict& req, int request_id);
 
-    int appointContractSellStockRepay(const dict& req, int request_id);
-
     int queryStkConcentration(const dict& req, int request_id);
 
     int queryHKHisOrders(const dict& req, int request_id);
@@ -1381,5 +1349,4 @@ public:
     int queryMSPositions(const dict& req, int request_id);
 
     int queryMSCreditDebtsFlow(const dict& req, int request_id);
-
 };
