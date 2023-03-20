@@ -16,6 +16,7 @@ def get_ext_modules() -> list:
     extra_compile_flags = ["-O2", "-MT"]
     extra_link_args = []
     runtime_library_dirs = []
+    define_macros=[('NOMINMAX', None), ('_CRT_SECURE_NO_WARNINGS', None)]
 
     vnsip = Extension(
         "vnpy_hft.api.sip.vnsip",
@@ -26,7 +27,7 @@ def get_ext_modules() -> list:
                       "vnpy_hft/api/sip/include/sip",
                       "vnpy_hft/api/sip/include/sip/header_for_generator",
                       "vnpy_hft/api/sip/vnhft"],
-        define_macros=[],
+        define_macros=define_macros,
         undef_macros=[],
         library_dirs=["vnpy_hft/api/sip/libs", "vnpy_hft/api/sip"],
         libraries=["sipuix_x64"],
@@ -46,7 +47,7 @@ def get_ext_modules() -> list:
                       "vnpy_hft/api/hft/include/hft",
                       "vnpy_hft/api/hft/include/hft/header_for_generator",
                       "vnpy_hft/api/hft/vnhft"],
-        define_macros=[],
+        define_macros=define_macros,
         undef_macros=[],
         library_dirs=["vnpy_hft/api/hft/libs", "vnpy_hft/api/hft"],
         libraries=["libhft_trader_api"],
@@ -66,7 +67,7 @@ def get_ext_modules() -> list:
                       "vnpy_hft/api/hft/include/hft",
                       "vnpy_hft/api/hft/include/hft/header_for_generator",
                       "vnpy_hft/api/hft/vnhft"],
-        define_macros=[],
+        define_macros=define_macros,
         undef_macros=[],
         library_dirs=["vnpy_hft/api/hft/libs", "vnpy_hft/api/hft"],
         libraries=["libhft_trader_api"],
