@@ -82,7 +82,10 @@ struct ErrMsg {
 #define SIPE_ERR 				1     	///<未知或一般错误 
 #define SIPE_DISCONNECT			5		///<连接断开
 #define SIPE_CONSVRFAIL			7		///<连接服务器失败，此时接口会执行自动重连
+#define SIPE_USERAUTH			122	    ///<用户验证错误
 #define SIPE_NOTAG				124		///<订阅代码错误，无此编码
+#define SIPE_NOPOWER			123	    ///<权限错误
+#define SIPE_ERRARGS			150     ///<参数错误
 #endif
 #define SIPE_NOCONFIG			18		///<无配置信息
 #define SIPE_SOCKETINITERR		19		///<套接字初始化失败
@@ -146,7 +149,7 @@ namespace api
 		\param code 订阅的证券代码
 		\param dataLF LF行情结构体
 		*/
-		virtual void OnFastDepthMarketData(MKtype mk_type, char* code, T_SZ_StockMarketDataLF* dataLF) {};
+		virtual void OnFastDepthMarketData(MKtype mk_type, char* code, StockMarketDataLF* dataLF) {};
 
 		/*!
 		\brief L1行情数据回调
@@ -192,6 +195,13 @@ namespace api
 		\param steptrade 上交所逐笔行情数据结构体
 		*/
 		virtual void OnSHTrade(char* code, t_SH_StockStepTrade* steptrade) {};
+
+		/*!
+		\brief 上交所逐笔委托行情数据回调
+		\param code 订阅的证券代码
+		\param steptrade 上交所逐笔行情数据结构体
+		*/
+		virtual void OnSHOrder(char* code, t_SH_StockStepOrder* steporder) {};
 
 		/*!
 		\brief 深交所逐笔成交行情数据回调
@@ -267,7 +277,6 @@ namespace api
 		*/
 		virtual void OnEtfExtData(MKtype mk_type, char* code, T_ETFEXTENDS* etfextdata) {};
 public:
-
 	//析构函数
 	virtual ~CSipMdSpi() {};
 	};

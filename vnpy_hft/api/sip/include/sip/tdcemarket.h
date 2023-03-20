@@ -10,6 +10,7 @@
 #define ID_DCE_MARKETDATA 5002   //期货及期权行情数据
 #define ID_DCE_FORQOUTE 5003	 //询价通知
 #define ID_DCE_MARKETDATAL2 5004 //期货及期权L2行情数据
+#define ID_DCE__KLINE 5007 //期货及期权分钟K线行情数据
 
 #pragma pack(push, 1)
 //1.1 大商所期货行情
@@ -39,6 +40,8 @@ typedef struct t_DCE_FutursMarketData
 	T_U32 uBidVol[5];		//申买量
 	char sTradingStatus;	//交易状态
 	char sRevs[3];			//保留字段
+	T_I32      nTradingDay;            //交易日
+	T_I32      nActionDay;             //业务日期
 } T_DCE_FutursMarketData, *PDCE_FutursMarketData;
 //1.2 上期所期货基础信息
 /////产品类型-------------------------------------------------------
@@ -193,6 +196,10 @@ typedef struct t_DCE_BaseInfo
 	T_I64 i64UnderlyingMultiple;
 	///组合类型
 	char cCombinationType;
+	///涨停价,扩大至10000倍
+	T_I64	i64UplimitPrice;
+	///跌停价,扩大至10000倍
+	T_I64	i64LowlimitPrice;
 } T_DCE_BaseInfo, T_Instrument_BaseInfo, *PDCE_BaseInfo;
 ///发给做市商的询价请求
 typedef struct t_DCE_ForQuote

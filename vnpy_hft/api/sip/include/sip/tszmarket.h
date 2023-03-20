@@ -1,263 +1,281 @@
-#ifndef _T_SZ_MARKET_
+ï»¿#ifndef _T_SZ_MARKET_
 #define _T_SZ_MARKET_
 #include "tdef.h"
 //*****************************************************************************************
-//ÒÔÉÏ·şÎñÊı¾İID±£ÁôÓëÔ­ÏµÍ³¼æÈİ£¬ÒÔÏÂ·şÎñIDÕë¶ÔÃ¿¸öÊĞ³¡·Ö¿ª¶¨Òå
+//ä»¥ä¸ŠæœåŠ¡æ•°æ®IDä¿ç•™ä¸åŸç³»ç»Ÿå…¼å®¹ï¼Œä»¥ä¸‹æœåŠ¡IDé’ˆå¯¹æ¯ä¸ªå¸‚åœºåˆ†å¼€å®šä¹‰
 
-//-----------------------------------ÉîÛÚÊĞ³¡--------------------------------------
-#define ID_SZ_INDEXDATA 2000	   //Ö¸Êı(Stock_IndexData)
-#define ID_SZ_TRANSACTION 2001	 //³É½»(Stock_TransactionEx)
-#define ID_SZ_ORDERQUEUE 2002	  //Î¯ÍĞ¶ÓÁĞ(Stock_OrderQueue_Head+Stock_OrderQueue)
-#define ID_SZ_STEPORDER 2003	   //Öğ±ÊÎ¯ÍĞ(Stock_StepOrder)
-#define ID_SZ_MARKETDATA 2004	  //ĞĞÇéÊı¾İ(Stock_MarketData)
-#define ID_SZ_MARKETDATA_L1 2005   //ÓÃÓÚL1ĞĞÇé ÉîÛÚ(Stock_MarketData_L1)
-#define ID_SZ_MATCHMARKETDATA 2006 //´éºÏĞĞÇé£¬¸ù¾İÖğ±Ê³É½»ºÍÖğ±ÊÎ¯ÍĞ¼ÆËãµÄĞĞÇé
-#define ID_SZ_KLINEDATA 2007	   //Éî½»Ëù¸ö¹É·ÖÖÓKÏßÊı¾İ(T_SZ_Kline)
-#define ID_SZ_BASEINFO 2008		   //Éî½»ËùÖ¤È¯»ù´¡ĞÅÏ¢(¼ûtszopmarket.h)
+//-----------------------------------æ·±åœ³å¸‚åœº--------------------------------------
+#define ID_SZ_INDEXDATA 2000	   //æŒ‡æ•°(Stock_IndexData)
+#define ID_SZ_TRANSACTION 2001	   //æˆäº¤(Stock_TransactionEx)
+#define ID_SZ_ORDERQUEUE 2002	   //å§”æ‰˜é˜Ÿåˆ—(Stock_OrderQueue_Head+Stock_OrderQueue)
+#define ID_SZ_STEPORDER 2003	   //é€ç¬”å§”æ‰˜(Stock_StepOrder)
+#define ID_SZ_MARKETDATA 2004	   //è¡Œæƒ…æ•°æ®(Stock_MarketData)
+#define ID_SZ_MARKETDATA_L1 2005   //ç”¨äºL1è¡Œæƒ… æ·±åœ³(Stock_MarketData_L1)
+#define ID_SZ_MATCHMARKETDATA 2006 //æ’®åˆè¡Œæƒ…ï¼Œæ ¹æ®é€ç¬”æˆäº¤å’Œé€ç¬”å§”æ‰˜è®¡ç®—çš„è¡Œæƒ…
+#define ID_SZ_KLINEDATA 2007	   //æ·±äº¤æ‰€ä¸ªè‚¡åˆ†é’ŸKçº¿æ•°æ®(T_SZ_Kline)
+#define ID_SZ_BASEINFO 2008		   //æ·±äº¤æ‰€è¯åˆ¸åŸºç¡€ä¿¡æ¯(è§tszopmarket.h)
 
 #pragma pack(push, 1)
-// 1.1 ¹ÉÆ±ĞĞÇé
-typedef struct t_SZ_StockMarketDataL2 {
-	T_I32 nTime;				//Ê±¼ä(HHMMSSmmmm)
-	T_I32 nStatus;				//×´Ì¬
-	T_U32 uPreClose;			//Ç°ÊÕÅÌ¼Û
-	T_U32 uOpen;				//¿ªÅÌ¼Û
-	T_U32 uHigh;				//×î¸ß¼Û
-	T_U32 uLow;					//×îµÍ¼Û
-	T_U32 uMatch;				//×îĞÂ¼Û
-	T_U32 uAskPrice[10];		//ÉêÂô¼Û
-	T_U32 uAskVol[10];			//ÉêÂôÁ¿
-	T_U32 uBidPrice[10];		//ÉêÂò¼Û
-	T_U32 uBidVol[10];			//ÉêÂòÁ¿
-	T_U32 uNumTrades;			//³É½»±ÊÊı
-	T_I64 iVolume;				//³É½»×ÜÁ¿
-	T_I64 iTurnover;			//³É½»×Ü½ğ¶î
-	T_I64 iTotalBidVol;			//Î¯ÍĞÂòÈë×ÜÁ¿
-	T_I64 iTotalAskVol;			//Î¯ÍĞÂô³ö×ÜÁ¿
-	T_U32 uWeightedAvgBidPrice; //¼ÓÈ¨Æ½¾ùÎ¯Âò¼Û¸ñ
-	T_U32 uWeightedAvgAskPrice; //¼ÓÈ¨Æ½¾ùÎ¯Âô¼Û¸ñ
-	T_I32 nIOPV;				//IOPV¾»Öµ¹ÀÖµ
-	T_I32 nYieldToMaturity;		//µ½ÆÚÊÕÒæÂÊ
-	T_U32 uHighLimited;			//ÕÇÍ£¼Û 999999999 ±íÊ¾ÎŞÕÇÍ£¼Û¸ñÏŞÖÆ
-	T_U32 uLowLimited;			//µøÍ£¼Û -999999999 ,ÓÃÎŞ·ûºÅ±íÊ¾³É3294967297 ±íÊ¾ÎŞµøÍ£¼Û¸ñÏŞÖÆ£»¶ÔÓÚ¼Û¸ñ²»¿ÉÒÔÎª¸ºÊıµÄÒµÎñ£¬ÔòÌîĞ´¼Û¸ñµµÎ»£¬±íÊ¾ÎŞµøÍ£¼Û¸ñÏŞÖÆ£¬±ÈÈç¶ÔÓÚ¹ÉÆ±ÏÖ»õ¼¯ÖĞ¾º¼ÛÒµÎñÌîĞ´ 10
-	char sPrefix[4];			//Ö¤È¯ĞÅÏ¢Ç°×º
-	T_I32 nSyl1;				//ÊĞÓ¯ÂÊ1 2 Î»Ğ¡Êı ¹ÉÆ±£º¼Û¸ñ/ÉÏÄêÃ¿¹ÉÀûÈó Õ®È¯£ºÃ¿°ÙÔªÓ¦¼ÆÀûÏ¢
-	T_I32 nSyl2;				//ÊĞÓ¯ÂÊ2 2 Î»Ğ¡Êı ¹ÉÆ±£º¼Û¸ñ/±¾ÄêÃ¿¹ÉÀûÈó Õ®È¯£ºµ½ÆÚÊÕÒæÂÊ »ù½ğ£ºÃ¿°Ù·İµÄIOPV »ò¾»Öµ È¨Ö¤£ºÒç¼ÛÂÊ
-	T_I32 nSD2;					//Éıµø2£¨¶Ô±ÈÉÏÒ»±Ê£©
-	char sTradingPhraseCode[8]; //ÉÏ½»ËùÓëÉî½»Ëù×Ö¶Îº¬Òå²»Í¬£¬²Î¼ûÒÔÏÂ×¢½â£º
-	//Éî½»Ëù£º
-	//   ²úÆ·Ëù´¦µÄ½»Ò×½×¶Î´úÂë
-	//µÚ 0 Î»£º
-	//S=Æô¶¯£¨¿ªÊĞÇ°£©
-	//O=¿ªÅÌ¼¯ºÏ¾º¼Û
-	//T=Á¬Ğø¾º¼Û
-	//B=ĞİÊĞ
-	//C=ÊÕÅÌ¼¯ºÏ¾º¼Û
-	//E=ÒÑ±ÕÊĞ
-	//H=ÁÙÊ±Í£ÅÆ
-	//A=ÅÌºó½»Ò×
-	//V=²¨¶¯ĞÔÖĞ¶Ï
-	//µÚ 1 Î»£º
-	//0=Õı³£×´Ì¬
-	//1=È«ÌìÍ£ÅÆ
-	T_I32 nPreIOPV; //»ù½ğT-1ÈÕÊÕÅÌÊ±¿ÌIOPV ½ö±êµÄÎª»ù½ğÊ±ÓĞĞ§
+// 1.1 è‚¡ç¥¨è¡Œæƒ…
+typedef struct t_SZ_StockMarketDataL2
+{
+	T_I32 nTime;				//æ—¶é—´(HHMMSSmmmm)
+	T_I32 nStatus;				//çŠ¶æ€
+	T_U32 uPreClose;			//å‰æ”¶ç›˜ä»·
+	T_U32 uOpen;				//å¼€ç›˜ä»·
+	T_U32 uHigh;				//æœ€é«˜ä»·
+	T_U32 uLow;					//æœ€ä½ä»·
+	T_U32 uMatch;				//æœ€æ–°ä»·
+	T_U32 uAskPrice[10];		//ç”³å–ä»·
+	T_U32 uAskVol[10];			//ç”³å–é‡
+	T_U32 uBidPrice[10];		//ç”³ä¹°ä»·
+	T_U32 uBidVol[10];			//ç”³ä¹°é‡
+	T_U32 uNumTrades;			//æˆäº¤ç¬”æ•°
+	T_I64 iVolume;				//æˆäº¤æ€»é‡
+	T_I64 iTurnover;			//æˆäº¤æ€»é‡‘é¢
+	T_I64 iTotalBidVol;			//å§”æ‰˜ä¹°å…¥æ€»é‡
+	T_I64 iTotalAskVol;			//å§”æ‰˜å–å‡ºæ€»é‡
+	T_U32 uWeightedAvgBidPrice; //åŠ æƒå¹³å‡å§”ä¹°ä»·æ ¼
+	T_U32 uWeightedAvgAskPrice; //åŠ æƒå¹³å‡å§”å–ä»·æ ¼
+	T_I32 nIOPV;				//IOPVå‡€å€¼ä¼°å€¼
+	T_I32 nYieldToMaturity;		//åˆ°æœŸæ”¶ç›Šç‡
+	T_U32 uHighLimited;			//æ¶¨åœä»· 999999999 è¡¨ç¤ºæ— æ¶¨åœä»·æ ¼é™åˆ¶
+	T_U32 uLowLimited;			//è·Œåœä»· -999999999 ,ç”¨æ— ç¬¦å·è¡¨ç¤ºæˆ3294967297 è¡¨ç¤ºæ— è·Œåœä»·æ ¼é™åˆ¶ï¼›å¯¹äºä»·æ ¼ä¸å¯ä»¥ä¸ºè´Ÿæ•°çš„ä¸šåŠ¡ï¼Œåˆ™å¡«å†™ä»·æ ¼æ¡£ä½ï¼Œè¡¨ç¤ºæ— è·Œåœä»·æ ¼é™åˆ¶ï¼Œæ¯”å¦‚å¯¹äºè‚¡ç¥¨ç°è´§é›†ä¸­ç«ä»·ä¸šåŠ¡å¡«å†™ 10
+	char sPrefix[4];			//è¯åˆ¸ä¿¡æ¯å‰ç¼€
+	T_I32 nSyl1;				//å¸‚ç›ˆç‡1 2 ä½å°æ•° è‚¡ç¥¨ï¼šä»·æ ¼/ä¸Šå¹´æ¯è‚¡åˆ©æ¶¦ å€ºåˆ¸ï¼šæ¯ç™¾å…ƒåº”è®¡åˆ©æ¯
+	T_I32 nSyl2;				//å¸‚ç›ˆç‡2 2 ä½å°æ•° è‚¡ç¥¨ï¼šä»·æ ¼/æœ¬å¹´æ¯è‚¡åˆ©æ¶¦ å€ºåˆ¸ï¼šåˆ°æœŸæ”¶ç›Šç‡ åŸºé‡‘ï¼šæ¯ç™¾ä»½çš„IOPV æˆ–å‡€å€¼ æƒè¯ï¼šæº¢ä»·ç‡
+	T_I32 nSD2;					//å‡è·Œ2ï¼ˆå¯¹æ¯”ä¸Šä¸€ç¬”ï¼‰
+	char sTradingPhraseCode[8]; //ä¸Šäº¤æ‰€ä¸æ·±äº¤æ‰€å­—æ®µå«ä¹‰ä¸åŒï¼Œå‚è§ä»¥ä¸‹æ³¨è§£ï¼š
+	//æ·±äº¤æ‰€ï¼š
+	//   äº§å“æ‰€å¤„çš„äº¤æ˜“é˜¶æ®µä»£ç 
+	//ç¬¬ 0 ä½ï¼š
+	//S=å¯åŠ¨ï¼ˆå¼€å¸‚å‰ï¼‰
+	//O=å¼€ç›˜é›†åˆç«ä»·
+	//T=è¿ç»­ç«ä»·
+	//B=ä¼‘å¸‚
+	//C=æ”¶ç›˜é›†åˆç«ä»·
+	//E=å·²é—­å¸‚
+	//H=ä¸´æ—¶åœç‰Œ
+	//A=ç›˜åäº¤æ˜“
+	//V=æ³¢åŠ¨æ€§ä¸­æ–­
+	//ç¬¬ 1 ä½ï¼š
+	//0=æ­£å¸¸çŠ¶æ€
+	//1=å…¨å¤©åœç‰Œ
+	T_I32 nPreIOPV; //åŸºé‡‘T-1æ—¥æ”¶ç›˜æ—¶åˆ»IOPV ä»…æ ‡çš„ä¸ºåŸºé‡‘æ—¶æœ‰æ•ˆ
 } T_SZ_StockMarketDataL2, *PSZ_StockMarketDataL2;
 
-//1.2 L1ĞĞÇé£¬ÉÏ½»ËùÓëÉî½»Ëù¾ùÓÃ´Ë½á¹¹
-typedef struct t_SZ_StockMarketDataL1 {
-	T_I32 nTime;				//Ê±¼ä(HHMMSSmmmm)
-	T_I32 nStatus;				//×´Ì¬
-	T_U32 uPreClose;			//Ç°ÊÕÅÌ¼Û
-	T_U32 uOpen;				//¿ªÅÌ¼Û
-	T_U32 uHigh;				//×î¸ß¼Û
-	T_U32 uLow;					//×îµÍ¼Û
-	T_U32 uMatch;				//×îĞÂ¼Û
-	T_U32 uAskPrice[5];			//ÉêÂô¼Û
-	T_U32 uAskVol[5];			//ÉêÂôÁ¿
-	T_U32 uBidPrice[5];			//ÉêÂò¼Û
-	T_U32 uBidVol[5];			//ÉêÂòÁ¿
-	T_U32 uNumTrades;			//³É½»±ÊÊı
-	T_I64 iVolume;				//³É½»×ÜÁ¿
-	T_I64 iTurnover;			//³É½»×Ü½ğ¶î
-	T_U32 uHighLimited;			//ÕÇÍ£¼Û
-	T_U32 uLowLimited;			//µøÍ£¼Û
-	char sTradingPhraseCode[8]; //ÉÏ½»ËùÓëÉî½»Ëù×Ö¶Îº¬Òå²»Í¬£¬²Î¼ûÒÔÏÂ×¢½â£º
-	//Éî½»Ëù£º
-	//   ²úÆ·Ëù´¦µÄ½»Ò×½×¶Î´úÂë
-	//µÚ 0 Î»£º
-	//S=Æô¶¯£¨¿ªÊĞÇ°£©
-	//O=¿ªÅÌ¼¯ºÏ¾º¼Û
-	//T=Á¬Ğø¾º¼Û
-	//B=ĞİÊĞ
-	//C=ÊÕÅÌ¼¯ºÏ¾º¼Û
-	//E=ÒÑ±ÕÊĞ
-	//H=ÁÙÊ±Í£ÅÆ
-	//A=ÅÌºó½»Ò×
-	//V=²¨¶¯ĞÔÖĞ¶Ï
-	//µÚ 1 Î»£º
-	//0=Õı³£×´Ì¬
-	//1=È«ÌìÍ£ÅÆ
-	T_I32 nPreIOPV; //»ù½ğT-1ÈÕÊÕÅÌÊ±¿ÌIOPV ½ö±êµÄÎª»ù½ğÊ±ÓĞĞ§
-	T_I32 nIOPV;	//»ù½ğIOPV  ½ö±êµÄÎª»ù½ğÊ±ÓĞĞ§
+//1.2 L1è¡Œæƒ…ï¼Œä¸Šäº¤æ‰€ä¸æ·±äº¤æ‰€å‡ç”¨æ­¤ç»“æ„
+typedef struct t_SZ_StockMarketDataL1
+{
+	T_I32 nTime;				//æ—¶é—´(HHMMSSmmmm)
+	T_I32 nStatus;				//çŠ¶æ€
+	T_U32 uPreClose;			//å‰æ”¶ç›˜ä»·
+	T_U32 uOpen;				//å¼€ç›˜ä»·
+	T_U32 uHigh;				//æœ€é«˜ä»·
+	T_U32 uLow;					//æœ€ä½ä»·
+	T_U32 uMatch;				//æœ€æ–°ä»·
+	T_U32 uAskPrice[5];			//ç”³å–ä»·
+	T_U32 uAskVol[5];			//ç”³å–é‡
+	T_U32 uBidPrice[5];			//ç”³ä¹°ä»·
+	T_U32 uBidVol[5];			//ç”³ä¹°é‡
+	T_U32 uNumTrades;			//æˆäº¤ç¬”æ•°
+	T_I64 iVolume;				//æˆäº¤æ€»é‡
+	T_I64 iTurnover;			//æˆäº¤æ€»é‡‘é¢
+	T_U32 uHighLimited;			//æ¶¨åœä»·
+	T_U32 uLowLimited;			//è·Œåœä»·
+	char sTradingPhraseCode[8]; //ä¸Šäº¤æ‰€ä¸æ·±äº¤æ‰€å­—æ®µå«ä¹‰ä¸åŒï¼Œå‚è§ä»¥ä¸‹æ³¨è§£ï¼š
+	//æ·±äº¤æ‰€ï¼š
+	//   äº§å“æ‰€å¤„çš„äº¤æ˜“é˜¶æ®µä»£ç 
+	//ç¬¬ 0 ä½ï¼š
+	//S=å¯åŠ¨ï¼ˆå¼€å¸‚å‰ï¼‰
+	//O=å¼€ç›˜é›†åˆç«ä»·
+	//T=è¿ç»­ç«ä»·
+	//B=ä¼‘å¸‚
+	//C=æ”¶ç›˜é›†åˆç«ä»·
+	//E=å·²é—­å¸‚
+	//H=ä¸´æ—¶åœç‰Œ
+	//A=ç›˜åäº¤æ˜“
+	//V=æ³¢åŠ¨æ€§ä¸­æ–­
+	//ç¬¬ 1 ä½ï¼š
+	//0=æ­£å¸¸çŠ¶æ€
+	//1=å…¨å¤©åœç‰Œ
+	T_I32 nPreIOPV; //åŸºé‡‘T-1æ—¥æ”¶ç›˜æ—¶åˆ»IOPV ä»…æ ‡çš„ä¸ºåŸºé‡‘æ—¶æœ‰æ•ˆ
+	T_I32 nIOPV;	//åŸºé‡‘IOPV  ä»…æ ‡çš„ä¸ºåŸºé‡‘æ—¶æœ‰æ•ˆ
 } T_SZ_StockMarketDataL1, *PSZ_StockMarketDataL1;
 
-//Éî½»ËùV5°æÖğ±Ê³É½»Î¯ÍĞĞĞÇé  ¶ÔÓ¦BinaryĞ­ÒéÎÄµµ4.4.5
+//æ·±äº¤æ‰€V5ç‰ˆé€ç¬”æˆäº¤å§”æ‰˜è¡Œæƒ…  å¯¹åº”Binaryåè®®æ–‡æ¡£4.4.5
 
-typedef struct t_SZ_StepTrade {
-	T_U16 usChannelNo;		   //ÆµµÀ´úÂë
-	T_I64 i64ApplSeqNum;	   //ÏûÏ¢¼ÇÂ¼ºÅ ´Ó1¿ªÊ¼¼ÆÊı
-	char sMDStreamID[3];	   //ĞĞÇéÀà±ğ
-	T_I64 i64BidApplSeqNum;	//Âò·½Î¯ÍĞË÷Òı£¬´Ó1¿ªÊ¼¼ÆÊı£¬0±íÊ¾ÎŞ¶ÔÓ¦Î¯ÍĞ
-	T_I64 i64OfferApplSeqNum;  //Âô·½Î¯ÍĞË÷Òı,´Ó1¿ªÊ¼¼ÆÊı,0±íÊ¾ÎŞ¶ÔÓ¦Î¯ÍĞ
-	char sSecurityID[8];	   //Ö¤È¯´úÂë
-	char sSecurityIDSource[4]; //Ö¤È¯´úÂëÔ´ 101=ÉîÛÚÖ¤È¯½»Ò×Ëù
-	T_I64 i64LastPx;		   //Î¯ÍĞ¼Û¸ñ
-	T_I64 i64LastQty;		   //Î¯ÍĞÊıÁ¿
-	char cExecType;			   //³É½»Àà±ğ 4=³·Ïú F=³É½»
-	T_I64 i64TransactTime;	 //Î¯ÍĞÊ±¼ä
-	char sExtendFields[];	  //¸÷ÒµÎñÀ©Õ¹×Ö¶Î ÄÚÈİÓÉMDStreamID×Ö¶Î¾ö¶¨£¬ÈçMDStreamID=011 ±íÊ¾ÏÖ»õ£¨¹ÉÆ±£¬»ù½ğ£¬Õ®È¯µÈ£©¼¯ÖĞ¾º¼Û½»Ò×Öğ±ÊĞĞÇé£¬Ôİ±í¸÷À©Õ¹×Ö¶ÎÎª¿Õ
+typedef struct t_SZ_StepTrade
+{
+	T_U16 usChannelNo;		   //é¢‘é“ä»£ç 
+	T_I64 i64ApplSeqNum;	   //æ¶ˆæ¯è®°å½•å· ä»1å¼€å§‹è®¡æ•°
+	char sMDStreamID[3];	   //è¡Œæƒ…ç±»åˆ«
+	T_I64 i64BidApplSeqNum;	   //ä¹°æ–¹å§”æ‰˜ç´¢å¼•ï¼Œä»1å¼€å§‹è®¡æ•°ï¼Œ0è¡¨ç¤ºæ— å¯¹åº”å§”æ‰˜
+	T_I64 i64OfferApplSeqNum;  //å–æ–¹å§”æ‰˜ç´¢å¼•,ä»1å¼€å§‹è®¡æ•°,0è¡¨ç¤ºæ— å¯¹åº”å§”æ‰˜
+	char sSecurityID[8];	   //è¯åˆ¸ä»£ç 
+	char sSecurityIDSource[4]; //è¯åˆ¸ä»£ç æº 101=æ·±åœ³è¯åˆ¸äº¤æ˜“æ‰€
+	T_I64 i64LastPx;		   //æˆäº¤ä»·æ ¼
+	T_I64 i64LastQty;		   //æˆäº¤æ•°é‡
+	char cExecType;			   //æˆäº¤ç±»åˆ« 4=æ’¤é”€ F=æˆäº¤
+	T_I64 i64TransactTime;	   //å§”æ‰˜æ—¶é—´
+	char sExtendFields[];	   //å„ä¸šåŠ¡æ‰©å±•å­—æ®µ å†…å®¹ç”±MDStreamIDå­—æ®µå†³å®šï¼Œå¦‚MDStreamID=011 è¡¨ç¤ºç°è´§ï¼ˆè‚¡ç¥¨ï¼ŒåŸºé‡‘ï¼Œå€ºåˆ¸ç­‰ï¼‰é›†ä¸­ç«ä»·äº¤æ˜“é€ç¬”è¡Œæƒ…ï¼Œæš‚è¡¨å„æ‰©å±•å­—æ®µä¸ºç©º
 } T_SZ_STEPTRADE, *PSZ_STEPTRADE;
-//MDStreamID=011 ÏÖ»õ£¨¹ÉÆ±£¬»ù½ğ£¬Õ®È¯µÈ£©¼¯ÖĞ¾º¼Û½»Ò×Öğ±ÊĞĞÇé
-//MDStreamID=021 ÖÊÑºÊ½»Ø¹º½»Ò×Öğ±ÊĞĞÇé
-typedef struct t_SZ_300191ExtendFields {
+//MDStreamID=011 ç°è´§ï¼ˆè‚¡ç¥¨ï¼ŒåŸºé‡‘ï¼Œå€ºåˆ¸ç­‰ï¼‰é›†ä¸­ç«ä»·äº¤æ˜“é€ç¬”è¡Œæƒ…
+//MDStreamID=021 è´¨æŠ¼å¼å›è´­äº¤æ˜“é€ç¬”è¡Œæƒ…
+typedef struct t_SZ_300191ExtendFields
+{
 
 } T_SZ_300191EXTENDFIELDS, *PSZ_300191EXTENDFIELDS;
-//MDStreamID=051 Ğ­Òé½»Ò×Öğ±ÊÒâÏòĞĞÇé
-//MDStreamID=052 Ğ­Òé½»Ò×Öğ±Ê¶¨¼ÛĞĞÇé
-typedef struct t_SZ_300591ExtendFields {
+//MDStreamID=051 åè®®äº¤æ˜“é€ç¬”æ„å‘è¡Œæƒ…
+//MDStreamID=052 åè®®äº¤æ˜“é€ç¬”å®šä»·è¡Œæƒ…
+typedef struct t_SZ_300591ExtendFields
+{
 
 } T_SZ_300591EXTENDFIELDS, *PSZ_300591EXTENDFIELDS;
 
-//MDStreamID=071 ×ªÈÚÍ¨Ö¤È¯³ö½èÖğ±ÊĞĞÇé
-typedef struct t_SZ_300791ExtendFields {
+//MDStreamID=071 è½¬èé€šè¯åˆ¸å‡ºå€Ÿé€ç¬”è¡Œæƒ…
+typedef struct t_SZ_300791ExtendFields
+{
 
 } T_SZ_300791EXTENDFIELDS, *PSZ_300791EXTENDFIELDS;
 
-//Éî½»ËùV5°æÖğ±ÊÎ¯ÍĞĞĞÇé
+//æ·±äº¤æ‰€V5ç‰ˆé€ç¬”å§”æ‰˜è¡Œæƒ…
 
-//Öğ±ÊÎ¯ÍĞĞĞÇé MsgType=30XX92 ¶ÔÓ¦BinaryĞ­ÒéÎÄµµ4.4.4
-typedef struct t_SZ_StepOrder {
-	T_U16 usChannelNo;		   //ÆµµÀ´úÂë
-	T_I64 i64ApplSeqNum;	   //ÏûÏ¢¼ÇÂ¼ºÅ ´Ó1¿ªÊ¼¼ÆÊı
-	char sMDStreamID[3];	   //ĞĞÇéÀà±ğ
-	char sSecurityID[8];	   //Ö¤È¯´úÂë
-	char sSecurityIDSource[4]; //Ö¤È¯´úÂëÔ´ 101=ÉîÛÚÖ¤È¯½»Ò×Ëù
-	T_I64 i64Price;			   //Î¯ÍĞ¼Û¸ñ
-	T_I64 i64OrderQty;		   //Î¯ÍĞÊıÁ¿
-	char cSide;				   //ÂòÂô·½Ïò 1=Âò 2=Âô G=½èÈë F=½è³ö
-	T_I64 i64TransactTime;	 //Î¯ÍĞÊ±¼ä
-	char sExtendFields[];	  //¸÷ÒµÎñÀ©Õ¹×Ö¶Î ÄÚÈİÓÉMDStreamID×Ö¶Î¾ö¶¨£¬ÈçMDStreamID=011 ±íÊ¾ÏÖ»õ£¨¹ÉÆ±£¬»ù½ğ£¬Õ®È¯µÈ£©¼¯ÖĞ¾º¼Û½»Ò×Öğ±ÊĞĞÇé
+//é€ç¬”å§”æ‰˜è¡Œæƒ… MsgType=30XX92 å¯¹åº”Binaryåè®®æ–‡æ¡£4.4.4
+typedef struct t_SZ_StepOrder
+{
+	T_U16 usChannelNo;		   //é¢‘é“ä»£ç 
+	T_I64 i64ApplSeqNum;	   //æ¶ˆæ¯è®°å½•å· ä»1å¼€å§‹è®¡æ•°
+	char sMDStreamID[3];	   //è¡Œæƒ…ç±»åˆ«
+	char sSecurityID[8];	   //è¯åˆ¸ä»£ç 
+	char sSecurityIDSource[4]; //è¯åˆ¸ä»£ç æº 101=æ·±åœ³è¯åˆ¸äº¤æ˜“æ‰€
+	T_I64 i64Price;			   //å§”æ‰˜ä»·æ ¼
+	T_I64 i64OrderQty;		   //å§”æ‰˜æ•°é‡
+	char cSide;				   //ä¹°å–æ–¹å‘ 1=ä¹° 2=å– G=å€Ÿå…¥ F=å€Ÿå‡º
+	T_I64 i64TransactTime;	   //å§”æ‰˜æ—¶é—´
+	char sExtendFields[];	   //å„ä¸šåŠ¡æ‰©å±•å­—æ®µ å†…å®¹ç”±MDStreamIDå­—æ®µå†³å®šï¼Œå¦‚MDStreamID=011 è¡¨ç¤ºç°è´§ï¼ˆè‚¡ç¥¨ï¼ŒåŸºé‡‘ï¼Œå€ºåˆ¸ç­‰ï¼‰é›†ä¸­ç«ä»·äº¤æ˜“é€ç¬”è¡Œæƒ…
 } T_SZ_STEPORDER, *PSZ_STEPORDER;
 
 /***
-**  4.4.4.1 ¼¯ÖĞ¾º¼ÛÒµÎñÖğ±ÊÎ¯ÍĞĞĞÇéÀ©Õ¹×Ö¶Î£¨ 300192£©      ±í 4-14-1 ¼¯ÖĞ¾º¼ÛÒµÎñÖğ±ÊÎ¯ÍĞĞĞÇéÀ©Õ¹×Ö¶ÎËµÃ÷
+**  4.4.4.1 é›†ä¸­ç«ä»·ä¸šåŠ¡é€ç¬”å§”æ‰˜è¡Œæƒ…æ‰©å±•å­—æ®µï¼ˆ 300192ï¼‰      è¡¨ 4-14-1 é›†ä¸­ç«ä»·ä¸šåŠ¡é€ç¬”å§”æ‰˜è¡Œæƒ…æ‰©å±•å­—æ®µè¯´æ˜
 ***/
-//MDStreamID=011 ÏÖ»õ£¨¹ÉÆ±£¬»ù½ğ£¬Õ®È¯µÈ£©¼¯ÖĞ¾º¼Û½»Ò×Öğ±ÊĞĞÇé
-//MDStreamID=021 ÖÊÑºÊ½»Ø¹º½»Ò×Öğ±ÊĞĞÇé
-typedef struct t_SZ_300192ExtendFields {
-	char cOrdType; //¶©µ¥Àà±ğ 1=ÊĞ¼Û 2=ÏŞ¼Û U=±¾·½×îÓÅ
+//MDStreamID=011 ç°è´§ï¼ˆè‚¡ç¥¨ï¼ŒåŸºé‡‘ï¼Œå€ºåˆ¸ç­‰ï¼‰é›†ä¸­ç«ä»·äº¤æ˜“é€ç¬”è¡Œæƒ…
+//MDStreamID=021 è´¨æŠ¼å¼å›è´­äº¤æ˜“é€ç¬”è¡Œæƒ…
+typedef struct t_SZ_300192ExtendFields
+{
+	char cOrdType; //è®¢å•ç±»åˆ« 1=å¸‚ä»· 2=é™ä»· U=æœ¬æ–¹æœ€ä¼˜
 
 } T_SZ_300192EXTENDFIELDS, *PSZ_300192EXTENDFIELDS;
 
 /***
-   **  4.4.4.2 Ğ­Òé½»Ò×ÒµÎñÖğ±ÊÎ¯ÍĞĞĞÇéÀ©Õ¹×Ö¶Î£¨ 300592£©  ±í 4-14-2 Ğ­Òé½»Ò×ÒµÎñÖğ±ÊÎ¯ÍĞĞĞÇéÀ©Õ¹×Ö¶Î¶¨Òå
+   **  4.4.4.2 åè®®äº¤æ˜“ä¸šåŠ¡é€ç¬”å§”æ‰˜è¡Œæƒ…æ‰©å±•å­—æ®µï¼ˆ 300592ï¼‰  è¡¨ 4-14-2 åè®®äº¤æ˜“ä¸šåŠ¡é€ç¬”å§”æ‰˜è¡Œæƒ…æ‰©å±•å­—æ®µå®šä¹‰
    ***/
-//MDStreamID=051 Ğ­Òé½»Ò×Öğ±ÊÒâÏòĞĞÇé
-//MDStreamID=052 Ğ­Òé½»Ò×Öğ±Ê¶¨¼ÛĞĞÇé
-typedef struct t_SZ_300592ExtendFields {
-	char sConfirmID[8];	//¶¨¼ÛĞĞÇéÔ¼¶¨ºÅ  char[8]    ConfirmID Îª¿Õ±íÊ¾ÊÇÒâÏòĞĞÇé  ·ñÔòÎª¶¨¼ÛĞĞÇé
-	char sContactor[12];   // ÁªÏµÈË               char[12]
-	char sContactInfo[30]; // ÁªÏµ·½Ê½            char[30]
+//MDStreamID=051 åè®®äº¤æ˜“é€ç¬”æ„å‘è¡Œæƒ…
+//MDStreamID=052 åè®®äº¤æ˜“é€ç¬”å®šä»·è¡Œæƒ…
+typedef struct t_SZ_300592ExtendFields
+{
+	char sConfirmID[8];	   //å®šä»·è¡Œæƒ…çº¦å®šå·  char[8]    ConfirmID ä¸ºç©ºè¡¨ç¤ºæ˜¯æ„å‘è¡Œæƒ…  å¦åˆ™ä¸ºå®šä»·è¡Œæƒ…
+	char sContactor[12];   // è”ç³»äºº               char[12]
+	char sContactInfo[30]; // è”ç³»æ–¹å¼            char[30]
 
 } T_SZ_300592EXTENDFIELDS, *PSZ_300592EXTENDFIELDS;
 
 /***
-	**  4.4.4.3 ×ªÈÚÍ¨Ö¤È¯³ö½èÒµÎñÖğ±ÊÎ¯ÍĞĞĞÇéÀ©Õ¹×Ö¶Î£¨ 300792£©  ±í 4-14-3 ×ªÈÚÍ¨Ö¤È¯³ö½èÒµÎñÖğ±ÊÎ¯ÍĞĞĞÇéÀ©Õ¹×Ö¶Î¶¨Òå
+	**  4.4.4.3 è½¬èé€šè¯åˆ¸å‡ºå€Ÿä¸šåŠ¡é€ç¬”å§”æ‰˜è¡Œæƒ…æ‰©å±•å­—æ®µï¼ˆ 300792ï¼‰  è¡¨ 4-14-3 è½¬èé€šè¯åˆ¸å‡ºå€Ÿä¸šåŠ¡é€ç¬”å§”æ‰˜è¡Œæƒ…æ‰©å±•å­—æ®µå®šä¹‰
    ***/
-//MDStreamID=071 ×ªÈÚÍ¨Ö¤È¯³ö½èÖğ±ÊĞĞÇé
-typedef struct t_SZ_300792ExtendFields {
-	T_U16 usExpirationDays; // ÆÚÏŞ£¬           uInt16       µ¥Î»ÎªÌìÊı
-	T_U8 ucExpirationType;  // ÆÚÏŞÀàĞÍ         uInt8        1=¹Ì¶¨ÆÚÏŞ
+//MDStreamID=071 è½¬èé€šè¯åˆ¸å‡ºå€Ÿé€ç¬”è¡Œæƒ…
+typedef struct t_SZ_300792ExtendFields
+{
+	T_U16 usExpirationDays; // æœŸé™ï¼Œ           uInt16       å•ä½ä¸ºå¤©æ•°
+	T_U8 ucExpirationType;	// æœŸé™ç±»å‹         uInt8        1=å›ºå®šæœŸé™
 } T_SZ_300792EXTENDFIELDS, *PSZ_300792EXTENDFIELDS;
 
-//1.5 ¶©µ¥¶ÓÁĞ(Queue)
+//1.5 è®¢å•é˜Ÿåˆ—(Queue)
 #ifndef _ORDER_QUEUE_
 #define _ORDER_QUEUE_
 
-typedef struct t_OrderQueueHead {
-	T_I32 nItem; //Êı¾İ¸öÊı
+typedef struct t_OrderQueueHead
+{
+	T_I32 nItem; //æ•°æ®ä¸ªæ•°
 } T_OrderQueueHead, *POrderQueueHead;
-typedef struct t_OrderQueueItem {
-	T_I32 nTime;		  //¶©µ¥Ê±¼ä(HHMMSSmmmm)
-	T_I32 nSide;		  //ÂòÂô·½Ïò('B':Bid 'S':Ask)
-	T_I32 nPrice;		  //³É½»¼Û¸ñ
-	T_I32 nOrders;		  //¶©µ¥ÊıÁ¿
-	T_I32 nABItems;		  //Ã÷Ï¸¸öÊı
-	T_I32 nABVolume[200]; //¶©µ¥Ã÷Ï¸
+typedef struct t_OrderQueueItem
+{
+	T_I32 nTime;		  //è®¢å•æ—¶é—´(HHMMSSmmmm)
+	T_I32 nSide;		  //ä¹°å–æ–¹å‘('B':Bid 'S':Ask)
+	T_I32 nPrice;		  //æˆäº¤ä»·æ ¼
+	T_I32 nOrders;		  //è®¢å•æ•°é‡
+	T_I32 nABItems;		  //æ˜ç»†ä¸ªæ•°
+	T_I32 nABVolume[200]; //è®¢å•æ˜ç»†
 } T_OrderQueueItem, *POrderQueueItem;
 
 #endif //#define _ORDER_QUEUE_
-typedef struct t_SZ_StockOrderQueue {
+typedef struct t_SZ_StockOrderQueue
+{
 	T_OrderQueueHead tHead;
 	T_OrderQueueItem tItem[0];
 
 } T_SZ_StockOrderQueue, *PSZ_StockOrderQueue;
 
-//1.6 Ö¸Êı
-typedef struct t_SZ_StockIndex {
-	T_I32 nTime;		  //Ê±¼ä(HHMMSSmmmm)
-	T_I32 nOpenIndex;	 //½ñ¿ªÅÌÖ¸Êı
-	T_I32 nHighIndex;	 //×î¸ßÖ¸Êı
-	T_I32 nLowIndex;	  //×îµÍÖ¸Êı
-	T_I32 nLastIndex;	 //×îĞÂÖ¸Êı
-	T_I64 iTotalVolume;   //²ÎÓë¼ÆËãÏàÓ¦Ö¸ÊıµÄ½»Ò×ÊıÁ¿
-	T_I64 iTurnover;	  //²ÎÓë¼ÆËãÏàÓ¦Ö¸ÊıµÄ³É½»½ğ¶î
-	T_I32 nPreCloseIndex; //Ç°ÅÌÖ¸Êı
+//1.6 æŒ‡æ•°
+typedef struct t_SZ_StockIndex
+{
+	T_I32 nTime;		  //æ—¶é—´(HHMMSSmmmm)
+	T_I32 nOpenIndex;	  //ä»Šå¼€ç›˜æŒ‡æ•°
+	T_I32 nHighIndex;	  //æœ€é«˜æŒ‡æ•°
+	T_I32 nLowIndex;	  //æœ€ä½æŒ‡æ•°
+	T_I32 nLastIndex;	  //æœ€æ–°æŒ‡æ•°
+	T_I64 iTotalVolume;	  //å‚ä¸è®¡ç®—ç›¸åº”æŒ‡æ•°çš„äº¤æ˜“æ•°é‡
+	T_I64 iTurnover;	  //å‚ä¸è®¡ç®—ç›¸åº”æŒ‡æ•°çš„æˆäº¤é‡‘é¢
+	T_I32 nPreCloseIndex; //å‰ç›˜æŒ‡æ•°
 } T_SZ_StockIndex, *PSZ_StockIndex;
 
-//1.7 ·ÖÖÓKÏß
-typedef struct t_SZ_Kline {
-	T_U32 uDay;				// ÈÕÆÚ				YYYYMMDD
-	T_I32 nTime;			// Ê±¼ä(±±¾©Ê±¼ä)	HHMM
-	T_I32 nPreClose;		// Ç°ÊÕÅÌ¼Û         µ¥Î»£º1/100·Ö
-	T_I32 nValOpen;			// ¿ªÅÌ¼Û			µ¥Î»£º1/100·Ö,±ÈÈç1±íÊ¾0.0001Ôª
-	T_I32 nValHigh;			// ×î¸ß¼Û			µ¥Î»£º1/100·Ö
-	T_I32 nValLow;			// ×îµÍ¼Û			µ¥Î»£º1/100·Ö
-	T_I32 nValClose;		// ÊÕÅÌ¼Û			µ¥Î»£º1/100·Ö
-	T_I64 i64Volume;		// ·ÖÖÓÄÚ³É½»Á¿		µ¥Î»£º¸ÃÖ¤È¯µÄ×îĞ¡½»Ò×µ¥Î»£¬±ÈÈç¹ÉÆ±Îª¡°¹É¡±
-	T_I64 i64ValTotal;		// ·ÖÖÓÄÚ³É½»¶î		µ¥Î»£ºÔª
-	T_I64 i64TotalVol;		// ÀÛ¼Æ³É½»Á¿		µ¥Î»£º¸ÃÖ¤È¯µÄ×îĞ¡½»Ò×µ¥Î»£¬±ÈÈç¹ÉÆ±Îª¡°¹É¡±
-	T_I64 i64TotalTurnOver; // ÀÛ¼Æ³É½»½ğ¶î		µ¥Î»£ºÔª
-	T_I32 nTurover;			// »»ÊÖ(°Ù·ÖÊı)		µ¥Î»£º1/10000£¬±ÈÈç1±íÊ¾0.01%
-	T_I32 nValIncrease;		// ÕÇµøÖµ			µ¥Î»£º1/100·Ö
-} T_SZ_Kline, *PSZ_Kline;   // sizeof() = 48
+//1.7 åˆ†é’ŸKçº¿
+typedef struct t_SZ_Kline
+{
+	T_U32 uDay;				// æ—¥æœŸ				YYYYMMDD
+	T_I32 nTime;			// æ—¶é—´(åŒ—äº¬æ—¶é—´)	HHMM
+	T_I32 nPreClose;		// å‰æ”¶ç›˜ä»·         å•ä½ï¼š1/100åˆ†
+	T_I32 nValOpen;			// å¼€ç›˜ä»·			å•ä½ï¼š1/100åˆ†,æ¯”å¦‚1è¡¨ç¤º0.0001å…ƒ
+	T_I32 nValHigh;			// æœ€é«˜ä»·			å•ä½ï¼š1/100åˆ†
+	T_I32 nValLow;			// æœ€ä½ä»·			å•ä½ï¼š1/100åˆ†
+	T_I32 nValClose;		// æ”¶ç›˜ä»·			å•ä½ï¼š1/100åˆ†
+	T_I64 i64Volume;		// åˆ†é’Ÿå†…æˆäº¤é‡		å•ä½ï¼šè¯¥è¯åˆ¸çš„æœ€å°äº¤æ˜“å•ä½ï¼Œæ¯”å¦‚è‚¡ç¥¨ä¸ºâ€œè‚¡â€
+	T_I64 i64ValTotal;		// åˆ†é’Ÿå†…æˆäº¤é¢		å•ä½ï¼šå…ƒ
+	T_I64 i64TotalVol;		// ç´¯è®¡æˆäº¤é‡		å•ä½ï¼šè¯¥è¯åˆ¸çš„æœ€å°äº¤æ˜“å•ä½ï¼Œæ¯”å¦‚è‚¡ç¥¨ä¸ºâ€œè‚¡â€
+	T_I64 i64TotalTurnOver; // ç´¯è®¡æˆäº¤é‡‘é¢		å•ä½ï¼šå…ƒ
+	T_I32 nTurover;			// æ¢æ‰‹(ç™¾åˆ†æ•°)		å•ä½ï¼š1/10000ï¼Œæ¯”å¦‚1è¡¨ç¤º0.01%
+	T_I32 nValIncrease;		// æ¶¨è·Œå€¼			å•ä½ï¼š1/100åˆ†
+} T_SZ_Kline, *PSZ_Kline;	// sizeof() = 48
 
-//1.8 ´éºÏĞĞÇé
-typedef struct t_SZ_StockMarketDataLF {
-	T_I32 nTime;				//Ê±¼ä(HHMMSSmmmm)
-	T_U32 uPreClose;			//Ç°ÊÕÅÌ¼Û
-	T_U32 uOpen;				//¿ªÅÌ¼Û
-	T_U32 uHigh;				//×î¸ß¼Û
-	T_U32 uLow;					//×îµÍ¼Û
-	T_U32 uMatch;				//×îĞÂ¼Û
-	T_U32 uAskPrice[10];		//ÉêÂô¼Û
-	T_U32 uAskVol[10];			//ÉêÂôÁ¿
-	T_U32 uBidPrice[10];		//ÉêÂò¼Û
-	T_U32 uBidVol[10];			//ÉêÂòÁ¿
-	T_U32 uNumTrades;			//³É½»±ÊÊı
-	T_I64 iVolume;				//³É½»×ÜÁ¿
-	T_I64 iTurnover;			//³É½»×Ü½ğ¶î
-} T_SZ_StockMarketDataLF, *PSZ_StockMarketDataLF;
+//1.8 æ’®åˆè¡Œæƒ…
+typedef struct t_SZ_StockMarketDataLF
+{
+	T_I32 nTime;		 //æ—¶é—´(HHMMSSmmmm)
+	T_U32 uPreClose;	 //å‰æ”¶ç›˜ä»·,æ‰©å¤§10000å€
+	T_U32 uOpen;		 //å¼€ç›˜ä»·,æ‰©å¤§10000å€
+	T_U32 uHigh;		 //æœ€é«˜ä»·,æ‰©å¤§10000å€
+	T_U32 uLow;			 //æœ€ä½ä»·,æ‰©å¤§10000å€
+	T_U32 uMatch;		 //æœ€æ–°ä»·,æ‰©å¤§10000å€
+	T_U32 uAskPrice[10]; //ç”³å–ä»·,æ‰©å¤§10000å€
+	T_U32 uAskVol[10];	 //ç”³å–é‡
+	T_U32 uBidPrice[10]; //ç”³ä¹°ä»·,æ‰©å¤§10000å€
+	T_U32 uBidVol[10];	 //ç”³ä¹°é‡
+	T_U32 uNumTrades;	 //æˆäº¤ç¬”æ•°
+	T_I64 iVolume;		 //æˆäº¤æ€»é‡
+	T_I64 iTurnover;	 //æˆäº¤æ€»é‡‘é¢
+} StockMarketDataLF, T_SZ_StockMarketDataLF, *PSZ_StockMarketDataLF;
 
 /**
-* @brief Öğ±ÊĞĞÇéÊı¾İ
+* @brief é€ç¬”è¡Œæƒ…æ•°æ®
 *
 **/
-typedef struct t_TickByTickData {
-	char cType;					//Î¯ÍĞ:'0' ,³É½»:'1'
-	union {
-		T_SZ_STEPORDER		entrust; //Öğ±ÊÎ¯ÍĞ
-		T_SZ_STEPTRADE		 trade;	//Öğ±Ê³É½»
+typedef struct t_TickByTickData
+{
+	char cType; //å§”æ‰˜:'0' ,æˆäº¤:'1'
+	union
+	{
+		T_SZ_STEPORDER entrust; //é€ç¬”å§”æ‰˜
+		T_SZ_STEPTRADE trade;	//é€ç¬”æˆäº¤
 	} UttData;
 
 } T_SZ_TickByTickData, *PSZ_TickByTickData;

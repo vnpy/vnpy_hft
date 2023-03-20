@@ -1,11 +1,12 @@
-ï»¿
+
 #ifndef _DATATYPE_DEFINE_H_
 #define _DATATYPE_DEFINE_H_
-// æ¥å£ä½¿ç”¨çš„å…¬å…±å®šä¹‰å’Œç»“æ„
-// tdef.h LINUXç‰ˆ/Windowsç‰ˆå…¼å®¹
+// ½Ó¿ÚÊ¹ÓÃµÄ¹«¹²¶¨ÒåºÍ½á¹¹
+// tdef.h LINUX°æ/Windows°æ¼æÈİ
 // ver 1.0
+// ×÷Õß: Âí»Ô ¹úÌ©¾ı°²Ö¤È¯ 2013/10/23 
 
-// LINUXä¸­ GCCç±»å‹é•¿åº¦(å­—èŠ‚)
+// LINUXÖĞ GCCÀàĞÍ³¤¶È(×Ö½Ú)
 // type         x86_sizeof(type)    x64_sizeof(type)
 // char         1                   1
 // short        2                   2
@@ -18,11 +19,11 @@
 
 //__GNUC__
 //linux
-//__i386__  æ˜¯x86
-//__x86_64__  æ˜¯X64
+//__i386__  ÊÇx86
+//__x86_64__  ÊÇX64
 
 
-//windows VCç¼–è¯‘å™¨
+//windows VC±àÒëÆ÷
 // type         x86_sizeof(type)    x64_sizeof(type)
 // char         1                   1
 // short        2                   2
@@ -34,40 +35,40 @@
 // double       8                   8
 
 //_WIN32
-//  Defined for applications for Win32 and Win64. Always defined.
+//	Defined for applications for Win32 and Win64. Always defined.
 //_WIN64
-//  Defined for applications for Win64.
-//_WINDOWS_ åœ¨Windows.hä¸­å®šä¹‰çš„#ifndef _WINDOWS_
+//	Defined for applications for Win64.
+//_WINDOWS_ ÔÚWindows.hÖĞ¶¨ÒåµÄ#ifndef _WINDOWS_
 //#define _WINDOWS_
 
 
 
 
 
-// åŸºæœ¬æ•°æ®ç±»å‹
-typedef char                    T_I8;
-typedef unsigned char           T_U8;
+// »ù±¾Êı¾İÀàĞÍ
+typedef char				T_I8;
+typedef unsigned char		T_U8;
 
-typedef short int               T_I16;
-typedef unsigned short int      T_U16;
+typedef short int			T_I16;
+typedef unsigned short int	T_U16;
 
-typedef int                     T_I32;
-typedef unsigned int            T_U32;
+typedef int					T_I32;
+typedef unsigned int		T_U32;
 
-typedef long long               T_I64;
-typedef unsigned long long      T_U64;
+typedef long long			T_I64;
+typedef unsigned long long	T_U64;
 
-typedef float                   T_F32;
-typedef double                  T_F64;
+typedef float				T_F32;
+typedef double				T_F64;
 
 #ifdef linux    // linux
     #define UNALIGNED
     #define __stdcall
 
-    typedef  long               T_HANDLE;  // soæ¥å£ç”¨çš„å¥æŸ„ï¼Œå¯ä¸æŒ‡é’ˆç±»å‹äº’è½¬
-    typedef long                T_PARAM;  // ç”¨äºå›è°ƒå‚æ•°ï¼Œå¯ä¸æŒ‡é’ˆç±»å‹äº’è½¬
+    typedef	long			    T_HANDLE;	// so½Ó¿ÚÓÃµÄ¾ä±ú£¬¿ÉÓëÖ¸ÕëÀàĞÍ»¥×ª
+    typedef long			    T_PARAM;	// ÓÃÓÚ»Øµ÷²ÎÊı£¬¿ÉÓëÖ¸ÕëÀàĞÍ»¥×ª
 
-    //{{ windowsä¹ æƒ¯çš„å®šä¹‰
+    //{{ windowsÏ°¹ßµÄ¶¨Òå
     typedef int                 SOCKET;
 
     #define FALSE               0
@@ -78,22 +79,14 @@ typedef double                  T_F64;
     #define SOCKET_ERROR        (-1)
     #define INVALID_HANDLE_FILE (-1)
     #define stricmp(a,b)        strcasecmp(a,b)
-
-    #ifndef max
-        #define max(a,b)        (((a) > (b)) ? (a) : (b))
-    #endif
-
-    #ifndef min
-        #define min(a,b)        (((a) < (b)) ? (a) : (b))
-    #endif
     //}}
 #else // windows
     #ifdef _WIN64
-        typedef long long       T_HANDLE;
-        typedef long long       T_PARAM;  // ç”¨äºå›è°ƒå‚æ•°ï¼Œå¯ä¸æŒ‡é’ˆç±»å‹äº’è½¬
+        typedef long long           T_HANDLE;
+        typedef long long			T_PARAM;	// ÓÃÓÚ»Øµ÷²ÎÊı£¬¿ÉÓëÖ¸ÕëÀàĞÍ»¥×ª
     #else
-        typedef  long           T_HANDLE;
-        typedef long            T_PARAM;  // ç”¨äºå›è°ƒå‚æ•°ï¼Œå¯ä¸æŒ‡é’ˆç±»å‹äº’è½¬
+        typedef	long			    T_HANDLE;
+        typedef long			    T_PARAM;	// ÓÃÓÚ»Øµ÷²ÎÊı£¬¿ÉÓëÖ¸ÕëÀàĞÍ»¥×ª
     #endif //WIN64
 #endif
 

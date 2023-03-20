@@ -1,20 +1,19 @@
-#ifndef _T_SHFE_MARKET_
-#define _T_SHFE_MARKET_
+#ifndef _T_INE_MARKET_
+#define _T_INE_MARKET_
 #include "tdef.h"
 
 //*****************************************************************************************
 //以上服务数据ID保留与原系统兼容，以下服务ID针对每个市场分开定义
 
-//-----------------------------------上期所-----------------------------------------------
-#define ID_SHFE_BASEINFO 6001	 //期货及期权基础信息
-#define ID_SHFE_MARKETDATA 6002   //期货及期权行情数据
-#define ID_SHFE_FORQOUTE 6003	 //询价通知
-#define ID_SHFE_MARKETDATAL2 6004 //期货及期权L2行情数据
-#define ID_SHFE_KLINE 6007 //期货及期权分钟K线行情数据
+//-----------------------------------能源交易中心-----------------------------------------------
+#define ID_INE_BASEINFO 15001   //期货及期权基础信息
+#define ID_INE_MARKETDATA 15002 //期货及期权行情数据
+#define ID_INE_FORQOUTE 15003   //询价通知
+#define ID_INE_KLINE 15007 //期货及期权分钟K线行情数据
 
 #pragma pack(push, 1)
-//1.1 上期所期货行情
-typedef struct t_SHFE_FutursMarketData
+//1.1 能源交易中心期货行情
+typedef struct t_INE_FutursMarketData
 {
 	T_I32 nTime;			//时间(HHMMSSmmmm)
 	T_I32 nStatus;			//状态
@@ -42,8 +41,8 @@ typedef struct t_SHFE_FutursMarketData
 	char sRevs[3];			//保留字段
 	T_I32      nTradingDay;            //交易日
 	T_I32      nActionDay;             //业务日期
-} T_SHFE_FutursMarketData, *PSHFE_FutursMarketData;
-//1.2 上期所期货基础信息
+} T_INE_FutursMarketData, *PINE_FutursMarketData;
+//1.2 能源交易中心期货及期权基础信息
 /////产品类型-------------------------------------------------------
 ///期货
 #define THOST_FTDC_PC_Futures '1'
@@ -132,7 +131,7 @@ typedef struct t_SHFE_FutursMarketData
 ///收盘
 #define THOST_FTDC_IS_Closed '6'
 
-typedef struct t_SHFE_BaseInfo
+typedef struct t_INE_BaseInfo
 {
 	///合约代码
 	char sInstrumentID[31];
@@ -196,13 +195,14 @@ typedef struct t_SHFE_BaseInfo
 	T_I64 i64UnderlyingMultiple;
 	///组合类型
 	char cCombinationType;
-	///涨停价,扩大至10000倍
+    ///涨停价,扩大至10000倍
 	T_I64	i64UplimitPrice;
 	///跌停价,扩大至10000倍
 	T_I64	i64LowlimitPrice;
-} T_SHFE_BaseInfo, *PSHFE_BaseInfo;
+} T_INE_BaseInfo, *PINE_BaseInfo;
+
 ///发给做市商的询价请求
-typedef struct t_SHFE_ForQuote
+typedef struct t_INE_ForQuote
 {
 	///交易日
 	T_I32 nTradingDay;
@@ -213,9 +213,10 @@ typedef struct t_SHFE_ForQuote
 	///询价时间
 	T_I32 nForQuoteTime;
 	///业务日期
-	int nActionDay;
+	T_I32 nActionDay;
 	///交易所代码
 	char sExchangeID[9];
-} T_SHFE_ForQuote;
+} T_INE_ForQuote, *PINE_ForQuote;
+
 #pragma pack(pop)
-#endif //_T_SHFE_MARKET_
+#endif //_T_CFFEX_MARKET_

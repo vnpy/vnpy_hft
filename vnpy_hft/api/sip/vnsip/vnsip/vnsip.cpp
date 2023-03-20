@@ -1,7 +1,7 @@
 // vnctpmd.cpp : 定义 DLL 应用程序的导出函数。
 //
 
-#include "vnsipmd.h"
+#include "vnsip.h"
 
 
 ///-------------------------------------------------------------------------------------
@@ -16,11 +16,16 @@ void MdApi::OnLog(int32_t level, const char *source, const char *slog)
 	}
 };
 
+void MdApi::OnLogin(int32_t chn, void* mdapi)
+{
+	gil_scoped_acquire acquire;
+	this->onLogin(chn);
+};
+
 void MdApi::OnDisconnect(int32_t chn)
 {
 	gil_scoped_acquire acquire;
 	this->onDisconnect(chn);
-	
 };
 
 void MdApi::OnSubscribe(ErrMsg *errmsg)
@@ -102,6 +107,11 @@ void MdApi::OnDepthMarketData(MKtype mk_type, char *code, Stock_MarketData *data
 	this->onDepthMarketData(mk_type, code, data);
 };
 
+void MdApi::OnFastDepthMarketData(MKtype mk_type, char* code, StockMarketDataLF* dataLF)
+{
+
+};
+
 void MdApi::OnMarketData(MKtype mk_type, char *code, StockMarketDataL1 *dataL1)
 {
 	gil_scoped_acquire acquire;
@@ -165,6 +175,16 @@ void MdApi::OnIndexData(MKtype mk_type, char *code, Stock_IndexData *stockindex)
 	this->onIndexData(mk_type, code, data);
 };
 
+void MdApi::OnSHOption(char* code, t_SHOP_MarketData* optiondata)
+{
+
+};
+
+void MdApi::OnSZOption(char* code, t_SZOP_MarketData* optiondata)
+{
+
+};
+
 void MdApi::OnOrderQueue(MKtype mk_type, char *code, StockOrderQueue *orderqueue)
 {
 	gil_scoped_acquire acquire;
@@ -174,6 +194,10 @@ void MdApi::OnOrderQueue(MKtype mk_type, char *code, StockOrderQueue *orderqueue
 		data["tItem"] = orderqueue->tItem;
 	}
 	this->onOrderQueue(mk_type, code, data);
+};
+
+void MdApi::OnSHOrder(char* code, t_SH_StockStepOrder* steporder)
+{
 };
 
 void MdApi::OnSHTrade(char *code, t_SH_StockStepTrade *steptrade)
@@ -322,6 +346,59 @@ void MdApi::OnSZBaseInfo(char *code, t_SZ_BaseInfo *baseinfodata)
 	this->onSZBaseInfo(code, data);
 };
 
+void MdApi::OnSHOptionBaseInfo(char* code, t_SHOP_BaseInfo* baseinfodata)
+{
+
+};
+
+void MdApi::OnSZOptionBaseInfo(char* code, t_SZOP_BaseInfo* baseinfodata) 
+{
+
+};
+
+void MdApi::OnFuturesBaseInfo(MKtype mk_type, char* code, T_Instrument_BaseInfo* baseinfodata)
+{
+	gil_scoped_acquire acquire;
+	dict data;
+
+	{
+		data["sInstrumentID"] = toUtf(baseinfodata->sInstrumentID);
+		data["sExchangeID"] = toUtf(baseinfodata->sExchangeID);
+		data["sInstrumentName"] = toUtf(baseinfodata->sInstrumentName);
+		data["sExchangeInstID"] = toUtf(baseinfodata->sExchangeInstID);
+		data["sProductID"] = toUtf(baseinfodata->sProductID);
+		data["cProductClass"] = baseinfodata->cProductClass;
+		data["nDeliveryYear"] = baseinfodata->nDeliveryYear;
+		data["nDeliveryMonth"] = baseinfodata->nDeliveryMonth;
+		data["nMaxMarketOrderVolume"] = baseinfodata->nMaxMarketOrderVolume;
+		data["nMinMarketOrderVolume"] = baseinfodata->nMinMarketOrderVolume;
+		data["nMaxLimitOrderVolume"] = baseinfodata->nMaxLimitOrderVolume;
+		data["nMinLimitOrderVolume"] = baseinfodata->nMinLimitOrderVolume;
+		data["nVolumeMultiple"] = baseinfodata->nVolumeMultiple;
+		data["i64PriceTick"] = baseinfodata->i64PriceTick;
+		data["nCreateDate"] = baseinfodata->nCreateDate;
+		data["nOpenDate"] = baseinfodata->nOpenDate;
+		data["nExpireDate"] = baseinfodata->nExpireDate;
+		data["nStartDelivDate"] = baseinfodata->nStartDelivDate;
+		data["nEndDelivDate"] = baseinfodata->nEndDelivDate;
+		data["cInstLifePhase"] = baseinfodata->cInstLifePhase;
+		data["nIsTrading"] = baseinfodata->nIsTrading;
+		data["cPositionType"] = baseinfodata->cPositionType;
+		data["cPositionDateType"] = baseinfodata->cPositionDateType;
+		data["i64LongMarginRatio"] = baseinfodata->i64LongMarginRatio;
+		data["i64ShortMarginRatio"] = baseinfodata->i64ShortMarginRatio;
+		data["cMaxMarginSideAlgorithm"] = baseinfodata->cMaxMarginSideAlgorithm;
+		data["sUnderlyingInstrID"] = baseinfodata->sUnderlyingInstrID;
+		data["i64StrikePrice"] = baseinfodata->i64StrikePrice;
+		data["cOptionsType"] = baseinfodata->cOptionsType;
+		data["i64UnderlyingMultiple"] = baseinfodata->i64UnderlyingMultiple;
+		data["cCombinationType"] = baseinfodata->cCombinationType;
+		data["i64UplimitPrice"] = baseinfodata->i64UplimitPrice;
+		data["i64LowlimitPrice"] = baseinfodata->i64LowlimitPrice;
+	}
+	this->onFuturesBaseInfo(int(mk_type), code, data);
+};
+
 void MdApi::OnKline(MKtype mk_type, char *code, T_Kline *kline)
 {
 	gil_scoped_acquire acquire;
@@ -342,6 +419,56 @@ void MdApi::OnKline(MKtype mk_type, char *code, T_Kline *kline)
 		data["nValIncrease"] = kline->nValIncrease;
 	}
 	this->onKline(mk_type, code, data);
+};
+
+void MdApi::OnFuturesData(MKtype mk_type, char* code, Futures_MarketData* futuresdata)
+{
+	gil_scoped_acquire acquire;
+	dict data;
+
+	{
+		data["nTime"] = futuresdata->nTime;
+		data["nStatus"] = futuresdata->nStatus;
+		data["iPreOpenInterest"] = futuresdata->iPreOpenInterest;
+		data["uPreClose"] = futuresdata->uPreClose;
+		data["uPreSettlePrice"] = futuresdata->uPreSettlePrice;
+		data["uOpen"] = futuresdata->uOpen;
+		data["uHigh"] = futuresdata->uHigh;
+		data["uLow"] = futuresdata->uLow;
+		data["uMatch"] = futuresdata->uMatch;
+		data["iVolume"] = futuresdata->iVolume;
+		data["iTurnover"] = futuresdata->iTurnover;
+		data["iOpenInterest"] = futuresdata->iOpenInterest;
+		data["uClose"] = futuresdata->uClose;
+		data["uSettlePrice"] = futuresdata->uSettlePrice;
+		data["uHighLimited"] = futuresdata->uHighLimited;
+		data["uLowLimited"] = futuresdata->uLowLimited;
+		data["nPreDelta"] = futuresdata->nPreDelta;
+		data["nCurrDelta"] = futuresdata->nCurrDelta;
+		data["sTradingStatus"] = futuresdata->sTradingStatus;
+		data["sRevs"] = futuresdata->sRevs;
+		data["nTradingDay"] = futuresdata->nTradingDay;
+		data["nActionDay"] = futuresdata->nActionDay;
+
+		pybind11::list ask;
+		pybind11::list bid;
+		pybind11::list ask_qty;
+		pybind11::list bid_qty;
+
+		for (int i = 0; i < 5; i++)
+		{
+			ask.append(futuresdata->uAskPrice[i]);
+			bid.append(futuresdata->uBidPrice[i]);
+			ask_qty.append(futuresdata->uAskVol[i]);
+			bid_qty.append(futuresdata->uBidVol[i]);
+		}
+
+		data["ask"] = ask;
+		data["bid"] = bid;
+		data["bid_qty"] = bid_qty;
+		data["ask_qty"] = ask_qty;
+	}
+	this->onFuturesData(int(mk_type), code, data);
 };
 
 void MdApi::OnEtfExtData(MKtype mk_type, char *code, T_ETFEXTENDS *etfextdata)
@@ -372,7 +499,7 @@ void MdApi::OnEtfExtData(MKtype mk_type, char *code, T_ETFEXTENDS *etfextdata)
 ///-------------------------------------------------------------------------------------
 ///主动函数
 ///-------------------------------------------------------------------------------------
-int MdApi::createMdApi(string sjson, bool logging)
+int MdApi::initialize(string sjson, bool logging)
 {
 	this->logging = logging;
 	this->api = CSipMdApi::Register(this);
@@ -382,6 +509,7 @@ int MdApi::createMdApi(string sjson, bool logging)
 
 	return i;
 };
+
 int MdApi::login()
 {
 	int i = this->api->Login();
@@ -398,6 +526,10 @@ void MdApi::release()
 	this->api->Release();
 };
 
+string MdApi::getVersion()
+{
+	return this->api->GetVersion();
+}
 
 int MdApi::exit()
 {
@@ -588,6 +720,18 @@ public:
 		}
 	};
 
+	void onLogin(int chn) override
+	{
+		try
+		{
+			PYBIND11_OVERLOAD(void, MdApi, onLogin, chn);
+		}
+		catch (const error_already_set &e)
+		{
+			cout << e.what() << endl;
+		}
+	};
+
 	void onDisconnect(int chn) override
 	{
 		try
@@ -636,6 +780,18 @@ public:
 		}
 	};
 
+	void onFastDepthMarketData(int mk_type, string code, const dict &data) override
+	{
+		try
+		{
+			PYBIND11_OVERLOAD(void, MdApi, onFastDepthMarketData, mk_type, code, data);
+		}
+		catch (const error_already_set &e)
+		{
+			cout << e.what() << endl;
+		}
+	};
+
 	void onMarketData(int mk_type, string code, const dict &data) override
 	{
 		try
@@ -660,6 +816,30 @@ public:
 		}
 	};
 
+	void onSHOption(string code, const dict &data) override
+	{
+		try
+		{
+			PYBIND11_OVERLOAD(void, MdApi, onSHOption, code, data);
+		}
+		catch (const error_already_set &e)
+		{
+			cout << e.what() << endl;
+		}
+	};
+
+	void onSZOption(string code, const dict &data) override
+	{
+		try
+		{
+			PYBIND11_OVERLOAD(void, MdApi, onSZOption, code, data);
+		}
+		catch (const error_already_set &e)
+		{
+			cout << e.what() << endl;
+		}
+	};
+
 	void onOrderQueue(int mk_type, string code, const dict &data) override
 	{
 		try
@@ -677,6 +857,18 @@ public:
 		try
 		{
 			PYBIND11_OVERLOAD(void, MdApi, onSHTrade, code, data);
+		}
+		catch (const error_already_set &e)
+		{
+			cout << e.what() << endl;
+		}
+	};
+
+	void onSHOrder(string code, const dict &data) override
+	{
+		try
+		{
+			PYBIND11_OVERLOAD(void, MdApi, onSHOrder, code, data);
 		}
 		catch (const error_already_set &e)
 		{
@@ -719,6 +911,7 @@ public:
 			cout << e.what() << endl;
 		}
 	};
+
 	void onSZBaseInfo(string code, const dict &data) override
 	{
 		try
@@ -730,11 +923,60 @@ public:
 			cout << e.what() << endl;
 		}
 	};
+	
+	void onSHOptionBaseInfo(string code, const dict &data) override
+	{
+		try
+		{
+			PYBIND11_OVERLOAD(void, MdApi, onSHOptionBaseInfo, code, data);
+		}
+		catch (const error_already_set &e)
+		{
+			cout << e.what() << endl;
+		}
+	};
+
+	void onSZOptionBaseInfo(string code, const dict &data) override
+	{
+		try
+		{
+			PYBIND11_OVERLOAD(void, MdApi, onSZOptionBaseInfo, code, data);
+		}
+		catch (const error_already_set &e)
+		{
+			cout << e.what() << endl;
+		}
+	};
+
+	void onFuturesBaseInfo(int mk_type, string code, const dict &data) override
+	{
+		try
+		{
+			PYBIND11_OVERLOAD(void, MdApi, onFuturesBaseInfo, mk_type, code, data);
+		}
+		catch (const error_already_set &e)
+		{
+			cout << e.what() << endl;
+		}
+	};
+
 	void onKline(int mk_type, string code, const dict &data) override
 	{
 		try
 		{
 			PYBIND11_OVERLOAD(void, MdApi, onKline, mk_type, code, data);
+		}
+		catch (const error_already_set &e)
+		{
+			cout << e.what() << endl;
+		}
+	};
+
+	void onFuturesData(int mk_type, string code, const dict &data) override
+	{
+		try
+		{
+			PYBIND11_OVERLOAD(void, MdApi, onFuturesData, mk_type, code, data);
 		}
 		catch (const error_already_set &e)
 		{
@@ -758,15 +1000,16 @@ public:
 };
 
 
-PYBIND11_MODULE(vnsipmd, m)
+PYBIND11_MODULE(vnsip, m)
 {
     class_<MdApi, PyMdApi> MdApi(m, "MdApi", module_local());
     MdApi
         .def(init<>())
-		.def("createMdApi", &MdApi::createMdApi)
+		.def("initialize", &MdApi::initialize)
 		.def("login", &MdApi::login)
 		.def("stop", &MdApi::stop)
 		.def("release", &MdApi::release)
+		.def("getVersion", &MdApi::getVersion)
 		.def("exit", &MdApi::exit)
 		.def("subscribeDepthMarketData", &MdApi::subscribeDepthMarketData)
 		.def("subscribeMarketData", &MdApi::subscribeMarketData)
@@ -790,20 +1033,28 @@ PYBIND11_MODULE(vnsipmd, m)
 		.def("unSubscribeEtfExt", &MdApi::unSubscribeEtfExt)
 
 		.def("onLog", &MdApi::onLog)
+		.def("onLogin", &MdApi::onLogin)
 		.def("onDisconnect", &MdApi::onDisconnect)
 		.def("onSubscribe", &MdApi::onSubscribe)
 		.def("onUnSubscribe", &MdApi::onUnSubscribe)
 		.def("onDepthMarketData", &MdApi::onDepthMarketData)
+		.def("onFastDepthMarketData", &MdApi::onFastDepthMarketData)
 		.def("onMarketData", &MdApi::onMarketData)
 		.def("onIndexData", &MdApi::onIndexData)
+		.def("onSHOption", &MdApi::onSHOption)
+		.def("onSZOption", &MdApi::onSZOption)
 		.def("onOrderQueue", &MdApi::onOrderQueue)
 		.def("onSHTrade", &MdApi::onSHTrade)
+		.def("onSHOrder", &MdApi::onSHOrder)
 		.def("onSZTrade", &MdApi::onSZTrade)
 		.def("onSZOrder", &MdApi::onSZOrder)
 		.def("onSHBaseInfo", &MdApi::onSHBaseInfo)
 		.def("onSZBaseInfo", &MdApi::onSZBaseInfo)
+		.def("onSHOptionBaseInfo", &MdApi::onSHOptionBaseInfo)
+		.def("onSZOptionBaseInfo", &MdApi::onSZOptionBaseInfo)
+		.def("onFuturesBaseInfo", &MdApi::onFuturesBaseInfo)
 		.def("onKline", &MdApi::onKline)
+		.def("onFuturesData", &MdApi::onFuturesData)
 		.def("onEtfExtData", &MdApi::onEtfExtData)
 		;
-
 }

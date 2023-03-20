@@ -1,216 +1,252 @@
-#ifndef _T_CFFEX_MARKET_
+ï»¿#ifndef _T_CFFEX_MARKET_
 #define _T_CFFEX_MARKET_
 #include "tdef.h"
 
 //*****************************************************************************************
-//ÒÔÉÏ·şÎñÊı¾İID±£ÁôÓëÔ­ÏµÍ³¼æÈİ£¬ÒÔÏÂ·şÎñIDÕë¶ÔÃ¿¸öÊĞ³¡·Ö¿ª¶¨Òå
+//ä»¥ä¸ŠæœåŠ¡æ•°æ®IDä¿ç•™ä¸åŸç³»ç»Ÿå…¼å®¹ï¼Œä»¥ä¸‹æœåŠ¡IDé’ˆå¯¹æ¯ä¸ªå¸‚åœºåˆ†å¼€å®šä¹‰
 
-//-----------------------------------ÖĞ½ğËù-----------------------------------------------
-#define ID_CFFEX_BASEINFO 3001	 //ÆÚ»õ¼°ÆÚÈ¨»ù´¡ĞÅÏ¢
-#define ID_CFFEX_MARKETDATA 3002   //ÆÚ»õ¼°ÆÚÈ¨ĞĞÇéÊı¾İ
-#define ID_CFFEX_FORQOUTE 3003	 //Ñ¯¼ÛÍ¨Öª
-#define ID_CFFEX_MARKETDATAL2 3004 //ÆÚ»õ¼°ÆÚÈ¨L2ĞĞÇéÊı¾İ
+//-----------------------------------ä¸­é‡‘æ‰€-----------------------------------------------
+#define ID_CFFEX_BASEINFO 3001	 //æœŸè´§åŠæœŸæƒåŸºç¡€ä¿¡æ¯
+#define ID_CFFEX_MARKETDATA 3002   //æœŸè´§åŠæœŸæƒè¡Œæƒ…æ•°æ®
+#define ID_CFFEX_FORQOUTE 3003	 //è¯¢ä»·é€šçŸ¥
+#define ID_CFFEX_MARKETDATAL2 3004 //æœŸè´§åŠæœŸæƒL2è¡Œæƒ…æ•°æ®
+#define ID_CFFEX_KLINE 3007 //æœŸè´§åŠæœŸæƒåˆ†é’ŸKçº¿è¡Œæƒ…æ•°æ®
 
 #pragma pack(push, 1)
-//1.1 ÖĞ½ğËùÆÚ»õĞĞÇé
+//1.1 ä¸­é‡‘æ‰€æœŸè´§è¡Œæƒ…
 typedef struct t_CFFEX_FutursMarketData
 {
-	T_I32 nTime;			//Ê±¼ä(HHMMSSmmmm)
-	T_I32 nStatus;			//×´Ì¬
-	T_I64 iPreOpenInterest; //×ò³Ö²Ö
-	T_U32 uPreClose;		//×òÊÕÅÌ¼Û
-	T_U32 uPreSettlePrice;  //×ò½áËã
-	T_U32 uOpen;			//¿ªÅÌ¼Û
-	T_U32 uHigh;			//×î¸ß¼Û
-	T_U32 uLow;				//×îµÍ¼Û
-	T_U32 uMatch;			//×îĞÂ¼Û
-	T_I64 iVolume;			//³É½»×ÜÁ¿
-	T_I64 iTurnover;		//³É½»×Ü½ğ¶î
-	T_I64 iOpenInterest;	//³Ö²Ö×ÜÁ¿
-	T_U32 uClose;			//½ñÊÕÅÌ
-	T_U32 uSettlePrice;		//½ñ½áËã
-	T_U32 uHighLimited;		//ÕÇÍ£¼Û
-	T_U32 uLowLimited;		//µøÍ£¼Û
-	T_I32 nPreDelta;		//×òĞéÊµ¶È
-	T_I32 nCurrDelta;		//½ñĞéÊµ¶È
-	T_U32 uAskPrice[5];		//ÉêÂô¼Û
-	T_U32 uAskVol[5];		//ÉêÂôÁ¿
-	T_U32 uBidPrice[5];		//ÉêÂò¼Û
-	T_U32 uBidVol[5];		//ÉêÂòÁ¿
-	char sTradingStatus;	//½»Ò××´Ì¬
-	char sRevs[3];			//±£Áô×Ö¶Î
+	T_I32 nTime;			//æ—¶é—´(HHMMSSmmmm)
+	T_I32 nStatus;			//çŠ¶æ€
+	T_I64 iPreOpenInterest; //æ˜¨æŒä»“
+	T_U32 uPreClose;		//æ˜¨æ”¶ç›˜ä»·
+	T_U32 uPreSettlePrice;  //æ˜¨ç»“ç®—
+	T_U32 uOpen;			//å¼€ç›˜ä»·
+	T_U32 uHigh;			//æœ€é«˜ä»·
+	T_U32 uLow;				//æœ€ä½ä»·
+	T_U32 uMatch;			//æœ€æ–°ä»·
+	T_I64 iVolume;			//æˆäº¤æ€»é‡
+	T_I64 iTurnover;		//æˆäº¤æ€»é‡‘é¢
+	T_I64 iOpenInterest;	//æŒä»“æ€»é‡
+	T_U32 uClose;			//ä»Šæ”¶ç›˜
+	T_U32 uSettlePrice;		//ä»Šç»“ç®—
+	T_U32 uHighLimited;		//æ¶¨åœä»·
+	T_U32 uLowLimited;		//è·Œåœä»·
+	T_I32 nPreDelta;		//æ˜¨è™šå®åº¦
+	T_I32 nCurrDelta;		//ä»Šè™šå®åº¦
+	T_U32 uAskPrice[5];		//ç”³å–ä»·
+	T_U32 uAskVol[5];		//ç”³å–é‡
+	T_U32 uBidPrice[5];		//ç”³ä¹°ä»·
+	T_U32 uBidVol[5];		//ç”³ä¹°é‡
+	char sTradingStatus;	//äº¤æ˜“çŠ¶æ€
+	char sRevs[3];			//ä¿ç•™å­—æ®µ
+	T_I32      nTradingDay;            //äº¤æ˜“æ—¥
+	T_I32      nActionDay;             //ä¸šåŠ¡æ—¥æœŸ
 } Futures_MarketData, T_CFFEX_FutursMarketData, *PCFFEX_FutursMarketData;
-//1.2 ÖĞ½ğËùÆÚ»õ¼°ÆÚÈ¨»ù´¡ĞÅÏ¢
-/////²úÆ·ÀàĞÍ-------------------------------------------------------
-///ÆÚ»õ
+//1.2 ä¸­é‡‘æ‰€æœŸè´§åŠæœŸæƒåŸºç¡€ä¿¡æ¯
+/////äº§å“ç±»å‹-------------------------------------------------------
+///æœŸè´§
 #define THOST_FTDC_PC_Futures '1'
-///ÆÚ»õÆÚÈ¨
+///æœŸè´§æœŸæƒ
 #define THOST_FTDC_PC_Options '2'
-///×éºÏ
+///ç»„åˆ
 #define THOST_FTDC_PC_Combination '3'
-///¼´ÆÚ
+///å³æœŸ
 #define THOST_FTDC_PC_Spot '4'
-///ÆÚ×ªÏÖ
+///æœŸè½¬ç°
 #define THOST_FTDC_PC_EFP '5'
-///ÏÖ»õÆÚÈ¨
+///ç°è´§æœŸæƒ
 #define THOST_FTDC_PC_SpotOption '6'
-//ºÏÔ¼ÉúÃüÖÜÆÚ-----------------------------------------
-///Î´ÉÏÊĞ
+//åˆçº¦ç”Ÿå‘½å‘¨æœŸ-----------------------------------------
+///æœªä¸Šå¸‚
 #define THOST_FTDC_IP_NotStart '0'
-///ÉÏÊĞ
+///ä¸Šå¸‚
 #define THOST_FTDC_IP_Started '1'
-///Í£ÅÆ
+///åœç‰Œ
 #define THOST_FTDC_IP_Pause '2'
-///µ½ÆÚ
+///åˆ°æœŸ
 #define THOST_FTDC_IP_Expired '3'
-//³Ö²ÖÀàĞÍ-------------------------------------------------
-///¾»³Ö²Ö
+//æŒä»“ç±»å‹-------------------------------------------------
+///å‡€æŒä»“
 #define THOST_FTDC_PT_Net '1'
-///×ÛºÏ³Ö²Ö
+///ç»¼åˆæŒä»“
 #define THOST_FTDC_PT_Gross '2'
 
 /////////////////////////////////////////////////////////////////////////
-//////³Ö²ÖÈÕÆÚÀàĞÍ
+//////æŒä»“æ—¥æœŸç±»å‹
 /////////////////////////////////////////////////////////////////////////
-///Ê¹ÓÃÀúÊ·³Ö²Ö
+///ä½¿ç”¨å†å²æŒä»“
 #define THOST_FTDC_PDT_UseHistory '1'
-///²»Ê¹ÓÃÀúÊ·³Ö²Ö
+///ä¸ä½¿ç”¨å†å²æŒä»“
 #define THOST_FTDC_PDT_NoUseHistory '2'
 
 /////////////////////////////////////////////////////////////////////////
-///´ó¶îµ¥±ß±£Ö¤½ğËã·¨ÀàĞÍ
+///å¤§é¢å•è¾¹ä¿è¯é‡‘ç®—æ³•ç±»å‹
 /////////////////////////////////////////////////////////////////////////
-///²»Ê¹ÓÃ´ó¶îµ¥±ß±£Ö¤½ğËã·¨
+///ä¸ä½¿ç”¨å¤§é¢å•è¾¹ä¿è¯é‡‘ç®—æ³•
 #define THOST_FTDC_MMSA_NO '0'
-///Ê¹ÓÃ´ó¶îµ¥±ß±£Ö¤½ğËã·¨
+///ä½¿ç”¨å¤§é¢å•è¾¹ä¿è¯é‡‘ç®—æ³•
 #define THOST_FTDC_MMSA_YES '1'
 
 /////////////////////////////////////////////////////////////////////////
-///ÆÚÈ¨ÀàĞÍÀàĞÍ
+///æœŸæƒç±»å‹ç±»å‹
 /////////////////////////////////////////////////////////////////////////
-///¿´ÕÇ
+///çœ‹æ¶¨
 #define THOST_FTDC_CP_CallOptions '1'
-///¿´µø
+///çœ‹è·Œ
 #define THOST_FTDC_CP_PutOptions '2'
 
 /////////////////////////////////////////////////////////////////////////
-///×éºÏÀàĞÍÀàĞÍ
+///ç»„åˆç±»å‹ç±»å‹
 /////////////////////////////////////////////////////////////////////////
-///ÆÚ»õ×éºÏ
+///æœŸè´§ç»„åˆ
 #define THOST_FTDC_COMBT_Future '0'
-///´¹Ö±¼Û²îBUL
+///å‚ç›´ä»·å·®BUL
 #define THOST_FTDC_COMBT_BUL '1'
-///´¹Ö±¼Û²îBER
+///å‚ç›´ä»·å·®BER
 #define THOST_FTDC_COMBT_BER '2'
-///¿çÊ½×éºÏ
+///è·¨å¼ç»„åˆ
 #define THOST_FTDC_COMBT_STD '3'
-///¿í¿çÊ½×éºÏ
+///å®½è·¨å¼ç»„åˆ
 #define THOST_FTDC_COMBT_STG '4'
-///±¸¶Ò×éºÏ
+///å¤‡å…‘ç»„åˆ
 #define THOST_FTDC_COMBT_PRT '5'
-///Ê±¼ä¼Û²î×éºÏ
+///æ—¶é—´ä»·å·®ç»„åˆ
 #define THOST_FTDC_COMBT_CLD '6'
 
 /////////////////////////////////////////////////////////////////////////
-///ºÏÔ¼½»Ò××´Ì¬ÀàĞÍ
+///åˆçº¦äº¤æ˜“çŠ¶æ€ç±»å‹
 /////////////////////////////////////////////////////////////////////////
-///¿ªÅÌÇ°
+///å¼€ç›˜å‰
 #define THOST_FTDC_IS_BeforeTrading '0'
-///·Ç½»Ò×
+///éäº¤æ˜“
 #define THOST_FTDC_IS_NoTrading '1'
-///Á¬Ğø½»Ò×
+///è¿ç»­äº¤æ˜“
 #define THOST_FTDC_IS_Continous '2'
-///¼¯ºÏ¾º¼Û±¨µ¥
+///é›†åˆç«ä»·æŠ¥å•
 #define THOST_FTDC_IS_AuctionOrdering '3'
-///¼¯ºÏ¾º¼Û¼Û¸ñÆ½ºâ
+///é›†åˆç«ä»·ä»·æ ¼å¹³è¡¡
 #define THOST_FTDC_IS_AuctionBalance '4'
-///¼¯ºÏ¾º¼Û´éºÏ
+///é›†åˆç«ä»·æ’®åˆ
 #define THOST_FTDC_IS_AuctionMatch '5'
-///ÊÕÅÌ
+///æ”¶ç›˜
 #define THOST_FTDC_IS_Closed '6'
 
 typedef struct t_CFFEX_BaseInfo
 {
-	///ºÏÔ¼´úÂë
+	///åˆçº¦ä»£ç 
 	char sInstrumentID[31];
-	///½»Ò×Ëù´úÂë
+	///äº¤æ˜“æ‰€ä»£ç 
 	char sExchangeID[9];
-	///ºÏÔ¼Ãû³Æ
+	///åˆçº¦åç§°
 	char sInstrumentName[21];
-	///ºÏÔ¼ÔÚ½»Ò×ËùµÄ´úÂë
+	///åˆçº¦åœ¨äº¤æ˜“æ‰€çš„ä»£ç 
 	char sExchangeInstID[31];
-	///²úÆ·´úÂë
+	///äº§å“ä»£ç 
 	char sProductID[31];
-	///²úÆ·ÀàĞÍ
+	///äº§å“ç±»å‹
 	char cProductClass;
-	///½»¸îÄê·İ
+	///äº¤å‰²å¹´ä»½
 	T_I32 nDeliveryYear;
-	///½»¸îÔÂ
+	///äº¤å‰²æœˆ
 	T_I32 nDeliveryMonth;
-	///ÊĞ¼Ûµ¥×î´óÏÂµ¥Á¿
+	///å¸‚ä»·å•æœ€å¤§ä¸‹å•é‡
 	T_I32 nMaxMarketOrderVolume;
-	///ÊĞ¼Ûµ¥×îĞ¡ÏÂµ¥Á¿
+	///å¸‚ä»·å•æœ€å°ä¸‹å•é‡
 	T_I32 nMinMarketOrderVolume;
-	///ÏŞ¼Ûµ¥×î´óÏÂµ¥Á¿
+	///é™ä»·å•æœ€å¤§ä¸‹å•é‡
 	T_I32 nMaxLimitOrderVolume;
-	///ÏŞ¼Ûµ¥×îĞ¡ÏÂµ¥Á¿
+	///é™ä»·å•æœ€å°ä¸‹å•é‡
 	T_I32 nMinLimitOrderVolume;
-	///ºÏÔ¼ÊıÁ¿³ËÊı
+	///åˆçº¦æ•°é‡ä¹˜æ•°
 	T_I32 nVolumeMultiple;
-	///×îĞ¡±ä¶¯¼ÛÎ»,À©´ó10000±¶
+	///æœ€å°å˜åŠ¨ä»·ä½,æ‰©å¤§10000å€
 	T_I64 i64PriceTick;
-	///´´½¨ÈÕ
+	///åˆ›å»ºæ—¥
 	T_I32 nCreateDate;
-	///ÉÏÊĞÈÕ
+	///ä¸Šå¸‚æ—¥
 	T_I32 nOpenDate;
-	///µ½ÆÚÈÕ
+	///åˆ°æœŸæ—¥
 	T_I32 nExpireDate;
-	///¿ªÊ¼½»¸îÈÕ
+	///å¼€å§‹äº¤å‰²æ—¥
 	T_I32 nStartDelivDate;
-	///½áÊø½»¸îÈÕ
+	///ç»“æŸäº¤å‰²æ—¥
 	T_I32 nEndDelivDate;
-	///ºÏÔ¼ÉúÃüÖÜÆÚ×´Ì¬
+	///åˆçº¦ç”Ÿå‘½å‘¨æœŸçŠ¶æ€
 	char cInstLifePhase;
-	///µ±Ç°ÊÇ·ñ½»Ò×
+	///å½“å‰æ˜¯å¦äº¤æ˜“
 	T_I32 nIsTrading;
-	///³Ö²ÖÀàĞÍ
+	///æŒä»“ç±»å‹
 	char cPositionType;
-	///³Ö²ÖÈÕÆÚÀàĞÍ
+	///æŒä»“æ—¥æœŸç±»å‹
 	char cPositionDateType;
-	///¶àÍ·±£Ö¤½ğÂÊ,À©´óÖÁ10000±¶
+	///å¤šå¤´ä¿è¯é‡‘ç‡,æ‰©å¤§è‡³10000å€
 	T_I64 i64LongMarginRatio;
-	///¿ÕÍ·±£Ö¤½ğÂÊ,À©´óÖÁ10000±¶
+	///ç©ºå¤´ä¿è¯é‡‘ç‡,æ‰©å¤§è‡³10000å€
 	T_I64 i64ShortMarginRatio;
-	///ÊÇ·ñÊ¹ÓÃ´ó¶îµ¥±ß±£Ö¤½ğËã·¨
+	///æ˜¯å¦ä½¿ç”¨å¤§é¢å•è¾¹ä¿è¯é‡‘ç®—æ³•
 	char cMaxMarginSideAlgorithm;
-	///»ù´¡ÉÌÆ·´úÂë
+	///åŸºç¡€å•†å“ä»£ç 
 	char sUnderlyingInstrID[31];
-	///Ö´ĞĞ¼Û,À©´óÖÁ10000±¶
+	///æ‰§è¡Œä»·,æ‰©å¤§è‡³10000å€
 	T_I64 i64StrikePrice;
-	///ÆÚÈ¨ÀàĞÍ
+	///æœŸæƒç±»å‹
 	char cOptionsType;
-	///ºÏÔ¼»ù´¡ÉÌÆ·³ËÊı,À©´óÖÁ10000±¶
+	///åˆçº¦åŸºç¡€å•†å“ä¹˜æ•°,æ‰©å¤§è‡³10000å€
 	T_I64 i64UnderlyingMultiple;
-	///×éºÏÀàĞÍ
+	///ç»„åˆç±»å‹
 	char cCombinationType;
+	///æ¶¨åœä»·,æ‰©å¤§è‡³10000å€
+	T_I64	i64UplimitPrice;
+	///è·Œåœä»·,æ‰©å¤§è‡³10000å€
+	T_I64	i64LowlimitPrice;
 } T_CFFEX_BaseInfo, *PCFFEX_BaseInfo;
 
-///·¢¸ø×öÊĞÉÌµÄÑ¯¼ÛÇëÇó
+///å‘ç»™åšå¸‚å•†çš„è¯¢ä»·è¯·æ±‚
 typedef struct t_CFFEX_ForQuote
 {
-	///½»Ò×ÈÕ
+	///äº¤æ˜“æ—¥
 	T_I32 nTradingDay;
-	///ºÏÔ¼´úÂë
+	///åˆçº¦ä»£ç 
 	char sInstrumentID[31];
-	///Ñ¯¼Û±àºÅ
+	///è¯¢ä»·ç¼–å·
 	char sForQuoteSysID[21];
-	///Ñ¯¼ÛÊ±¼ä
+	///è¯¢ä»·æ—¶é—´
 	T_I32 nForQuoteTime;
-	///ÒµÎñÈÕÆÚ
+	///ä¸šåŠ¡æ—¥æœŸ
 	T_I32 nActionDay;
-	///½»Ò×Ëù´úÂë
+	///äº¤æ˜“æ‰€ä»£ç 
 	char sExchangeID[9];
 } T_CFFEX_ForQuote, *PCFFEX_ForQuote, T_ForQuote;
+
+//1.3 ä¸­é‡‘æ‰€æœŸè´§è¡Œæƒ…L2
+typedef struct t_CFFEX_FutursMarketDataL2
+{
+	T_I32 nTime;			//æ—¶é—´(HHMMSSmmmm)
+	T_I32 nStatus;			//çŠ¶æ€
+	T_I64 iPreOpenInterest; //æ˜¨æŒä»“
+	T_U32 uPreClose;		//æ˜¨æ”¶ç›˜ä»·
+	T_U32 uPreSettlePrice;  //æ˜¨ç»“ç®—
+	T_U32 uOpen;			//å¼€ç›˜ä»·
+	T_U32 uHigh;			//æœ€é«˜ä»·
+	T_U32 uLow;				//æœ€ä½ä»·
+	T_U32 uMatch;			//æœ€æ–°ä»·
+	T_I64 iVolume;			//æˆäº¤æ€»é‡
+	T_I64 iTurnover;		//æˆäº¤æ€»é‡‘é¢
+	T_I64 iOpenInterest;	//æŒä»“æ€»é‡
+	T_U32 uClose;			//ä»Šæ”¶ç›˜
+	T_U32 uSettlePrice;		//ä»Šç»“ç®—
+	T_U32 uHighLimited;		//æ¶¨åœä»·
+	T_U32 uLowLimited;		//è·Œåœä»·
+	T_I32 nPreDelta;		//æ˜¨è™šå®åº¦
+	T_I32 nCurrDelta;		//ä»Šè™šå®åº¦
+	T_U32 uAskPrice[5];		//ç”³å–ä»·
+	T_U32 uAskVol[5];		//ç”³å–é‡
+	T_U32 uBidPrice[5];		//ç”³ä¹°ä»·
+	T_U32 uBidVol[5];		//ç”³ä¹°é‡
+	char sTradingStatus;	//äº¤æ˜“çŠ¶æ€
+	char sRevs[3];			//ä¿ç•™å­—æ®µ
+} Futures_MarketDataL2, T_CFFEX_FutursMarketDataL2, *PCFFEX_FutursMarketDataL2;
 
 #pragma pack(pop)
 #endif //_T_CFFEX_MARKET_

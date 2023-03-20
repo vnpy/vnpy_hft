@@ -21,12 +21,6 @@
     <ClInclude Include="pch.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="vnsip.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="vnsipmd.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\include\sip\tdef.h">
       <Filter>头文件</Filter>
     </ClInclude>
@@ -60,6 +54,9 @@
     <ClInclude Include="..\..\include\sip\tdcemarket.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="vnsip.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -68,7 +65,7 @@
     <ClCompile Include="pch.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="vnsipmd.cpp">
+    <ClCompile Include="vnsip.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.28307.960
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "vnsipmd", "vnsipmd\vnsipmd.vcxproj", "{F194EA40-DAA9-462F-B05B-A2C5FD0F2911}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "vnsip", "vnsip\vnsip.vcxproj", "{F194EA40-DAA9-462F-B05B-A2C5FD0F2911}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
