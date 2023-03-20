@@ -3184,7 +3184,7 @@ public:
 };
 
 
-PYBIND11_MODULE(vnhfttd, m)
+PYBIND11_MODULE(vnhftoption, m)
 {
 	class_<OptionApi, PyOptionApi> OptionApi(m, "OptionApi", module_local());
 	OptionApi
