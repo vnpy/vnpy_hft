@@ -17,10 +17,10 @@ def get_ext_modules() -> list:
     extra_link_args = []
     runtime_library_dirs = []
 
-    vnsipmd = Extension(
-        "vnpy_hft.api.sip.vnsipmd",
+    vnsip = Extension(
+        "vnpy_hft.api.sip.vnsip",
         [
-            "vnpy_hft/api/sip/vnsip/vnsipmd/vnsipmd.cpp",
+            "vnpy_hft/api/sip/vnsip/vnsip/vnsip.cpp",
         ],
         include_dirs=["vnpy_hft/api/sip/include",
                       "vnpy_hft/api/sip/include/sip",
@@ -57,7 +57,27 @@ def get_ext_modules() -> list:
         language="cpp",
     )
 
-    return [vnhfttd, vnsipmd]
+    vnhftoption = Extension(
+        "vnpy_hft.api.hft.vnhftoption",
+        [
+            "vnpy_hft/api/hft/vnhft/vnhftoption/vnhftoption.cpp",
+        ],
+        include_dirs=["vnpy_hft/api/hft/include",
+                      "vnpy_hft/api/hft/include/hft",
+                      "vnpy_hft/api/hft/include/hft/header_for_generator",
+                      "vnpy_hft/api/hft/vnhft"],
+        define_macros=[],
+        undef_macros=[],
+        library_dirs=["vnpy_hft/api/hft/libs", "vnpy_hft/api/hft"],
+        libraries=["libhft_trader_api"],
+        extra_compile_args=extra_compile_flags,
+        extra_link_args=extra_link_args,
+        runtime_library_dirs=runtime_library_dirs,
+        depends=[],
+        language="cpp",
+    )
+
+    return [vnsip, vnhfttd, vnhftoption]
 
 
 setup(
