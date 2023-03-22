@@ -177,12 +177,12 @@ void MdApi::OnIndexData(MKtype mk_type, char *code, Stock_IndexData *stockindex)
 
 void MdApi::OnSHOption(char* code, t_SHOP_MarketData* optiondata)
 {
-
+	cout << "OnSHOption" << endl;
 };
 
 void MdApi::OnSZOption(char* code, t_SZOP_MarketData* optiondata)
 {
-
+	cout << "OnSZOption" << endl;
 };
 
 void MdApi::OnOrderQueue(MKtype mk_type, char *code, StockOrderQueue *orderqueue)
@@ -341,19 +341,92 @@ void MdApi::OnSZBaseInfo(char *code, t_SZ_BaseInfo *baseinfodata)
 		data["i64BuyQtyUnit"] = baseinfodata->tCashParams.i64BuyQtyUnit;
 		data["i64SellQtyUnit"] = baseinfodata->tCashParams.i64SellQtyUnit;
 		data["i64PriceTick"] = baseinfodata->tCashParams.i64PriceTick;
-
 	}
 	this->onSZBaseInfo(code, data);
 };
 
 void MdApi::OnSHOptionBaseInfo(char* code, t_SHOP_BaseInfo* baseinfodata)
 {
-
+	gil_scoped_acquire acquire;
+	dict data;
+	{
+		data["sSecurityID"] = toUtf(baseinfodata->sSecurityID);
+		data["sContractID"] = toUtf(baseinfodata->sContractID);
+		data["sContractSymbol"] = toUtf(baseinfodata->sContractSymbol);
+		data["sUnderlyingSecurityID"] = toUtf(baseinfodata->sUnderlyingSecurityID);
+		data["sUnderlyingSymbol"] = toUtf(baseinfodata->sUnderlyingSymbol);
+		data["sUnderlyingType"] = toUtf(baseinfodata->sUnderlyingType);
+		data["cOptionType"] = baseinfodata->cOptionType;
+		data["cCallOrPut"] = baseinfodata->cCallOrPut;
+		data["uContractMultiplierUnit"] = baseinfodata->uContractMultiplierUnit;
+		data["uExercisePrice"] = baseinfodata->uExercisePrice;
+		data["sStartDate"] = toUtf(baseinfodata->sStartDate);
+		data["sEndDate"] = toUtf(baseinfodata->sEndDate);
+		data["sExerciseDate"] = toUtf(baseinfodata->sExerciseDate);
+		data["sDeliveryDate"] = toUtf(baseinfodata->sDeliveryDate);
+		data["sExpireDate"] = toUtf(baseinfodata->sExpireDate);
+		data["cUpdateVersion"] = baseinfodata->cUpdateVersion;
+		data["iTotalLongPosition"] = baseinfodata->iTotalLongPosition;
+		data["uSecurityClosePx"] = baseinfodata->uSecurityClosePx;
+		data["uSettlPrice"] = baseinfodata->uSettlPrice;
+		data["uUnderlyingClosePx"] = baseinfodata->uUnderlyingClosePx;
+		data["cPriceLimitType"] = baseinfodata->cPriceLimitType;
+		data["uDailyPriceUpLimit"] = baseinfodata->uDailyPriceUpLimit;
+		data["uDailyPriceDownLimit"] = baseinfodata->uDailyPriceDownLimit;
+		data["uMarginUnit"] = baseinfodata->uMarginUnit;
+		data["nMarginRatioParam1"] = baseinfodata->nMarginRatioParam1;
+		data["nMarginRatioParam2"] = baseinfodata->nMarginRatioParam2;
+		data["uRoundLot"] = baseinfodata->uRoundLot;
+		data["uLmtOrdMinFloor"] = baseinfodata->uLmtOrdMinFloor;
+		data["uLmtOrdMaxFloor"] = baseinfodata->uLmtOrdMaxFloor;
+		data["uMktOrdMinFloor"] = baseinfodata->uMktOrdMinFloor;
+		data["uMktOrdMaxFloor"] = baseinfodata->uMktOrdMaxFloor;
+		data["uTickSize"] = baseinfodata->uTickSize;
+		data["sSecurityStatusFlag"] = toUtf(baseinfodata->sSecurityStatusFlag);
+	}
+	this->onSHOptionBaseInfo(code, data);
 };
 
 void MdApi::OnSZOptionBaseInfo(char* code, t_SZOP_BaseInfo* baseinfodata) 
 {
-
+	gil_scoped_acquire acquire;
+	dict data;
+	{
+		data["sSecurityID"] = toUtf(baseinfodata->tBase.sSecurityID);
+		data["sSecurityIDSource"] = toUtf(baseinfodata->tBase.sSecurityIDSource);
+		data["sSymbol"] = toUtf(baseinfodata->tBase.sSymbol);
+		data["sEnglishName"] = toUtf(baseinfodata->tBase.sEnglishName);
+		data["sISIN"] = toUtf(baseinfodata->tBase.sISIN);
+		data["sUnderlyingSecurityID"] = toUtf(baseinfodata->tBase.sUnderlyingSecurityID);
+		data["sUnderlyingSecurityIDSource"] = toUtf(baseinfodata->tBase.sUnderlyingSecurityIDSource);
+		data["uListDate"] = baseinfodata->tBase.uListDate;
+		data["usSecurityType"] = baseinfodata->tBase.usSecurityType;
+		data["sCurrency"] = toUtf(baseinfodata->tBase.sCurrency);
+		data["i64QtyUnit"] = baseinfodata->tBase.i64QtyUnit;
+		data["cDayTrading"] = baseinfodata->tBase.cDayTrading;
+		data["i64PrevClosePx"] = baseinfodata->tBase.i64PrevClosePx;
+		data["usSecurityStatus"] = baseinfodata->tBase.usSecurityStatus;
+		data["i64OutstandingShare"] = baseinfodata->tBase.i64OutstandingShare;
+		data["i64PublicFloatShareQuantity"] = baseinfodata->tBase.i64PublicFloatShareQuantity;
+		data["i64ParValue"] = baseinfodata->tBase.i64ParValue;
+		data["cGageFlag"] = baseinfodata->tBase.cGageFlag;
+		data["nGageRatio"] = baseinfodata->tBase.nGageRatio;
+		data["cCrdBuyUnderlying"] = baseinfodata->tBase.cCrdBuyUnderlying;
+		data["cCrdSellUnderlying"] = baseinfodata->tBase.cCrdSellUnderlying;
+		data["nPriceCheckMode"] = baseinfodata->tBase.nPriceCheckMode;
+		data["cPledgeFlag"] = baseinfodata->tBase.cPledgeFlag;
+		data["i64ContractMultiplier"] = baseinfodata->tBase.i64ContractMultiplier;
+		data["sRegularShare"] = toUtf(baseinfodata->tBase.sRegularShare);
+		data["cQualificationFlag"] = baseinfodata->tBase.cQualificationFlag;
+		data["sSecurityID"] = toUtf(baseinfodata->tDeParmas.sSecurityID);
+		data["sSecurityIDSource"] = baseinfodata->tDeParmas.sSecurityIDSource;
+		data["i64BuyQtyUpperLimit"] = baseinfodata->tDeParmas.i64BuyQtyUpperLimit;
+		data["i64SellQtyUpperLimit"] = baseinfodata->tDeParmas.i64SellQtyUpperLimit;
+		data["i64BuyQtyUnit"] = baseinfodata->tDeParmas.i64BuyQtyUnit;
+		data["i64SellQtyUnit"] = baseinfodata->tDeParmas.i64SellQtyUnit;
+		data["i64PriceTick"] = baseinfodata->tDeParmas.i64PriceTick;
+	}
+	this->onSZOptionBaseInfo(code, data);
 };
 
 void MdApi::OnFuturesBaseInfo(MKtype mk_type, char* code, T_Instrument_BaseInfo* baseinfodata)
