@@ -23,7 +23,7 @@
 
 import importlib_metadata
 
-from .gateway import HftGateway
+from .gateway import HftStockGateway, HftOptionGateway
 
 
 try:
