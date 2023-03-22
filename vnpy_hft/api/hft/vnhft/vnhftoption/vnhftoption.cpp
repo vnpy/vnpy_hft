@@ -59,7 +59,6 @@ void OptionApi::OnFailBackNotify(FailBackNotify* failback_notify)
 void OptionApi::OnLogin(LoginRsp* rsp, ErrorInfo* error_info)
 {
 	gil_scoped_acquire acquire;
-	cout << 11 << endl;
 	dict data;
 	{
 		data["account_id"] = toUtf(rsp->account_id);
