@@ -142,7 +142,7 @@ void MdApi::OnMarketData(MKtype mk_type, char *code, StockMarketDataL1 *dataL1)
 		pybind11::list ask_qty;
 		pybind11::list bid_qty;
 
-		for (int i = 0; i < 10; i++)
+		for (int i = 0; i < 5; i++)
 		{
 			ask.append(dataL1->uAskPrice[i]);
 			bid.append(dataL1->uBidPrice[i]);
@@ -177,12 +177,93 @@ void MdApi::OnIndexData(MKtype mk_type, char *code, Stock_IndexData *stockindex)
 
 void MdApi::OnSHOption(char* code, t_SHOP_MarketData* optiondata)
 {
-	cout << "OnSHOption" << endl;
+	gil_scoped_acquire acquire;
+	dict data;
+	{
+		data["nTime"] = optiondata->nDataTimestamp;
+		data["iPreSettlPrice"] = optiondata->iPreSettlPrice;
+		data["iSettlPrice"] = optiondata->iSettlPrice;
+		data["iOpenPx"] = optiondata->iOpenPx;
+		data["iHighPx"] = optiondata->iHighPx;
+		data["iLowPx"] = optiondata->iLowPx;
+		data["iLastPx"] = optiondata->iLastPx;
+		data["iAuctionPrice"] = optiondata->iAuctionPrice;
+		data["iAuctionQty"] = optiondata->iAuctionQty;
+		data["iTotalLongPosition"] = optiondata->iTotalLongPosition;
+		data["iTotalVolumeTrade"] = optiondata->iTotalVolumeTrade;
+		data["iTotalValueTrade"] = optiondata->iTotalValueTrade;
+		data["sTradingPhaseCode"] = toUtf(optiondata->sTradingPhaseCode);
+		data["sTransactTimeOnly"] = toUtf(optiondata->sTransactTimeOnly);
+		data["iDailyPriceUpLimit"] = optiondata->iDailyPriceUpLimit;
+		data["iDailyPriceDownLimit"] = optiondata->iDailyPriceDownLimit;
+
+		pybind11::list ask;
+		pybind11::list bid;
+		pybind11::list ask_qty;
+		pybind11::list bid_qty;
+
+		for (int i = 0; i < 5; i++)
+		{
+			ask.append(optiondata->iOfferPx[i]);
+			bid.append(optiondata->iBidPx[i]);
+			ask_qty.append(optiondata->iOfferSize[i]);
+			bid_qty.append(optiondata->iBidSize[i]);
+		}
+
+		data["ask"] = ask;
+		data["bid"] = bid;
+		data["bid_qty"] = bid_qty;
+		data["ask_qty"] = ask_qty;
+	}
+	this->onSHOption(code, data);
 };
 
 void MdApi::OnSZOption(char* code, t_SZOP_MarketData* optiondata)
 {
-	cout << "OnSZOption" << endl;
+	gil_scoped_acquire acquire;
+	dict data;
+	{
+		data["nTime"] = optiondata->nTime;
+		data["usChannelNo"] = optiondata->usChannelNo;
+		data["sMDStreamID"] = toUtf(optiondata->sMDStreamID);
+		data["sSecrityID"] = toUtf(optiondata->sSecrityID);
+		data["sSecurityIDSource"] = toUtf(optiondata->sSecurityIDSource);
+		data["sTradingPhaseCode"] = toUtf(optiondata->sTradingPhaseCode);
+		data["i64PrevClosePx"] = optiondata->i64PrevClosePx;
+		data["i64NumTrades"] = optiondata->i64NumTrades;
+		data["i64TotalVolumeTrade"] = optiondata->i64TotalVolumeTrade;
+		data["i64TotalValueTrade"] = optiondata->i64TotalValueTrade;
+		data["i64LastPrice"] = optiondata->i64LastPrice;
+		data["i64OpenPrice"] = optiondata->i64OpenPrice;
+		data["i64HighPrice"] = optiondata->i64HighPrice;
+		data["i64LowPrice"] = optiondata->i64LowPrice;
+		data["i64BuyAvgPrice"] = optiondata->i64BuyAvgPrice;
+		data["i64BuyVolumeTrade"] = optiondata->i64BuyVolumeTrade;
+		data["i64SellAvgPrice"] = optiondata->i64SellAvgPrice;
+		data["i64SellVolumeTrade"] = optiondata->i64SellVolumeTrade;
+		data["i64PriceUpperLimit"] = optiondata->i64PriceUpperLimit;
+		data["i64PriceLowerLimit"] = optiondata->i64PriceLowerLimit;
+		data["i64ContractPosition"] = optiondata->i64ContractPosition;
+
+		pybind11::list ask;
+		pybind11::list bid;
+		pybind11::list ask_qty;
+		pybind11::list bid_qty;
+
+		for (int i = 0; i < 10; i++)
+		{
+			ask.append(optiondata->i64OfferPrice[i]);
+			bid.append(optiondata->i64BidPrice[i]);
+			ask_qty.append(optiondata->i64OfferQty[i]);
+			bid_qty.append(optiondata->i64BidQty[i]);
+		}
+
+		data["ask"] = ask;
+		data["bid"] = bid;
+		data["bid_qty"] = bid_qty;
+		data["ask_qty"] = ask_qty;
+	}
+	this->onSZOption(code, data);
 };
 
 void MdApi::OnOrderQueue(MKtype mk_type, char *code, StockOrderQueue *orderqueue)
@@ -418,6 +499,19 @@ void MdApi::OnSZOptionBaseInfo(char* code, t_SZOP_BaseInfo* baseinfodata)
 		data["i64ContractMultiplier"] = baseinfodata->tBase.i64ContractMultiplier;
 		data["sRegularShare"] = toUtf(baseinfodata->tBase.sRegularShare);
 		data["cQualificationFlag"] = baseinfodata->tBase.cQualificationFlag;
+		data["cCallOrPut"] = baseinfodata->tBase.tExtendParmas.optionParmas.cCallOrPut;
+		data["usListType"] = baseinfodata->tBase.tExtendParmas.optionParmas.usListType;
+		data["nDeliveryDay"] = baseinfodata->tBase.tExtendParmas.optionParmas.nDeliveryDay;
+		data["nDeliveryMonth"] = baseinfodata->tBase.tExtendParmas.optionParmas.nDeliveryMonth;
+		data["cDeliveryType"] = baseinfodata->tBase.tExtendParmas.optionParmas.cDeliveryType;
+		data["nExerciseBeginDate"] = baseinfodata->tBase.tExtendParmas.optionParmas.nExerciseBeginDate;
+		data["i64ExercisePrice"] = baseinfodata->tBase.tExtendParmas.optionParmas.i64ExercisePrice;
+		data["cExerciseType"] = baseinfodata->tBase.tExtendParmas.optionParmas.cExerciseType;
+		data["nLastTradeDay"] = baseinfodata->tBase.tExtendParmas.optionParmas.nLastTradeDay;
+		data["usAdjustTimes"] = baseinfodata->tBase.tExtendParmas.optionParmas.usAdjustTimes;
+		data["i64ContractUnit"] = baseinfodata->tBase.tExtendParmas.optionParmas.i64ContractUnit;
+		data["i64PrevClearingPrice"] = baseinfodata->tBase.tExtendParmas.optionParmas.i64PrevClearingPrice;
+		data["i64ContractPosition"] = baseinfodata->tBase.tExtendParmas.optionParmas.i64ContractPosition;
 		data["sSecurityID"] = toUtf(baseinfodata->tDeParmas.sSecurityID);
 		data["sSecurityIDSource"] = baseinfodata->tDeParmas.sSecurityIDSource;
 		data["i64BuyQtyUpperLimit"] = baseinfodata->tDeParmas.i64BuyQtyUpperLimit;
