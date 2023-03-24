@@ -53,64 +53,14 @@ from ..api.hft import (
     TradeReportType_Normal,
     OrderFlag_Future_Option_Speculation
 )
-from ..api.sip import (
-    MdApi,
-    MKtype_SHOP,
-    MKtype_SZOP,
-)
+from ..api.sip import MdApi, MKtype_SHOP, MKtype_SZOP
 from .terminal_info import get_terminal_info
 
 
 # 市场映射
-MK_HFT2VT: Dict[int, Exchange] = {
-    MKtype_SHOP: Exchange.SSE,
-    MKtype_SZOP: Exchange.SZSE
-
-}
-MK_VT2HFT: Dict[Exchange, int] = {v: k for k, v in MK_HFT2VT.items()}
-
-# 产品类型映射
-SH_PRODUCT_HFT2VT: Dict[str, Product] = {
-    "ES": Product.EQUITY,
-    "D": Product.BOND,
-    "RWS": Product.OPTION,
-    "FF": Product.FUTURES,
-    "EU": Product.FUND
-}
-SZ_PRODUCT_HFT2VT: Dict[int, Product] = {
-    1: Product.EQUITY,
-    2: Product.EQUITY,
-    3: Product.EQUITY,
-    4: Product.EQUITY,
-    5: Product.BOND,
-    6: Product.BOND,
-    7: Product.BOND,
-    8: Product.BOND,
-    9: Product.BOND,
-    10: Product.BOND,
-    11: Product.BOND,
-    12: Product.BOND,
-    13: Product.BOND,
-    14: Product.ETF,
-    15: Product.ETF,
-    16: Product.ETF,
-    17: Product.ETF,
-    18: Product.ETF,
-    19: Product.ETF,
-    20: Product.ETF,
-    21: Product.ETF,
-    22: Product.ETF,
-    23: Product.FUND,
-    24: Product.FUND,
-    25: Product.FUND,
-    26: Product.FUND,
-    28: Product.OPTION,
-    29: Product.OPTION,
-    30: Product.OPTION,
-    33: Product.EQUITY,
-    34: Product.BOND,
-    35: Product.BOND,
-
+MK_VT2HFT: Dict[Exchange, int] = {
+    Exchange.SSE: MKtype_SHOP,
+    Exchange.SZSE: MKtype_SZOP
 }
 
 # 委托类型映射
