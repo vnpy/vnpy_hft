@@ -162,12 +162,12 @@ CHINA_TZ = ZoneInfo("Asia/Shanghai")            # 中国时区
 symbol_contract_map: Dict[str, ContractData] = {}
 
 
-class HftGateway(BaseGateway):
+class HftStockGateway(BaseGateway):
     """
     VeighNa用于对接国泰君安的交易接口。
     """
 
-    default_name: str = "HFT"
+    default_name: str = "HFTSTOCK"
 
     default_setting: Dict[str, str] = {
         "交易用户名": "",
@@ -276,11 +276,11 @@ class HftGateway(BaseGateway):
 
 class HftMdApi(MdApi):
 
-    def __init__(self, gateway: HftGateway) -> None:
+    def __init__(self, gateway: HftStockGateway) -> None:
         """构造函数"""
         super().__init__()
 
-        self.gateway: HftGateway = gateway
+        self.gateway: HftStockGateway = gateway
         self.gateway_name: str = gateway.gateway_name
 
         self.userid: str = ""
@@ -444,7 +444,7 @@ class HftTdApi(TdApi):
         """构造函数"""
         super().__init__()
 
-        self.gateway: HftGateway = gateway
+        self.gateway: HftStockGateway = gateway
         self.gateway_name: str = gateway.gateway_name
 
         self.reqid: int = 0
