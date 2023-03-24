@@ -16,7 +16,7 @@ def get_ext_modules() -> list:
     extra_compile_flags = ["-O2", "-MT"]
     extra_link_args = []
     runtime_library_dirs = []
-    define_macros=[('NOMINMAX', None), ('_CRT_SECURE_NO_WARNINGS', None)]
+    define_macros = [("NOMINMAX", None), ("_CRT_SECURE_NO_WARNINGS", None)]
 
     vnsip = Extension(
         "vnpy_hft.api.sip.vnsip",

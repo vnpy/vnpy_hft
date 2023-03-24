@@ -295,7 +295,7 @@ class HftMdApi(MdApi):
         tick.ask_price_5 = data["ask"][4] / 10000
         tick.bid_volume_1, tick.bid_volume_2, tick.bid_volume_3, tick.bid_volume_4, tick.bid_volume_5 = data["bid_qty"][0:5]
         tick.ask_volume_1, tick.ask_volume_2, tick.ask_volume_3, tick.ask_volume_4, tick.ask_volume_5 = data["ask_qty"][0:5]
-        
+
         contract: ContractData = symbol_contract_map.get(tick.symbol, "")
         if contract:
             tick.name = contract.name
@@ -333,7 +333,7 @@ class HftMdApi(MdApi):
         tick.ask_price_5 = data["ask"][4] / 10000
         tick.bid_volume_1, tick.bid_volume_2, tick.bid_volume_3, tick.bid_volume_4, tick.bid_volume_5 = data["bid_qty"][0:5]
         tick.ask_volume_1, tick.ask_volume_2, tick.ask_volume_3, tick.ask_volume_4, tick.ask_volume_5 = data["ask_qty"][0:5]
-        
+
         contract: ContractData = symbol_contract_map.get(tick.symbol, "")
         if contract:
             tick.name = contract.name
@@ -735,7 +735,7 @@ class HftTdApi(OptionApi):
         if not exchange:
             self.gateway.write_log(f"不支持的交易所{req.exchange.value}")
             return ""
-        
+
         if req.type == OrderType.MARKET and exchange != Exchange.SZSE:
             self.gateway.write_log(f"无效的报单价格类型{req.type.value}")
             return ""

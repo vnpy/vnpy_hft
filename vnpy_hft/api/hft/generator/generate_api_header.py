@@ -19,7 +19,7 @@ def run_generate(filepath: str) -> None:
                     in_callback = True
                 elif function_prefix in line:
                     in_function = True
-                
+
                 if in_callback or in_function:
                     buf.append(line.strip())
                 else:
@@ -33,6 +33,7 @@ def run_generate(filepath: str) -> None:
                     in_function = False
                     f_write.write("    " + " ".join(buf) + "\n")
                     buf.clear()
+
 
 if __name__ == "__main__":
     run_generate("../include/hft/hft_option_trader_api.h")
