@@ -804,15 +804,11 @@ public:
     //-------------------------------------------------------------------------------------
     //req:主动函数的请求字典
     //-------------------------------------------------------------------------------------
-    void setLogConfig(string log_path);
-
     void createTraderApi();
 
-    void release();
-
-    int exit();
-
     string getApiVersion();
+
+    void setLogConfig(string log_path);
 
     void setCriticalMsgLog(bool enable);
 
@@ -822,7 +818,13 @@ public:
 
     void setReconnectConfig(int max_retry_count, int min_interval, int max_interval);
 
+    void setKeepaliveConfig(int ka_interval, int max_probe_cnt);
+
+    void release();
+
     dict getApiLastError();
+
+    int exit();
 
     int login(const dict& req);
 

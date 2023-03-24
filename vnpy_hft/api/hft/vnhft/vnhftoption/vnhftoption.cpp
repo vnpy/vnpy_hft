@@ -1841,7 +1841,11 @@ void OptionApi::setLoginRetryInterval(int login_retry_interval)
 void OptionApi::setReconnectConfig(int max_retry_count, int min_interval, int max_interval)
 {
 	this->api->SetReconnectConfig(max_retry_count, min_interval, max_interval);
+};
 
+void OptionApi::setKeepaliveConfig(int ka_interval, int max_probe_cnt)
+{
+	this->api->SetKeepaliveConfig(ka_interval, max_probe_cnt);
 };
 
 dict OptionApi::getApiLastError()
@@ -3188,15 +3192,16 @@ PYBIND11_MODULE(vnhftoption, m)
 	OptionApi
 		.def(init<>())
 		.def("createTraderApi", &OptionApi::createTraderApi)
-		.def("release", &OptionApi::release)
-		.def("exit", &OptionApi::exit)
 		.def("getApiVersion", &OptionApi::getApiVersion)
 		.def("setLogConfig", &OptionApi::setLogConfig)
 		.def("setCriticalMsgLog", &OptionApi::setCriticalMsgLog)
 		.def("setLoginRetryCount", &OptionApi::setLoginRetryCount)
 		.def("setLoginRetryInterval", &OptionApi::setLoginRetryInterval)
 		.def("setReconnectConfig", &OptionApi::setReconnectConfig)
+		.def("setKeepaliveConfig", &OptionApi::setKeepaliveConfig)
+		.def("release", &OptionApi::release)
 		.def("getApiLastError", &OptionApi::getApiLastError)
+		.def("exit", &OptionApi::exit)
 
 		.def("login", &OptionApi::login)
 		.def("getCounterType", &OptionApi::getCounterType)
