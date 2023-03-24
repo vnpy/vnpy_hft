@@ -243,20 +243,10 @@ class HftMdApi(MdApi):
         self.gateway: HftOptionGateway = gateway
         self.gateway_name: str = gateway.gateway_name
 
-        self.userid: str = ""
-        self.password: str = ""
-        self.client_id: int = 0
-        self.server_ip: str = ""
-        self.server_port: int = 0
-        self.protocol: int = 0
-        self.session_id: int = 0
         self.date: str = ""
 
         self.connect_status: bool = False
         self.login_status: bool = False
-
-        self.sse_inited: bool = False
-        self.szse_inited: bool = False
 
     def onDisconnected(self, reason: int) -> None:
         """服务器连接断开回报"""
@@ -401,10 +391,7 @@ class HftTdApi(OptionApi):
         self.connect_status: bool = False
         self.login_status: bool = False
 
-        self.userid: str = ""
-        self.password: str = ""
         self.orders: Dict[str, OrderData] = {}
-        self.short_positions: Dict[str, PositionData] = {}
 
         self.orderid_sysid_map: Dict[str, str] = {}
 
@@ -716,8 +703,6 @@ class HftTdApi(OptionApi):
         port: str,
     ) -> None:
         """连接服务器"""
-        self.userid = userid
-        self.password = password
         self.prefix = datetime.now().strftime("%Y%m%d%H%M%S")
 
         if not self.connect_status:
