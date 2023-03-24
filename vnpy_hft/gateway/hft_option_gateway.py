@@ -559,8 +559,11 @@ class HftTdApi(OptionApi):
             exchange=EXCHANGE_HFT2VT[exchange],
             direction=DIRECTION_HFT2VT[data["side"]],
             volume=data["volume"],
-            price=data["buy_cost"] / data["volume"],
         )
+
+        if pos.volume:
+            pos.price = (data["buy_cost"] / 10000) / pos.volume    # 还需除以合约乘数
+
         self.gateway.on_position(pos)
 
     def onQueryCashRsp(self, data: dict, error: dict, reqid: int) -> None:
