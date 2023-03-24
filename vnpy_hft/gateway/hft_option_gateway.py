@@ -15,7 +15,7 @@ from vnpy.trader.constant import (
     OptionType
 )
 from vnpy.trader.gateway import BaseGateway
-from vnpy.trader.utility import round_to, get_folder_path, ZoneInfo
+from vnpy.trader.utility import get_folder_path, ZoneInfo
 from vnpy.trader.object import (
     TickData,
     OrderData,
@@ -53,64 +53,14 @@ from ..api.hft import (
     TradeReportType_Normal,
     OrderFlag_Future_Option_Speculation
 )
-from ..api.sip import (
-    MdApi,
-    MKtype_SHOP,
-    MKtype_SZOP,
-)
+from ..api.sip import MdApi, MKtype_SHOP, MKtype_SZOP
 from .terminal_info import get_terminal_info
 
 
 # 市场映射
-MK_HFT2VT: Dict[int, Exchange] = {
-    MKtype_SHOP: Exchange.SSE,
-    MKtype_SZOP: Exchange.SZSE
-
-}
-MK_VT2HFT: Dict[Exchange, int] = {v: k for k, v in MK_HFT2VT.items()}
-
-# 产品类型映射
-SH_PRODUCT_HFT2VT: Dict[str, Product] = {
-    "ES": Product.EQUITY,
-    "D": Product.BOND,
-    "RWS": Product.OPTION,
-    "FF": Product.FUTURES,
-    "EU": Product.FUND
-}
-SZ_PRODUCT_HFT2VT: Dict[int, Product] = {
-    1: Product.EQUITY,
-    2: Product.EQUITY,
-    3: Product.EQUITY,
-    4: Product.EQUITY,
-    5: Product.BOND,
-    6: Product.BOND,
-    7: Product.BOND,
-    8: Product.BOND,
-    9: Product.BOND,
-    10: Product.BOND,
-    11: Product.BOND,
-    12: Product.BOND,
-    13: Product.BOND,
-    14: Product.ETF,
-    15: Product.ETF,
-    16: Product.ETF,
-    17: Product.ETF,
-    18: Product.ETF,
-    19: Product.ETF,
-    20: Product.ETF,
-    21: Product.ETF,
-    22: Product.ETF,
-    23: Product.FUND,
-    24: Product.FUND,
-    25: Product.FUND,
-    26: Product.FUND,
-    28: Product.OPTION,
-    29: Product.OPTION,
-    30: Product.OPTION,
-    33: Product.EQUITY,
-    34: Product.BOND,
-    35: Product.BOND,
-
+MK_VT2HFT: Dict[Exchange, int] = {
+    Exchange.SSE: MKtype_SHOP,
+    Exchange.SZSE: MKtype_SZOP
 }
 
 # 委托类型映射
@@ -128,7 +78,7 @@ ORDERSTATUS_HFT2VT: Dict[int, Status] = {
 }
 ORDERTYPE_HFT2VT: Dict[int, OrderType] = {
     OrderType_LMT: OrderType.LIMIT,
-    OrderType_B5TC: OrderType.MARKET
+    OrderType_B5TC: OrderType.MARKET    # 只有深交所支持
 }
 ORDERTYPE_VT2HFT: Dict[OrderType, int] = {
     v: k for k, v in ORDERTYPE_HFT2VT.items()
@@ -159,9 +109,9 @@ SIDE_VT2HFT: Dict[Any, int] = {
 }
 
 # 期权类型映射
-OPTIONTYPE_HFT2VT: Dict[str, OptionType] = {
-    "C": OptionType.CALL,
-    "P": OptionType.PUT
+OPTIONTYPE_HFT2VT: Dict[int, OptionType] = {
+    1: OptionType.CALL,
+    2: OptionType.PUT
 }
 
 # 其他常量
@@ -293,20 +243,10 @@ class HftMdApi(MdApi):
         self.gateway: HftOptionGateway = gateway
         self.gateway_name: str = gateway.gateway_name
 
-        self.userid: str = ""
-        self.password: str = ""
-        self.client_id: int = 0
-        self.server_ip: str = ""
-        self.server_port: int = 0
-        self.protocol: int = 0
-        self.session_id: int = 0
         self.date: str = ""
 
         self.connect_status: bool = False
         self.login_status: bool = False
-
-        self.sse_inited: bool = False
-        self.szse_inited: bool = False
 
     def onDisconnected(self, reason: int) -> None:
         """服务器连接断开回报"""
@@ -323,52 +263,8 @@ class HftMdApi(MdApi):
                 f"订阅失败，错误码{error['errcode']}，信息{error['errstr']}"
             )
 
-    def onMarketData(self, mk_type: int, symbol: str, data: dict) -> None:
-        """行情数据推送"""
-        print("onMarketData")
-        timestamp: str = f"{self.date} {str(data['nTime'])}"
-        dt: datetime = generate_datetime(timestamp)
-
-        tick: TickData = TickData(
-            symbol=symbol,
-            exchange=MK_HFT2VT[mk_type],
-            datetime=dt,
-            volume=data["iVolume"],
-            last_price=data["uMatch"] / 10000,
-            limit_up=data["uHighLimited"] / 10000,
-            limit_down=data["uLowLimited"] / 10000,
-            open_price=data["uOpen"] / 10000,
-            high_price=data["uHigh"] / 10000,
-            low_price=data["uLow"] / 10000,
-            pre_close=data["uPreClose"] / 10000,
-            gateway_name=self.gateway_name
-        )
-        contract: ContractData = symbol_contract_map[tick.symbol]
-
-        tick.bid_price_1, tick.bid_price_2, tick.bid_price_3, tick.bid_price_4, tick.bid_price_5 = data["bid"][0:5]
-        tick.ask_price_1, tick.ask_price_2, tick.ask_price_3, tick.ask_price_4, tick.ask_price_5 = data["ask"][0:5]
-        tick.bid_volume_1, tick.bid_volume_2, tick.bid_volume_3, tick.bid_volume_4, tick.bid_volume_5 = data["bid_qty"][0:5]
-        tick.ask_volume_1, tick.ask_volume_2, tick.ask_volume_3, tick.ask_volume_4, tick.ask_volume_5 = data["ask_qty"][0:5]
-
-        pricetick: float = contract.pricetick
-        if pricetick:
-            tick.bid_price_1 = round_to(tick.bid_price_1 / 10000, pricetick)
-            tick.bid_price_2 = round_to(tick.bid_price_2 / 10000, pricetick)
-            tick.bid_price_3 = round_to(tick.bid_price_3 / 10000, pricetick)
-            tick.bid_price_4 = round_to(tick.bid_price_4 / 10000, pricetick)
-            tick.bid_price_5 = round_to(tick.bid_price_5 / 10000, pricetick)
-            tick.ask_price_1 = round_to(tick.ask_price_1 / 10000, pricetick)
-            tick.ask_price_2 = round_to(tick.ask_price_2 / 10000, pricetick)
-            tick.ask_price_3 = round_to(tick.ask_price_3 / 10000, pricetick)
-            tick.ask_price_4 = round_to(tick.ask_price_4 / 10000, pricetick)
-            tick.ask_price_5 = round_to(tick.ask_price_5 / 10000, pricetick)
-
-        tick.name = contract.name
-        self.gateway.on_tick(tick)
-
     def onSHOption(self, code: str, data: dict) -> None:
         """上交所期权快照行情数据回调"""
-        # print("OnSHOption")
         timestamp: str = f"{self.date} {str(data['nTime'])}"
         dt: datetime = generate_datetime(timestamp)
 
@@ -377,36 +273,32 @@ class HftMdApi(MdApi):
             exchange=Exchange.SSE,
             datetime=dt,
             volume=data["iTotalVolumeTrade"],
-            last_price=data["iLastPx"],
-            limit_up=data["iDailyPriceUpLimit"],
-            limit_down=data["iDailyPriceDownLimit"],
+            last_price=data["iLastPx"] / 10000,
+            limit_up=data["iDailyPriceUpLimit"] / 10000,
+            limit_down=data["iDailyPriceDownLimit"] / 10000,
             open_price=data["iOpenPx"] / 10000,
             high_price=data["iHighPx"] / 10000,
             low_price=data["iLowPx"] / 10000,
             pre_close=data["iPreSettlPrice"] / 10000,
             gateway_name=self.gateway_name
         )
-        contract: ContractData = symbol_contract_map[tick.symbol]
 
-        tick.bid_price_1, tick.bid_price_2, tick.bid_price_3, tick.bid_price_4, tick.bid_price_5 = data["bid"][0:5]
-        tick.ask_price_1, tick.ask_price_2, tick.ask_price_3, tick.ask_price_4, tick.ask_price_5 = data["ask"][0:5]
+        tick.bid_price_1 = data["bid"][0] / 10000
+        tick.bid_price_2 = data["bid"][1] / 10000
+        tick.bid_price_3 = data["bid"][2] / 10000
+        tick.bid_price_4 = data["bid"][3] / 10000
+        tick.bid_price_5 = data["bid"][4] / 10000
+        tick.ask_price_1 = data["ask"][0] / 10000
+        tick.ask_price_2 = data["ask"][1] / 10000
+        tick.ask_price_3 = data["ask"][2] / 10000
+        tick.ask_price_4 = data["ask"][3] / 10000
+        tick.ask_price_5 = data["ask"][4] / 10000
         tick.bid_volume_1, tick.bid_volume_2, tick.bid_volume_3, tick.bid_volume_4, tick.bid_volume_5 = data["bid_qty"][0:5]
         tick.ask_volume_1, tick.ask_volume_2, tick.ask_volume_3, tick.ask_volume_4, tick.ask_volume_5 = data["ask_qty"][0:5]
-
-        pricetick: float = contract.pricetick
-        if pricetick:
-            tick.bid_price_1 = round_to(tick.bid_price_1 / 10000, pricetick)
-            tick.bid_price_2 = round_to(tick.bid_price_2 / 10000, pricetick)
-            tick.bid_price_3 = round_to(tick.bid_price_3 / 10000, pricetick)
-            tick.bid_price_4 = round_to(tick.bid_price_4 / 10000, pricetick)
-            tick.bid_price_5 = round_to(tick.bid_price_5 / 10000, pricetick)
-            tick.ask_price_1 = round_to(tick.ask_price_1 / 10000, pricetick)
-            tick.ask_price_2 = round_to(tick.ask_price_2 / 10000, pricetick)
-            tick.ask_price_3 = round_to(tick.ask_price_3 / 10000, pricetick)
-            tick.ask_price_4 = round_to(tick.ask_price_4 / 10000, pricetick)
-            tick.ask_price_5 = round_to(tick.ask_price_5 / 10000, pricetick)
-
-        tick.name = contract.name
+        
+        contract: ContractData = symbol_contract_map.get(tick.symbol, "")
+        if contract:
+            tick.name = contract.name
         self.gateway.on_tick(tick)
 
     def onSZOption(self, code: str, data: dict) -> None:
@@ -416,39 +308,35 @@ class HftMdApi(MdApi):
 
         tick: TickData = TickData(
             symbol=code,
-            exchange=Exchange.SSE,
+            exchange=Exchange.SZSE,
             datetime=dt,
             volume=data["i64TotalVolumeTrade"],
-            last_price=data["i64LastPrice"],
-            limit_up=data["i64PriceUpperLimit"],
-            limit_down=data["i64PriceLowerLimit"],
+            last_price=data["i64LastPrice"] / 10000,
+            limit_up=data["i64PriceUpperLimit"] / 10000,
+            limit_down=data["i64PriceLowerLimit"] / 10000,
             open_price=data["i64OpenPrice"] / 10000,
             high_price=data["i64HighPrice"] / 10000,
             low_price=data["i64LowPrice"] / 10000,
             pre_close=data["i64PrevClosePx"] / 10000,
             gateway_name=self.gateway_name
         )
-        contract: ContractData = symbol_contract_map[tick.symbol]
 
-        tick.bid_price_1, tick.bid_price_2, tick.bid_price_3, tick.bid_price_4, tick.bid_price_5 = data["bid"][0:5]
-        tick.ask_price_1, tick.ask_price_2, tick.ask_price_3, tick.ask_price_4, tick.ask_price_5 = data["ask"][0:5]
+        tick.bid_price_1 = data["bid"][0] / 10000
+        tick.bid_price_2 = data["bid"][1] / 10000
+        tick.bid_price_3 = data["bid"][2] / 10000
+        tick.bid_price_4 = data["bid"][3] / 10000
+        tick.bid_price_5 = data["bid"][4] / 10000
+        tick.ask_price_1 = data["ask"][0] / 10000
+        tick.ask_price_2 = data["ask"][1] / 10000
+        tick.ask_price_3 = data["ask"][2] / 10000
+        tick.ask_price_4 = data["ask"][3] / 10000
+        tick.ask_price_5 = data["ask"][4] / 10000
         tick.bid_volume_1, tick.bid_volume_2, tick.bid_volume_3, tick.bid_volume_4, tick.bid_volume_5 = data["bid_qty"][0:5]
         tick.ask_volume_1, tick.ask_volume_2, tick.ask_volume_3, tick.ask_volume_4, tick.ask_volume_5 = data["ask_qty"][0:5]
-
-        pricetick: float = contract.pricetick
-        if pricetick:
-            tick.bid_price_1 = round_to(tick.bid_price_1 / 10000, pricetick)
-            tick.bid_price_2 = round_to(tick.bid_price_2 / 10000, pricetick)
-            tick.bid_price_3 = round_to(tick.bid_price_3 / 10000, pricetick)
-            tick.bid_price_4 = round_to(tick.bid_price_4 / 10000, pricetick)
-            tick.bid_price_5 = round_to(tick.bid_price_5 / 10000, pricetick)
-            tick.ask_price_1 = round_to(tick.ask_price_1 / 10000, pricetick)
-            tick.ask_price_2 = round_to(tick.ask_price_2 / 10000, pricetick)
-            tick.ask_price_3 = round_to(tick.ask_price_3 / 10000, pricetick)
-            tick.ask_price_4 = round_to(tick.ask_price_4 / 10000, pricetick)
-            tick.ask_price_5 = round_to(tick.ask_price_5 / 10000, pricetick)
-
-        tick.name = contract.name
+        
+        contract: ContractData = symbol_contract_map.get(tick.symbol, "")
+        if contract:
+            tick.name = contract.name
         self.gateway.on_tick(tick)
 
     def connect(
@@ -466,7 +354,6 @@ class HftMdApi(MdApi):
         if not self.connect_status:
             self.initialize(cfg, False)
             n: int = self.login()
-            self.query_contract()
 
             if not n:
                 self.gateway.write_log("行情服务器登录成功")
@@ -487,73 +374,6 @@ class HftMdApi(MdApi):
             exchange = MK_VT2HFT.get(req.exchange, "")
             self.subscribeMarketData(exchange, req.symbol)
 
-    def query_contract(self) -> None:
-        """查询合约"""
-        # 8 -> 上交所期权
-        # 11 -> 深交所期权
-        self.subscribeBaseInfo(8)
-        self.subscribeBaseInfo(11)
-
-    def onSHOptionBaseInfo(self, code: str, data: dict) -> None:
-        """上交所期权合约查询回报"""
-        # print("onSHOptionBaseInfo", data)
-        contract: ContractData = ContractData(
-            gateway_name=self.gateway_name,
-            symbol=code,
-            exchange=Exchange.SSE,
-            name=data["sContractSymbol"],
-            product=Product.OPTION,
-            pricetick=data["uTickSize"],
-            size=data["uRoundLot"]
-        )
-        contract.option_underlying = (
-            data["sUnderlyingSecurityID"]
-            + "-"
-            + data["sExpireDate"]
-        )
-        contract.option_portfolio = data["sUnderlyingSecurityID"] + "_O"
-        contract.option_type = OPTIONTYPE_HFT2VT[data["cCallOrPut"]]
-        contract.option_strike = data["uExercisePrice"]
-        contract.option_expiry = datetime.strptime(
-            data["sExpireDate"], "%Y%m%d"
-        )
-        contract.option_index = get_option_index(
-            contract.option_strike, data["sSecurityID"]
-        )
-
-        self.gateway.on_contract(contract)
-        symbol_contract_map[contract.symbol] = contract
-
-    def onSZOptionBaseInfo(self, code: str, data: dict) -> None:
-        """深交所期权合约查询回报"""
-        print("onSZOptionBaseInfo", data)
-        contract: ContractData = ContractData(
-            gateway_name=self.gateway_name,
-            symbol=code,
-            exchange=Exchange.SZSE,
-            name=data["sSymbol"],
-            product=Product.OPTION,
-            pricetick=data["i64PriceTick"],
-            size=data["i64ContractUnit"]
-        )
-        contract.option_underlying = (
-            data["sUnderlyingSecurityID"]
-            + "-"
-            + str(data["nDeliveryDay"])
-        )
-        contract.option_portfolio = data["sUnderlyingSecurityID"] + "_O"
-        contract.option_type = OPTIONTYPE_HFT2VT[data["cCallOrPut"]]
-        contract.option_strike = data["i64ExercisePrice"]
-        contract.option_expiry = datetime.strptime(
-            str(data["nDeliveryDay"]), "%Y%m%d"
-        )
-        contract.option_index = get_option_index(
-            contract.option_strike, data["sSecurityID"]
-        )
-
-        self.gateway.on_contract(contract)
-        symbol_contract_map[contract.symbol] = contract
-
 
 class HftTdApi(OptionApi):
     """"""
@@ -571,10 +391,7 @@ class HftTdApi(OptionApi):
         self.connect_status: bool = False
         self.login_status: bool = False
 
-        self.userid: str = ""
-        self.password: str = ""
         self.orders: Dict[str, OrderData] = {}
-        self.short_positions: Dict[str, PositionData] = {}
 
         self.orderid_sysid_map: Dict[str, str] = {}
 
@@ -603,6 +420,7 @@ class HftTdApi(OptionApi):
 
             self.query_order()
             self.query_trade()
+            self.query_contract()
             self.gateway.init_query()
         else:
             self.gateway.write_error("交易服务器登录失败", error)
@@ -728,8 +546,11 @@ class HftTdApi(OptionApi):
             exchange=EXCHANGE_HFT2VT[exchange],
             direction=DIRECTION_HFT2VT[data["side"]],
             volume=data["volume"],
-            price=data["buy_cost"] / data["volume"],
         )
+
+        if pos.volume:
+            pos.price = (data["buy_cost"] / 10000) / pos.volume    # 还需除以合约乘数
+
         self.gateway.on_position(pos)
 
     def onQueryCashRsp(self, data: dict, error: dict, reqid: int) -> None:
@@ -741,6 +562,40 @@ class HftTdApi(OptionApi):
             gateway_name=self.gateway_name
         )
         self.gateway.on_account(account)
+
+    def onQueryContractInfoRsp(self, data: dict, error: dict, reqid: int, last: bool) -> None:
+        """"""
+        exchange, symbol = data["contract_id"].split(".")
+
+        contract: ContractData = ContractData(
+            gateway_name=self.gateway_name,
+            symbol=symbol,
+            exchange=EXCHANGE_HFT2VT[exchange],
+            name=data["contract_name"],
+            product=Product.OPTION,
+            pricetick=data["price_tick"] / 10000,
+            size=data["underlying_multiplier"]
+        )
+        contract.option_underlying = (
+            data["underlying_contract_id"]
+            + "-"
+            + str(data["expire_date"])
+        )
+        contract.option_portfolio = data["underlying_contract_id"] + "_O"
+        contract.option_type = OPTIONTYPE_HFT2VT[data["options_type"]]
+        contract.option_strike = data["strike_price"] / 10000
+        contract.option_expiry = datetime.strptime(
+            str(data["expire_date"]), "%Y%m%d"
+        )
+        contract.option_index = get_option_index(
+            contract.option_strike, data["exch_contract_id"]
+        )
+
+        self.gateway.on_contract(contract)
+        symbol_contract_map[contract.symbol] = contract
+
+        if last:
+            self.gateway.write_log("合约信息查询成功")
 
     def onQueryOrderRsp(
         self,
@@ -848,8 +703,6 @@ class HftTdApi(OptionApi):
         port: str,
     ) -> None:
         """连接服务器"""
-        self.userid = userid
-        self.password = password
         self.prefix = datetime.now().strftime("%Y%m%d%H%M%S")
 
         if not self.connect_status:
@@ -878,6 +731,15 @@ class HftTdApi(OptionApi):
             self.gateway.write_log(f"当前接口不支持该类型的委托{req.type.value}")
             return ""
 
+        exchange: Exchange = EXCHANGE_VT2HFT.get(req.exchange, None)
+        if not exchange:
+            self.gateway.write_log(f"不支持的交易所{req.exchange.value}")
+            return ""
+        
+        if req.type == OrderType.MARKET and exchange != Exchange.SZSE:
+            self.gateway.write_log(f"无效的报单价格类型{req.type.value}")
+            return ""
+
         if req.offset == Offset.NONE:
             self.gateway.write_log("委托失败，需要选择开平方向")
             return ""
@@ -886,7 +748,6 @@ class HftTdApi(OptionApi):
         suffix: str = str(self.order_count).rjust(6, "0")
         orderid: str = f"{self.prefix}_{suffix}"
 
-        exchange: Exchange = EXCHANGE_VT2HFT[req.exchange]
         hft_symbol: str = f"{exchange}.{req.symbol}"
 
         order_req: dict = {
@@ -926,6 +787,11 @@ class HftTdApi(OptionApi):
 
         self.reqid += 1
         self.queryTrades(hft_req, self.reqid)
+
+    def query_contract(self) -> None:
+        """查询成交"""
+        self.reqid += 1
+        self.queryContractInfo(self.reqid, "")
 
     def cancel_order(self, req: CancelRequest) -> None:
         """委托撤单"""
