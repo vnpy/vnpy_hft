@@ -159,9 +159,9 @@ SIDE_VT2HFT: Dict[Any, int] = {
 }
 
 # 期权类型映射
-OPTIONTYPE_HFT2VT: Dict[str, OptionType] = {
-    "C": OptionType.CALL,
-    "P": OptionType.PUT
+OPTIONTYPE_HFT2VT: Dict[int, OptionType] = {
+    1: OptionType.CALL,
+    2: OptionType.PUT
 }
 
 # 其他常量
