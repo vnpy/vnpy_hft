@@ -279,13 +279,6 @@ class HftMdApi(MdApi):
         self.gateway: HftStockGateway = gateway
         self.gateway_name: str = gateway.gateway_name
 
-        self.userid: str = ""
-        self.password: str = ""
-        self.client_id: int = 0
-        self.server_ip: str = ""
-        self.server_port: int = 0
-        self.protocol: int = 0
-        self.session_id: int = 0
         self.date: str = ""
 
         self.connect_status: bool = False
