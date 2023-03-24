@@ -328,27 +328,24 @@ class HftMdApi(MdApi):
             pre_close=data["uPreClose"] / 10000,
             gateway_name=self.gateway_name
         )
-        contract: ContractData = symbol_contract_map[tick.symbol]
 
-        tick.bid_price_1, tick.bid_price_2, tick.bid_price_3, tick.bid_price_4, tick.bid_price_5 = data["bid"][0:5]
-        tick.ask_price_1, tick.ask_price_2, tick.ask_price_3, tick.ask_price_4, tick.ask_price_5 = data["ask"][0:5]
+        tick.bid_price_1 = data["bid"][0] / 10000
+        tick.bid_price_2 = data["bid"][1] / 10000
+        tick.bid_price_3 = data["bid"][2] / 10000
+        tick.bid_price_4 = data["bid"][3] / 10000
+        tick.bid_price_5 = data["bid"][4] / 10000
+        tick.ask_price_1 = data["ask"][0] / 10000
+        tick.ask_price_2 = data["ask"][1] / 10000
+        tick.ask_price_3 = data["ask"][2] / 10000
+        tick.ask_price_4 = data["ask"][3] / 10000
+        tick.ask_price_5 = data["ask"][4] / 10000
         tick.bid_volume_1, tick.bid_volume_2, tick.bid_volume_3, tick.bid_volume_4, tick.bid_volume_5 = data["bid_qty"][0:5]
         tick.ask_volume_1, tick.ask_volume_2, tick.ask_volume_3, tick.ask_volume_4, tick.ask_volume_5 = data["ask_qty"][0:5]
+        
+        contract: ContractData = symbol_contract_map.get(tick.symbol, "")
+        if contract:
+            tick.name = contract.name
 
-        pricetick: float = contract.pricetick
-        if pricetick:
-            tick.bid_price_1 = round_to(tick.bid_price_1 / 10000, pricetick)
-            tick.bid_price_2 = round_to(tick.bid_price_2 / 10000, pricetick)
-            tick.bid_price_3 = round_to(tick.bid_price_3 / 10000, pricetick)
-            tick.bid_price_4 = round_to(tick.bid_price_4 / 10000, pricetick)
-            tick.bid_price_5 = round_to(tick.bid_price_5 / 10000, pricetick)
-            tick.ask_price_1 = round_to(tick.ask_price_1 / 10000, pricetick)
-            tick.ask_price_2 = round_to(tick.ask_price_2 / 10000, pricetick)
-            tick.ask_price_3 = round_to(tick.ask_price_3 / 10000, pricetick)
-            tick.ask_price_4 = round_to(tick.ask_price_4 / 10000, pricetick)
-            tick.ask_price_5 = round_to(tick.ask_price_5 / 10000, pricetick)
-
-        tick.name = contract.name
         self.gateway.on_tick(tick)
 
     def connect(
