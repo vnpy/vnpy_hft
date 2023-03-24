@@ -3069,4 +3069,3 @@ MSCreditDebtsFlowDetail = {
     "logassetsno": "string",
     "totalnum": "int64_t",
 }
-
