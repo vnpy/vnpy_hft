@@ -361,7 +361,7 @@ class HftMdApi(MdApi):
         self.date = datetime.now().strftime("%Y%m%d")
 
         if not self.connect_status:
-            self.createMdApi(cfg, False)
+            self.initialize(cfg, False)
             n: int = self.login()
             self.query_contract()
 
