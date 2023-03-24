@@ -51,11 +51,7 @@ from ..api.hft import (
     OrderStatus_CancelRejected,
     TradeReportType_Normal,
 )
-from ..api.sip import (
-    MdApi,
-    MKtype_SH,
-    MKtype_SZ,
-)
+from ..api.sip import MdApi, MKtype_SH, MKtype_SZ
 from .terminal_info import get_terminal_info
 
 
@@ -164,7 +160,7 @@ symbol_contract_map: Dict[str, ContractData] = {}
 
 class HftStockGateway(BaseGateway):
     """
-    VeighNa用于对接国泰君安的交易接口。
+    VeighNa用于对接国泰君安股票的交易接口。
     """
 
     default_name: str = "HFTSTOCK"
@@ -304,7 +300,7 @@ class HftMdApi(MdApi):
         self.login_status = False
         self.gateway.write_log(f"行情服务器连接断开, 原因{reason}")
 
-        self.login_server()
+        self.login()
 
     def onSubscribe(self, error) -> None:
         """订阅行情回报"""
