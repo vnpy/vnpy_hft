@@ -15,7 +15,7 @@ from vnpy.trader.constant import (
     OptionType
 )
 from vnpy.trader.gateway import BaseGateway
-from vnpy.trader.utility import round_to, get_folder_path, ZoneInfo
+from vnpy.trader.utility import get_folder_path, ZoneInfo
 from vnpy.trader.object import (
     TickData,
     OrderData,
@@ -325,7 +325,6 @@ class HftMdApi(MdApi):
 
     def onSHOption(self, code: str, data: dict) -> None:
         """上交所期权快照行情数据回调"""
-        # print("OnSHOption")
         timestamp: str = f"{self.date} {str(data['nTime'])}"
         dt: datetime = generate_datetime(timestamp)
 
@@ -334,36 +333,32 @@ class HftMdApi(MdApi):
             exchange=Exchange.SSE,
             datetime=dt,
             volume=data["iTotalVolumeTrade"],
-            last_price=data["iLastPx"],
-            limit_up=data["iDailyPriceUpLimit"],
-            limit_down=data["iDailyPriceDownLimit"],
+            last_price=data["iLastPx"] / 10000,
+            limit_up=data["iDailyPriceUpLimit"] / 10000,
+            limit_down=data["iDailyPriceDownLimit"] / 10000,
             open_price=data["iOpenPx"] / 10000,
             high_price=data["iHighPx"] / 10000,
             low_price=data["iLowPx"] / 10000,
             pre_close=data["iPreSettlPrice"] / 10000,
             gateway_name=self.gateway_name
         )
-        contract: ContractData = symbol_contract_map[tick.symbol]
 
-        tick.bid_price_1, tick.bid_price_2, tick.bid_price_3, tick.bid_price_4, tick.bid_price_5 = data["bid"][0:5]
-        tick.ask_price_1, tick.ask_price_2, tick.ask_price_3, tick.ask_price_4, tick.ask_price_5 = data["ask"][0:5]
+        tick.bid_price_1 = data["bid"][0] / 10000
+        tick.bid_price_2 = data["bid"][1] / 10000
+        tick.bid_price_3 = data["bid"][2] / 10000
+        tick.bid_price_4 = data["bid"][3] / 10000
+        tick.bid_price_5 = data["bid"][4] / 10000
+        tick.ask_price_1 = data["ask"][0] / 10000
+        tick.ask_price_2 = data["ask"][1] / 10000
+        tick.ask_price_3 = data["ask"][2] / 10000
+        tick.ask_price_4 = data["ask"][3] / 10000
+        tick.ask_price_5 = data["ask"][4] / 10000
         tick.bid_volume_1, tick.bid_volume_2, tick.bid_volume_3, tick.bid_volume_4, tick.bid_volume_5 = data["bid_qty"][0:5]
         tick.ask_volume_1, tick.ask_volume_2, tick.ask_volume_3, tick.ask_volume_4, tick.ask_volume_5 = data["ask_qty"][0:5]
-
-        pricetick: float = contract.pricetick
-        if pricetick:
-            tick.bid_price_1 = round_to(tick.bid_price_1 / 10000, pricetick)
-            tick.bid_price_2 = round_to(tick.bid_price_2 / 10000, pricetick)
-            tick.bid_price_3 = round_to(tick.bid_price_3 / 10000, pricetick)
-            tick.bid_price_4 = round_to(tick.bid_price_4 / 10000, pricetick)
-            tick.bid_price_5 = round_to(tick.bid_price_5 / 10000, pricetick)
-            tick.ask_price_1 = round_to(tick.ask_price_1 / 10000, pricetick)
-            tick.ask_price_2 = round_to(tick.ask_price_2 / 10000, pricetick)
-            tick.ask_price_3 = round_to(tick.ask_price_3 / 10000, pricetick)
-            tick.ask_price_4 = round_to(tick.ask_price_4 / 10000, pricetick)
-            tick.ask_price_5 = round_to(tick.ask_price_5 / 10000, pricetick)
-
-        tick.name = contract.name
+        
+        contract: ContractData = symbol_contract_map.get(tick.symbol, "")
+        if contract:
+            tick.name = contract.name
         self.gateway.on_tick(tick)
 
     def onSZOption(self, code: str, data: dict) -> None:
@@ -373,39 +368,35 @@ class HftMdApi(MdApi):
 
         tick: TickData = TickData(
             symbol=code,
-            exchange=Exchange.SSE,
+            exchange=Exchange.SZSE,
             datetime=dt,
             volume=data["i64TotalVolumeTrade"],
-            last_price=data["i64LastPrice"],
-            limit_up=data["i64PriceUpperLimit"],
-            limit_down=data["i64PriceLowerLimit"],
+            last_price=data["i64LastPrice"] / 10000,
+            limit_up=data["i64PriceUpperLimit"] / 10000,
+            limit_down=data["i64PriceLowerLimit"] / 10000,
             open_price=data["i64OpenPrice"] / 10000,
             high_price=data["i64HighPrice"] / 10000,
             low_price=data["i64LowPrice"] / 10000,
             pre_close=data["i64PrevClosePx"] / 10000,
             gateway_name=self.gateway_name
         )
-        contract: ContractData = symbol_contract_map[tick.symbol]
 
-        tick.bid_price_1, tick.bid_price_2, tick.bid_price_3, tick.bid_price_4, tick.bid_price_5 = data["bid"][0:5]
-        tick.ask_price_1, tick.ask_price_2, tick.ask_price_3, tick.ask_price_4, tick.ask_price_5 = data["ask"][0:5]
+        tick.bid_price_1 = data["bid"][0] / 10000
+        tick.bid_price_2 = data["bid"][1] / 10000
+        tick.bid_price_3 = data["bid"][2] / 10000
+        tick.bid_price_4 = data["bid"][3] / 10000
+        tick.bid_price_5 = data["bid"][4] / 10000
+        tick.ask_price_1 = data["ask"][0] / 10000
+        tick.ask_price_2 = data["ask"][1] / 10000
+        tick.ask_price_3 = data["ask"][2] / 10000
+        tick.ask_price_4 = data["ask"][3] / 10000
+        tick.ask_price_5 = data["ask"][4] / 10000
         tick.bid_volume_1, tick.bid_volume_2, tick.bid_volume_3, tick.bid_volume_4, tick.bid_volume_5 = data["bid_qty"][0:5]
         tick.ask_volume_1, tick.ask_volume_2, tick.ask_volume_3, tick.ask_volume_4, tick.ask_volume_5 = data["ask_qty"][0:5]
-
-        pricetick: float = contract.pricetick
-        if pricetick:
-            tick.bid_price_1 = round_to(tick.bid_price_1 / 10000, pricetick)
-            tick.bid_price_2 = round_to(tick.bid_price_2 / 10000, pricetick)
-            tick.bid_price_3 = round_to(tick.bid_price_3 / 10000, pricetick)
-            tick.bid_price_4 = round_to(tick.bid_price_4 / 10000, pricetick)
-            tick.bid_price_5 = round_to(tick.bid_price_5 / 10000, pricetick)
-            tick.ask_price_1 = round_to(tick.ask_price_1 / 10000, pricetick)
-            tick.ask_price_2 = round_to(tick.ask_price_2 / 10000, pricetick)
-            tick.ask_price_3 = round_to(tick.ask_price_3 / 10000, pricetick)
-            tick.ask_price_4 = round_to(tick.ask_price_4 / 10000, pricetick)
-            tick.ask_price_5 = round_to(tick.ask_price_5 / 10000, pricetick)
-
-        tick.name = contract.name
+        
+        contract: ContractData = symbol_contract_map.get(tick.symbol, "")
+        if contract:
+            tick.name = contract.name
         self.gateway.on_tick(tick)
 
     def connect(
