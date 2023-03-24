@@ -466,7 +466,6 @@ class HftMdApi(MdApi):
         if not self.connect_status:
             self.initialize(cfg, False)
             n: int = self.login()
-            self.query_contract()
 
             if not n:
                 self.gateway.write_log("行情服务器登录成功")
@@ -486,73 +485,6 @@ class HftMdApi(MdApi):
         if self.login_status:
             exchange = MK_VT2HFT.get(req.exchange, "")
             self.subscribeMarketData(exchange, req.symbol)
-
-    def query_contract(self) -> None:
-        """查询合约"""
-        # 8 -> 上交所期权
-        # 11 -> 深交所期权
-        self.subscribeBaseInfo(8)
-        self.subscribeBaseInfo(11)
-
-    def onSHOptionBaseInfo(self, code: str, data: dict) -> None:
-        """上交所期权合约查询回报"""
-        # print("onSHOptionBaseInfo", data)
-        contract: ContractData = ContractData(
-            gateway_name=self.gateway_name,
-            symbol=code,
-            exchange=Exchange.SSE,
-            name=data["sContractSymbol"],
-            product=Product.OPTION,
-            pricetick=data["uTickSize"],
-            size=data["uRoundLot"]
-        )
-        contract.option_underlying = (
-            data["sUnderlyingSecurityID"]
-            + "-"
-            + data["sExpireDate"]
-        )
-        contract.option_portfolio = data["sUnderlyingSecurityID"] + "_O"
-        contract.option_type = OPTIONTYPE_HFT2VT[data["cCallOrPut"]]
-        contract.option_strike = data["uExercisePrice"]
-        contract.option_expiry = datetime.strptime(
-            data["sExpireDate"], "%Y%m%d"
-        )
-        contract.option_index = get_option_index(
-            contract.option_strike, data["sSecurityID"]
-        )
-
-        self.gateway.on_contract(contract)
-        symbol_contract_map[contract.symbol] = contract
-
-    def onSZOptionBaseInfo(self, code: str, data: dict) -> None:
-        """深交所期权合约查询回报"""
-        print("onSZOptionBaseInfo", data)
-        contract: ContractData = ContractData(
-            gateway_name=self.gateway_name,
-            symbol=code,
-            exchange=Exchange.SZSE,
-            name=data["sSymbol"],
-            product=Product.OPTION,
-            pricetick=data["i64PriceTick"],
-            size=data["i64ContractUnit"]
-        )
-        contract.option_underlying = (
-            data["sUnderlyingSecurityID"]
-            + "-"
-            + str(data["nDeliveryDay"])
-        )
-        contract.option_portfolio = data["sUnderlyingSecurityID"] + "_O"
-        contract.option_type = OPTIONTYPE_HFT2VT[data["cCallOrPut"]]
-        contract.option_strike = data["i64ExercisePrice"]
-        contract.option_expiry = datetime.strptime(
-            str(data["nDeliveryDay"]), "%Y%m%d"
-        )
-        contract.option_index = get_option_index(
-            contract.option_strike, data["sSecurityID"]
-        )
-
-        self.gateway.on_contract(contract)
-        symbol_contract_map[contract.symbol] = contract
 
 
 class HftTdApi(OptionApi):
@@ -603,6 +535,7 @@ class HftTdApi(OptionApi):
 
             self.query_order()
             self.query_trade()
+            self.query_contract()
             self.gateway.init_query()
         else:
             self.gateway.write_error("交易服务器登录失败", error)
@@ -741,6 +674,40 @@ class HftTdApi(OptionApi):
             gateway_name=self.gateway_name
         )
         self.gateway.on_account(account)
+
+    def onQueryContractInfoRsp(self, data: dict, error: dict, reqid: int, last: bool) -> None:
+        """"""
+        exchange, symbol = data["contract_id"].split(".")
+
+        contract: ContractData = ContractData(
+            gateway_name=self.gateway_name,
+            symbol=symbol,
+            exchange=EXCHANGE_HFT2VT[exchange],
+            name=data["contract_name"],
+            product=Product.OPTION,
+            pricetick=data["price_tick"] / 10000,
+            size=data["underlying_multiplier"]
+        )
+        contract.option_underlying = (
+            data["underlying_contract_id"]
+            + "-"
+            + str(data["expire_date"])
+        )
+        contract.option_portfolio = data["underlying_contract_id"] + "_O"
+        contract.option_type = OPTIONTYPE_HFT2VT[data["options_type"]]
+        contract.option_strike = data["strike_price"] / 10000
+        contract.option_expiry = datetime.strptime(
+            str(data["expire_date"]), "%Y%m%d"
+        )
+        contract.option_index = get_option_index(
+            contract.option_strike, data["exch_contract_id"]
+        )
+
+        self.gateway.on_contract(contract)
+        symbol_contract_map[contract.symbol] = contract
+
+        if last:
+            self.gateway.write_log("合约信息查询成功")
 
     def onQueryOrderRsp(
         self,
@@ -926,6 +893,11 @@ class HftTdApi(OptionApi):
 
         self.reqid += 1
         self.queryTrades(hft_req, self.reqid)
+
+    def query_contract(self) -> None:
+        """查询成交"""
+        self.reqid += 1
+        self.queryContractInfo(self.reqid, "")
 
     def cancel_order(self, req: CancelRequest) -> None:
         """委托撤单"""
