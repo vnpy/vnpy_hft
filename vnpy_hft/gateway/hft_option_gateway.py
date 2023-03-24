@@ -78,7 +78,7 @@ ORDERSTATUS_HFT2VT: Dict[int, Status] = {
 }
 ORDERTYPE_HFT2VT: Dict[int, OrderType] = {
     OrderType_LMT: OrderType.LIMIT,
-    OrderType_B5TC: OrderType.MARKET
+    OrderType_B5TC: OrderType.MARKET    # 只有深交所支持
 }
 ORDERTYPE_VT2HFT: Dict[OrderType, int] = {
     v: k for k, v in ORDERTYPE_HFT2VT.items()
@@ -746,6 +746,15 @@ class HftTdApi(OptionApi):
             self.gateway.write_log(f"当前接口不支持该类型的委托{req.type.value}")
             return ""
 
+        exchange: Exchange = EXCHANGE_VT2HFT.get(req.exchange, None)
+        if not exchange:
+            self.gateway.write_log(f"不支持的交易所{req.exchange.value}")
+            return ""
+        
+        if req.type == OrderType.MARKET and exchange != Exchange.SZSE:
+            self.gateway.write_log(f"无效的报单价格类型{req.type.value}")
+            return ""
+
         if req.offset == Offset.NONE:
             self.gateway.write_log("委托失败，需要选择开平方向")
             return ""
@@ -754,7 +763,6 @@ class HftTdApi(OptionApi):
         suffix: str = str(self.order_count).rjust(6, "0")
         orderid: str = f"{self.prefix}_{suffix}"
 
-        exchange: Exchange = EXCHANGE_VT2HFT[req.exchange]
         hft_symbol: str = f"{exchange}.{req.symbol}"
 
         order_req: dict = {
