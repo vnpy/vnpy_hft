@@ -51,11 +51,7 @@ from ..api.hft import (
     OrderStatus_CancelRejected,
     TradeReportType_Normal,
 )
-from ..api.sip import (
-    MdApi,
-    MKtype_SH,
-    MKtype_SZ,
-)
+from ..api.sip import MdApi, MKtype_SH, MKtype_SZ
 from .terminal_info import get_terminal_info
 
 
@@ -162,12 +158,12 @@ CHINA_TZ = ZoneInfo("Asia/Shanghai")            # 中国时区
 symbol_contract_map: Dict[str, ContractData] = {}
 
 
-class HftGateway(BaseGateway):
+class HftStockGateway(BaseGateway):
     """
-    VeighNa用于对接国泰君安的交易接口。
+    VeighNa用于对接国泰君安股票的交易接口。
     """
 
-    default_name: str = "HFT"
+    default_name: str = "HFTSTOCK"
 
     default_setting: Dict[str, str] = {
         "交易用户名": "",
@@ -276,20 +272,13 @@ class HftGateway(BaseGateway):
 
 class HftMdApi(MdApi):
 
-    def __init__(self, gateway: HftGateway) -> None:
+    def __init__(self, gateway: HftStockGateway) -> None:
         """构造函数"""
         super().__init__()
 
-        self.gateway: HftGateway = gateway
+        self.gateway: HftStockGateway = gateway
         self.gateway_name: str = gateway.gateway_name
 
-        self.userid: str = ""
-        self.password: str = ""
-        self.client_id: int = 0
-        self.server_ip: str = ""
-        self.server_port: int = 0
-        self.protocol: int = 0
-        self.session_id: int = 0
         self.date: str = ""
 
         self.connect_status: bool = False
@@ -304,7 +293,7 @@ class HftMdApi(MdApi):
         self.login_status = False
         self.gateway.write_log(f"行情服务器连接断开, 原因{reason}")
 
-        self.login_server()
+        self.login()
 
     def onSubscribe(self, error) -> None:
         """订阅行情回报"""
@@ -332,27 +321,24 @@ class HftMdApi(MdApi):
             pre_close=data["uPreClose"] / 10000,
             gateway_name=self.gateway_name
         )
-        contract: ContractData = symbol_contract_map[tick.symbol]
 
-        tick.bid_price_1, tick.bid_price_2, tick.bid_price_3, tick.bid_price_4, tick.bid_price_5 = data["bid"][0:5]
-        tick.ask_price_1, tick.ask_price_2, tick.ask_price_3, tick.ask_price_4, tick.ask_price_5 = data["ask"][0:5]
+        tick.bid_price_1 = data["bid"][0] / 10000
+        tick.bid_price_2 = data["bid"][1] / 10000
+        tick.bid_price_3 = data["bid"][2] / 10000
+        tick.bid_price_4 = data["bid"][3] / 10000
+        tick.bid_price_5 = data["bid"][4] / 10000
+        tick.ask_price_1 = data["ask"][0] / 10000
+        tick.ask_price_2 = data["ask"][1] / 10000
+        tick.ask_price_3 = data["ask"][2] / 10000
+        tick.ask_price_4 = data["ask"][3] / 10000
+        tick.ask_price_5 = data["ask"][4] / 10000
         tick.bid_volume_1, tick.bid_volume_2, tick.bid_volume_3, tick.bid_volume_4, tick.bid_volume_5 = data["bid_qty"][0:5]
         tick.ask_volume_1, tick.ask_volume_2, tick.ask_volume_3, tick.ask_volume_4, tick.ask_volume_5 = data["ask_qty"][0:5]
+        
+        contract: ContractData = symbol_contract_map.get(tick.symbol, "")
+        if contract:
+            tick.name = contract.name
 
-        pricetick: float = contract.pricetick
-        if pricetick:
-            tick.bid_price_1 = round_to(tick.bid_price_1 / 10000, pricetick)
-            tick.bid_price_2 = round_to(tick.bid_price_2 / 10000, pricetick)
-            tick.bid_price_3 = round_to(tick.bid_price_3 / 10000, pricetick)
-            tick.bid_price_4 = round_to(tick.bid_price_4 / 10000, pricetick)
-            tick.bid_price_5 = round_to(tick.bid_price_5 / 10000, pricetick)
-            tick.ask_price_1 = round_to(tick.ask_price_1 / 10000, pricetick)
-            tick.ask_price_2 = round_to(tick.ask_price_2 / 10000, pricetick)
-            tick.ask_price_3 = round_to(tick.ask_price_3 / 10000, pricetick)
-            tick.ask_price_4 = round_to(tick.ask_price_4 / 10000, pricetick)
-            tick.ask_price_5 = round_to(tick.ask_price_5 / 10000, pricetick)
-
-        tick.name = contract.name
         self.gateway.on_tick(tick)
 
     def connect(
@@ -368,7 +354,7 @@ class HftMdApi(MdApi):
         self.date = datetime.now().strftime("%Y%m%d")
 
         if not self.connect_status:
-            self.createMdApi(cfg, False)
+            self.initialize(cfg, False)
             n: int = self.login()
             self.query_contract()
 
@@ -444,7 +430,7 @@ class HftTdApi(TdApi):
         """构造函数"""
         super().__init__()
 
-        self.gateway: HftGateway = gateway
+        self.gateway: HftStockGateway = gateway
         self.gateway_name: str = gateway.gateway_name
 
         self.reqid: int = 0
