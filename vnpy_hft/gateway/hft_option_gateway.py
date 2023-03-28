@@ -547,9 +547,10 @@ class HftTdApi(OptionApi):
             direction=DIRECTION_HFT2VT[data["side"]],
             volume=data["volume"],
         )
+        size: int = data.get("underlying_multiple", 10000)
 
         if pos.volume:
-            pos.price = (data["buy_cost"] / 10000) / pos.volume    # 还需除以合约乘数
+            pos.price = ((data["buy_cost"] / 10000) / pos.volume) / size
 
         self.gateway.on_position(pos)
 
@@ -564,7 +565,7 @@ class HftTdApi(OptionApi):
         self.gateway.on_account(account)
 
     def onQueryContractInfoRsp(self, data: dict, error: dict, reqid: int, last: bool) -> None:
-        """"""
+        """期权合约信息查询回报"""
         exchange, symbol = data["contract_id"].split(".")
 
         contract: ContractData = ContractData(
@@ -603,7 +604,7 @@ class HftTdApi(OptionApi):
         error: dict,
         reqid: int,
         last: bool,
-        pos: str
+        pos_str: str
     ) -> None:
         """未成交委托查询回报"""
         if not error["err_code"]:
@@ -639,10 +640,10 @@ class HftTdApi(OptionApi):
             self.gateway.on_order(order)
 
             if last:
-                self.query_order(pos)
+                self.query_order(pos_str)
 
         elif error["err_code"] != 14020:
-            self.gateway.write_error(error)
+            self.gateway.write_error("委托查询", error)
 
         else:
             self.gateway.write_log("查询委托信息成功")
@@ -653,7 +654,7 @@ class HftTdApi(OptionApi):
         error: dict,
         reqid: int,
         last: bool,
-        pos: str
+        pos_str: str
     ) -> None:
         """成交信息查询回报"""
         if not error["err_code"]:
@@ -684,10 +685,10 @@ class HftTdApi(OptionApi):
             self.gateway.on_trade(trade)
 
             if last:
-                self.query_trade(pos)
+                self.query_trade(pos_str)
 
         elif error["err_code"] != 14020:
-            self.gateway.write_error(error)
+            self.gateway.write_error("成交查询", error)
 
         else:
             self.gateway.write_log("查询成交信息成功")
