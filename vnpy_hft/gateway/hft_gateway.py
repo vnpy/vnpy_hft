@@ -230,7 +230,7 @@ class HftGateway(BaseGateway):
 
     def send_order(self, req: OrderRequest) -> str:
         """委托下单"""
-        self.td_api.send_order(req)
+        return self.td_api.send_order(req)
 
     def cancel_order(self, req: CancelRequest) -> None:
         """委托撤单"""
