@@ -3,6 +3,7 @@ import json
 from datetime import datetime
 from typing import Dict, List, Any
 from pathlib import Path
+from decimal import Decimal
 
 from vnpy.event import EventEngine
 from vnpy.trader.constant import (
@@ -230,7 +231,7 @@ class HftGateway(BaseGateway):
 
     def send_order(self, req: OrderRequest) -> str:
         """委托下单"""
-        self.td_api.send_order(req)
+        return self.td_api.send_order(req)
 
     def cancel_order(self, req: CancelRequest) -> None:
         """委托撤单"""
@@ -816,7 +817,7 @@ class HftTdApi(TdApi):
             "symbol": hft_symbol,
             "order_type": ORDERTYPE_VT2HFT[req.type],
             "volume": int(req.volume),
-            "price": int(req.price * 10000),
+            "price": int(Decimal(str(req.price)) * 10000), # int(req.price * 10000),
             "side": SIDE_VT2HFT[(req.direction, req.offset)]
         }
 
